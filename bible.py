@@ -782,5 +782,4 @@ current_mode = 1
 problem_num = 0
 problem_completed = False
 display_problem(current_mode)
-
 root.mainloop()
