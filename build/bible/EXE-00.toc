@@ -3025,7 +3025,7 @@
  [],
  False,
  False,
- 1756430530,
+ 1756430868,
  [('run.exe',
    'C:\\Users\\나정우\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
    'EXECUTABLE')],
