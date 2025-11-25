@@ -6,6 +6,7 @@ import re
 import sys
 import os
 import json
+import shutil
 from pathlib import Path
 
 # --- Configuration & Constants ---
@@ -205,19 +206,14 @@ class BibleApp(ctk.CTk):
         # Management Menu
         manage_menu = tk.Menu(menubar, tearoff=0)
         
-        # Day Selection Submenu
-        self.day_menu = tk.Menu(manage_menu, tearoff=0)
-        manage_menu.add_cascade(label="일차 선택", menu=self.day_menu)
-        manage_menu.add_separator()
-        
         manage_menu.add_command(label="일차 추가", command=self.open_add_day_popup)
+        manage_menu.add_command(label="일차 삭제", command=self.delete_file_popup)
         manage_menu.add_command(label="구절 추가", command=self.open_add_verse_popup)
-        manage_menu.add_command(label="구절 삭제", command=self.delete_verse_popup)
         manage_menu.add_command(label="구절 수정", command=self.open_edit_verse_popup)
-        manage_menu.add_command(label="파일 삭제", command=self.delete_file_popup)
+        manage_menu.add_command(label="구절 삭제", command=self.delete_verse_popup)
         manage_menu.add_separator()
-        manage_menu.add_command(label="데이터 폴더 등록", command=self.register_data_folder)
-        manage_menu.add_command(label="데이터 폴더 열기", command=self.open_data_folder)
+        manage_menu.add_command(label="파일 내보내기", command=self.export_file_popup)
+        manage_menu.add_command(label="파일 가져오기", command=self.import_file_popup)
         menubar.add_cascade(label="관리", menu=manage_menu)
         
         # View Menu (Theme)
@@ -230,11 +226,6 @@ class BibleApp(ctk.CTk):
         self.refresh_day_menu()
 
     def refresh_day_menu(self):
-        self.day_menu.delete(0, tk.END)
-        for i, fname in enumerate(self.original_filenames):
-            label = fname.replace(".txt", "")
-            self.day_menu.add_command(label=label, command=lambda idx=i: self.select_day(idx))
-        
         # Update ComboBox if exists
         if hasattr(self, 'day_combo'):
             self.day_combo.configure(values=[f.replace(".txt", "") for f in self.original_filenames])
@@ -263,6 +254,97 @@ class BibleApp(ctk.CTk):
         self.load_data()
         self.refresh_day_menu()
         messagebox.showinfo("성공", f"폴더가 등록되었습니다.\n{folder_path}")
+
+    def export_file_popup(self):
+        if not self.original_filenames:
+            messagebox.showinfo("알림", "내보낼 파일이 없습니다.")
+            return
+            
+        win = ctk.CTkToplevel(self)
+        win.title("파일 내보내기")
+        win.geometry("300x150")
+        win.grab_set()
+
+        ctk.CTkLabel(win, text="내보낼 파일 선택").pack(pady=10)
+        file_var = ctk.StringVar(value=self.original_filenames[0])
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var)
+        file_cb.pack(pady=5)
+
+        def export():
+            fname = file_var.get()
+            
+            # Find source path
+            src_path = ""
+            bundled_data_dir = resource_path("data")
+            if getattr(sys, 'frozen', False):
+                local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+            else:
+                local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+            # Check local first, then bundled, then custom
+            possible_dirs = [local_data_dir, bundled_data_dir] + self.config_data.get("custom_data_paths", [])
+            
+            for d in possible_dirs:
+                p = os.path.join(d, fname)
+                if os.path.exists(p):
+                    src_path = p
+                    break
+            
+            if not src_path:
+                messagebox.showerror("오류", "원본 파일을 찾을 수 없습니다.")
+                return
+
+            from tkinter import filedialog
+            dest_path = filedialog.asksaveasfilename(
+                defaultextension=".txt",
+                filetypes=[("Text files", "*.txt")],
+                initialfile=fname,
+                title="다른 이름으로 저장"
+            )
+            
+            if dest_path:
+                try:
+                    shutil.copy2(src_path, dest_path)
+                    messagebox.showinfo("성공", f"파일이 내보내졌습니다.\n{dest_path}")
+                    win.destroy()
+                except Exception as e:
+                    messagebox.showerror("오류", str(e))
+
+        ctk.CTkButton(win, text="내보내기", command=export).pack(pady=20)
+
+    def import_file_popup(self):
+        from tkinter import filedialog
+        src_path = filedialog.askopenfilename(
+            filetypes=[("Text files", "*.txt")],
+            title="가져올 파일 선택"
+        )
+        
+        if not src_path:
+            return
+            
+        fname = os.path.basename(src_path)
+        
+        if getattr(sys, 'frozen', False):
+            local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+        else:
+            local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+            
+        if not os.path.exists(local_data_dir):
+            os.makedirs(local_data_dir)
+            
+        dest_path = os.path.join(local_data_dir, fname)
+        
+        if os.path.exists(dest_path):
+            if not messagebox.askyesno("확인", f"'{fname}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?"):
+                return
+        
+        try:
+            shutil.copy2(src_path, dest_path)
+            messagebox.showinfo("성공", "파일을 가져왔습니다.")
+            self.load_data()
+            self.refresh_day_menu()
+        except Exception as e:
+            messagebox.showerror("오류", str(e))
 
     def create_widgets(self):
         self.grid_columnconfigure(0, weight=1)
@@ -739,11 +821,11 @@ class BibleApp(ctk.CTk):
         if not self.original_filenames: return
         
         win = ctk.CTkToplevel(self)
-        win.title("파일 삭제")
+        win.title("일차 삭제")
         win.geometry("300x150")
         win.grab_set()
 
-        ctk.CTkLabel(win, text="삭제할 파일").pack(pady=10)
+        ctk.CTkLabel(win, text="삭제할 일차").pack(pady=10)
         file_var = ctk.StringVar(value=self.original_filenames[0])
         file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var)
         file_cb.pack(pady=5)
