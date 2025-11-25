@@ -30,9 +30,30 @@ def mask_one_keep_punct(tok: str) -> str:
     return re.sub(r'[0-9A-Za-z가-힣]+', '_', tok)
 
 def parse_ref_parts(ref: str):
-    s = ref.strip()[1:-1]
-    book, chap_verse = s.split()
-    chap, verse = chap_verse.split(':', 1)
+    s = ref.strip()
+    if s.startswith('(') and s.endswith(')'):
+        s = s[1:-1]
+    
+    # Try splitting by last space first (standard format: Book Chap:Verse)
+    parts = s.rsplit(None, 1)
+    if len(parts) == 2:
+        book, chap_verse = parts
+    else:
+        # Fallback: try to find where the number starts
+        m = re.search(r'\d', s)
+        if m:
+            idx = m.start()
+            book = s[:idx].strip()
+            chap_verse = s[idx:].strip()
+        else:
+            # No numbers found, treat whole as book
+            return s, "0", "0"
+
+    if ':' in chap_verse:
+        chap, verse = chap_verse.split(':', 1)
+    else:
+        chap, verse = chap_verse, "0"
+        
     return book, chap, verse
 
 def split_verse_parts(verse: str):
