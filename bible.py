@@ -1,785 +1,950 @@
-# noinspection PyInterpreter
+import customtkinter as ctk
 import tkinter as tk
+from tkinter import messagebox
 import random
 import re
-from tkinter import font as tkFont
-from tkinter import ttk
-import sys, os
+import sys
+import os
+import json
 from pathlib import Path
-from tkinter import messagebox
 
-if sys.platform == "win32":
-    import ctypes
-    try:
-        # Per-Monitor DPI Aware v2 (가장 선명)
-        ctypes.windll.user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
-    except Exception:
-        try:
-            # Per-Monitor DPI Aware (대안)
-            ctypes.windll.shcore.SetProcessDpiAwareness(2)
-        except Exception:
-            try:
-                # System DPI Aware (최후 대안)
-                ctypes.windll.user32.SetProcessDPIAware()
-            except Exception:
-                pass
+# --- Configuration & Constants ---
+ctk.set_appearance_mode("System")
+ctk.set_default_color_theme("blue")
 
-PUNCT_RE = re.compile(r'[,\-]')  # 쉼표/하이픈 무시용
+PUNCT_RE = re.compile(r'[,\-]')
+WORD_TOKEN_RE = re.compile(r'[0-9A-Za-z가-힣]')
 
-WORD_TOKEN_RE = re.compile(r'[0-9A-Za-z가-힣]')   # 글자가 하나라도 있는지
-PUNCT_RE = re.compile(r'[,\-/]')                 # ← 슬래시도 무시 대상에 포함
+def resource_path(rel: str) -> str:
+    base = getattr(sys, "_MEIPASS", Path(__file__).parent)
+    return str(Path(base, rel))
 
 def norm_token(s: str) -> str:
-    return PUNCT_RE.sub('', s).strip()
-
-def norm_token(s: str) -> str:
-    """채점 및 정답 저장용: 쉼표/하이픈 제거."""
     return PUNCT_RE.sub('', s).strip()
 
 def mask_len_keep_punct(tok: str) -> str:
-    """모드1: 길이 힌트 O, 문장부호는 그대로."""
     return re.sub(r'[0-9A-Za-z가-힣]+', lambda m: '_' * len(m.group(0)), tok)
 
 def mask_one_keep_punct(tok: str) -> str:
-    """모드2/4: 길이 힌트 X, 문장부호는 그대로."""
     return re.sub(r'[0-9A-Za-z가-힣]+', '_', tok)
 
 def parse_ref_parts(ref: str):
-    """
-    '(요 5:38-39)' -> ('요','5','38-39')
-    항상 괄호로 들어온다고 가정.
-    """
-    s = ref.strip()[1:-1]  # 괄호 제거
+    s = ref.strip()[1:-1]
     book, chap_verse = s.split()
     chap, verse = chap_verse.split(':', 1)
     return book, chap, verse
 
 def split_verse_parts(verse: str):
-    """
-    '38-39' -> ('_-_', ['38','39'])
-    '37,39' -> ('_,_', ['37','39'])
-    '39'    -> ('_',   ['39'])
-    """
     if '-' in verse:
         a, b = verse.split('-', 1)
         return '_-_', [a, b]
     if ',' in verse:
         parts = [p.strip() for p in verse.split(',') if p.strip()]
-        # 파트 개수만큼 '_'와 ','를 섞어 마스크 문자열 생성 (예: '_,_,_' 등)
         mask = ','.join(['_'] * len(parts))
         return mask, parts
     return '_', [verse]
 
 def ref_masked(ref: str, masked: bool) -> str:
-    """
-    masked=False: 원문 장절 그대로 (괄호 유지)
-    masked=True : 책/장 가리고 절은 split 규칙에 맞춘 마스크, (괄호 유지)
-                  예: (요 5:38-39) -> (_ _:_-_)
-                      (요 5:37,39) -> (_ _:_,_)
-                      (요 5:39)    -> (_ _:_)
-    """
     book, chap, verse = parse_ref_parts(ref)
     if not masked:
         return f"({book} {chap}:{verse})"
     verse_mask, _ = split_verse_parts(verse)
     return f"(_ _:{verse_mask})"
 
-# 문제를 생성하는 함수
-def create_blank_problem(scripture, mode):
-    global blank_num, whole_level_num
-    reference, verse = scripture.split('^')
-    words = verse.split()
-    num_words = len(words)
-    answers = []
-    print(reference, verse, "\n")
-    
-    if mode == 1:
-        num_words = len(words)
-        num_blanks = int(num_words * max(blank_num, 0) * 0.1)
-        num_blanks = max(0, min(num_blanks, num_words))
-        maskable_idx = [i for i, w in enumerate(words) if WORD_TOKEN_RE.search(w)]
-        num_blanks = min(num_blanks, len(maskable_idx))
-        blank_indices = sorted(random.sample(maskable_idx, num_blanks)) if num_blanks else []
+class ConfigManager:
+    def __init__(self, filename="settings.json"):
+        self.filename = filename
+        self.default_config = {
+            "theme": "System",
+            "font_size": 24,
+            "last_day_index": 0,
+            "custom_data_paths": []
+        }
+        
+    @property
+    def filepath(self):
+        if getattr(sys, 'frozen', False):
+            base_dir = os.path.dirname(sys.executable)
+        else:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(base_dir, self.filename)
 
-        # 정답은 문장부호 제거본으로 저장(중복 쉼표 방지)
-        answers = [norm_token(words[i]) for i in blank_indices]
-
-        # 화면은 길이 힌트 O + 문장부호 보존
-        problem_words = [
-            (mask_len_keep_punct(w) if i in blank_indices else w)
-            for i, w in enumerate(words)
-        ]
-
-        # 장절 공개(괄호 유지)
-        ref_view = ref_masked(reference, masked=False)
-        problem_text = ref_view + " " + " ".join(problem_words)
-        return problem_text, answers, reference
-
-    elif mode == 2:
-        answers = [norm_token(w) for w in words if WORD_TOKEN_RE.search(w)]
-        problem_words = [
-            (mask_one_keep_punct(w) if WORD_TOKEN_RE.search(w) else w)
-            for w in words
-        ]
-        ref_view = ref_masked(reference, masked=False)
-        problem_text = ref_view + " " + " ".join(problem_words)
-        return problem_text, answers, reference
-
-    elif mode == 3:
-        book, chap, verse = parse_ref_parts(reference)
-        verse_mask, verse_parts = split_verse_parts(verse)
-
-        # 장절은 마스크로, 본문은 공개
-        ref_view = ref_masked(reference, masked=True)
-        problem_text = ref_view + " " + " ".join(words)
-
-        # 정답 순서: 책, 장, 절의 각 파트  (예: 38-39 -> ['38','39'])
-        answers = [book, chap] + verse_parts
-        return problem_text, answers, reference
-
-    elif mode == 4:
-        n = min(whole_level_num, len(words))
-        rand_index = random.randint(0, len(words) - n)
-        visible_words = words[rand_index:rand_index + n]
-
-        first_occurrence = True
-        problem_words = []
-        i = 0
-        while i < len(words):
-            if first_occurrence and i <= len(words) - n and words[i:i+n] == visible_words:
-                problem_words.extend(visible_words)      # 이 블록 공개
-                first_occurrence = False
-                i += n
-            else:
-                w = words[i]
-                problem_words.append(mask_one_keep_punct(w))  # 힌트 X
-                i += 1
-
-        # 장절 마스킹
-        book, chap, verse = parse_ref_parts(reference)
-        verse_mask, verse_parts = split_verse_parts(verse)
-        ref_view = ref_masked(reference, masked=True)
-
-        problem_text = ref_view + " " + " ".join(problem_words)
-
-        answers = [book, chap] + verse_parts
-
-        i = 0
-        skipped_once = False
-        while i < len(words):
-            if (not skipped_once) and i <= len(words) - n and words[i:i+n] == visible_words:
-                skipped_once = True
-                i += n
-                continue
-            w = words[i]
-            if WORD_TOKEN_RE.search(w):
-                answers.append(norm_token(w))
-            i += 1
-
-        return problem_text, answers, reference
-    
-def blank_level():
-    blank_level_window = tk.Toplevel()
-    blank_level_window.title("빈칸 난이도 선택")
-    blank_level_window.focus_set()
-    tk.Button(blank_level_window, text="0%", width=10, command=lambda : (level_num(-1), blank_level_window.destroy())).pack()
-    for i in range(10):
-        tk.Button(blank_level_window, text=str(i + 1)+"0%", width=10, command=lambda num=i: (level_num(num), blank_level_window.destroy())).pack()
-
-def level_num(num):
-    global blank_num
-    blank_num = num + 1
-    set_mode(1)
-    
-def whole_level():
-    whole_level_window = tk.Toplevel()
-    whole_level_window.title("어절 수 선택")
-    whole_level_window.focus_set()
-    tk.Button(whole_level_window, text="1어절", width=10, command=lambda : (whole_num(1), whole_level_window.destroy())).pack()
-    for i in range(2, 5):
-        tk.Button(whole_level_window, text=str(i) + "어절", width=10, command=lambda num=i: (whole_num(num), whole_level_window.destroy())).pack()    
-
-def whole_num(num):
-    global whole_level_num
-    whole_level_num = num
-    set_mode(4)
-
-# 문제를 텍스트 박스에 표시
-def display_problem(mode):
-    global current_problem, current_answers, current_reference, attempts, problem_completed, scripture, problem_num
-    if len(scripture)-1 == 0:
-        problem_num = 0
-    elif len(scripture)-1 < 0:
-        return
-    else:
-        problem_num = random.randint(0, len(scripture)-1)
-    current_problem, current_answers, current_reference = create_blank_problem(scripture[problem_num], mode)
-    attempts = 0
-    problem_completed = False
-    problem_text_box.config(state=tk.NORMAL)
-    problem_text_box.delete(1.0, tk.END)
-    problem_text_box.insert(tk.END, current_problem)
-    problem_text_box.config(state=tk.DISABLED)
-    answer_text_box.delete(1.0, tk.END)
-
-# 답안 제출 함수
-def submit_answer(event=None):
-    global attempts, problem_completed, scripture, problem_num, left_verse, fail_num, wrong_verses
-    user_answer = answer_text_box.get(1.0, tk.END).strip()
-
-    if left_verse:
-        if problem_completed or not current_answers:
-            # 완료/소진 시 다음 문제로 (기존 semantics 유지)
+    def load(self):
+        if os.path.exists(self.filepath):
             try:
-                scripture.pop(problem_num)
-                left_verse -= 1
-            except Exception:
-                pass
-            reload_texts()
-            display_problem(current_mode)
-            answer_text_box.delete(1.0, tk.END)
-            return "break" if event else None
+                with open(self.filepath, "r", encoding="utf-8") as f:
+                    return {**self.default_config, **json.load(f)}
+            except:
+                return self.default_config
+        return self.default_config
 
-        # if user_answer == current_answers[0]:
-        if norm_token(user_answer) == norm_token(current_answers[0]):
-            replace_blank_with_answer(current_answers[0], 1)
-            current_answers.pop(0)
-            answer_text_box.delete(1.0, tk.END)
-            attempts = 0
-            if not current_answers:
-                problem_completed = True
-        else:
-            attempts += 1
-            answer_text_box.delete(1.0, tk.END)
-            # 틀렸을 때 처리 부분에서 (attempts >= 3일 때)
-            if attempts >= 3:
-                try:
-                    # 틀린 구절 저장
-                    wrong_verse = {
-                        'reference': current_reference,
-                        'verse': scripture[problem_num].split('^')[1],
-                        'full_text': scripture[problem_num]  # 전체 텍스트 저장
-                    }
-                except:
-                    pass
-                # 중복 방지 체크
-                if not any(w['full_text'] == wrong_verse['full_text'] for w in wrong_verses):
-                    wrong_verses.append(wrong_verse)
-                
-                replace_blank_with_answer(current_answers[0], 0)
-                current_answers.pop(0)
-                fail_num += 1
-                reload_texts()
-                attempts = 0
-                if not current_answers:
-                    problem_completed = True
-    else:
-        answer_text_box.delete(1.0, tk.END)
-
-    return "break" if event else None 
-
-# 틀린 구절 팝업
-def show_wrong_verses():
-    if not wrong_verses:
-        messagebox.showinfo("알림", "틀린 구절이 없습니다.")
-        return
-    
-    popup = tk.Toplevel(root)
-    popup.title("틀린 구절 모음")
-    popup.geometry("600x400")
-    popup.grid_rowconfigure(0, weight=1)
-    popup.grid_columnconfigure(0, weight=1)
-    
-    # 스크롤 가능한 텍스트 박스
-    frame = tk.Frame(popup)
-    frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
-    frame.grid_rowconfigure(0, weight=1)
-    frame.grid_columnconfigure(0, weight=1)
-    
-    current_font = (font_style_var.get(), 25, 'bold' if bold_var.get() else 'normal')
-    
-    text_box = tk.Text(frame, wrap=tk.WORD, font=current_font)
-    scrollbar = ttk.Scrollbar(frame, orient="vertical", command=text_box.yview)
-    text_box.config(yscrollcommand=scrollbar.set)
-    
-    text_box.grid(row=0, column=0, sticky="nsew")
-    scrollbar.grid(row=0, column=1, sticky="ns")
-    
-    # 틀린 구절들 표시
-    for i, wrong in enumerate(wrong_verses, 1):
-        text_box.insert(tk.END, f"{i}. {wrong['reference']} {wrong['verse']}\n\n")
-    
-    text_box.config(state=tk.DISABLED)
-    
-    # 암송 리스트에 추가 버튼
-    def add_to_memorization():
-        global scripture, left_verse, fail_num, wrong_verses
-        scripture = [w['full_text'] for w in wrong_verses]
-        left_verse = len(scripture)
-        fail_num = 0  # 틀린 갯수 초기화
-        wrong_verses = []  # 틀린 구절 목록 초기화
-        reload_texts()
-        
-        # 현재 보여주고 있는 문제 지우기
-        problem_text_box.config(state=tk.NORMAL)
-        problem_text_box.delete(1.0, tk.END)
-        problem_text_box.config(state=tk.DISABLED)
-        answer_text_box.delete(1.0, tk.END)
-        
-        popup.destroy()
-        display_problem(current_mode)
-        messagebox.showinfo("완료", f"틀린 구절들이 암송 리스트에 추가되었습니다.\n틀린 구절 목록이 초기화되었습니다.")
-
-    # 틀린 구절 초기화 버튼
-    def reset_wrong_verses():
-        global wrong_verses
-        wrong_verses = []  # 틀린 구절 목록 초기화
-        
-        popup.destroy()
-        messagebox.showinfo("완료", "틀린 구절 목록이 초기화되었습니다.")
-    
-    button = tk.Button(popup, text="틀린 구절 복습", command=add_to_memorization)
-    button.grid(row=1, column=0, pady=10)
-    button = tk.Button(popup, text="틀린 구절 초기화", command=reset_wrong_verses)
-    button.grid(row=2, column=0)
-
-# 빈칸을 정답으로 대체하는 함수
-def replace_blank_with_answer(answer, correct):
-    global current_problem
-    try:
-        test_index = current_problem.index('_')
-    except ValueError:
-        return
-
-    current_problem = re.sub(r'(_+)', answer, current_problem, count=1)
-
-    problem_text_box.config(state=tk.NORMAL)
-    problem_text_box.delete(1.0, tk.END)
-
-    problem_text_box.tag_configure("highlight", foreground=("green" if correct else "red"))
-    problem_text_box.insert(tk.END, current_problem)
-
-    start_index = f"1.0 + {test_index} chars"
-    end_index   = f"1.0 + {test_index + len(answer)} chars"
-    problem_text_box.tag_add("highlight", start_index, end_index)
-    problem_text_box.config(state=tk.DISABLED)
-
-# 모드 선택에 따라 문제를 표시하는 함수
-def set_mode(mode):
-    global current_mode
-    current_mode = mode
-    display_problem(mode)
-
-def select_day(num):
-    global day_num, scripture, left_verse
-    day_num = 1
-    scripture.clear()
-    scripture.extend(original_scriptures[0])  # day1.txt 데이터만 사용
-    left_verse = len(scripture)
-    reload_texts()
-
-def reload_texts():
-    left_verse_label.config(text="남은 구절 : "+str(left_verse))
-    fail_num_label.config(text="틀린 갯수 : "+str(fail_num))
-
-def day_reset():
-    global scripture, left_verse, problem_text_box, fail_num, wrong_verses
-    scripture = []
-    left_verse = 0
-    fail_num = 0
-    wrong_verses = []
-    reload_texts()
-    problem_text_box.config(state=tk.NORMAL)
-    problem_text_box.delete(1.0, tk.END)
-    problem_text_box.config(state=tk.DISABLED)
-
-# GUI 설정
-root = tk.Tk()
-root.tk.call('tk', 'scaling', 1.0)
-root.geometry("900x600")               # 기본 창 크기
-root.minsize(450, 300)                  # 최소 크기
-root.option_add("*Font", ("맑은 고딕", 15))
-root.grid_rowconfigure(1, weight=1)
-root.grid_columnconfigure(0, weight=1)
-
-def resource_path(rel: str) -> str:
-    # PyInstaller 실행파일(임시폴더 _MEIPASS)과 개발환경 둘 다 지원
-    base = getattr(sys, "_MEIPASS", Path(__file__).parent)
-    return str(Path(base, rel))
-
-# 1) 우선 Windows에서는 .ico 시도
-try:
-    if sys.platform == "win32":
-        ico = resource_path("samuel_icon.ico")
-        if Path(ico).exists():
-            root.iconbitmap(ico)   # 파일 경로 반드시 절대/정규화
-        else:
-            raise FileNotFoundError(ico)
-    else:
-        raise OSError("iconbitmap not reliable on this platform")
-except Exception:
-    # 2) 모든 OS에서 동작하는 대안: PNG로 창 아이콘 설정 (Tk 8.6+)
-    try:
-        png = resource_path("samuel_icon.png")  # 같은 폴더에 PNG도 준비
-        if Path(png).exists():
-            img = tk.PhotoImage(file=png)
-            root.wm_iconphoto(True, img)
-    except Exception:
-        pass  # 아이콘 설정 실패해도 앱은 계속 뜨게
-
-def load_original_scriptures_txt():
-    days = []
-    # day1.txt만 불러옴
-    p = resource_path(os.path.join("data", "day1.txt"))
-    with open(p, "r", encoding="utf-8") as f:
-        items = [line.strip() for line in f.readlines() if line.strip()]
-    days.append(items)
-    return days
-
-
-# 일차 번호
-day_num = 1
-# 일차가 선택된 구절들
-scripture = []
-# 과정이 선택된 구절들
-selected_scriptures = [[], [], [], [], [], []]
-# 원본 구절
-original_scriptures = load_original_scriptures_txt()
-# 틀린 구절들을 저장할 리스트 (existing globals 근처에 추가)
-wrong_verses = []  # 각 항목: {'reference': str, 'verse': str, 'mode': int, 'blanks': list}
-
-def init_ui_fonts(root, family="맑은 고딕", size=13):
-    import tkinter.ttk as ttk
-    from tkinter import font as tkFont
-
-    # Tk 기본 폰트들(이미 생성된 위젯도 자동 반영)
-    for name in ("TkDefaultFont", "TkTextFont", "TkMenuFont", "TkHeadingFont", "TkTooltipFont"):
+    def save(self, config):
         try:
-            f = tkFont.nametofont(name)
-            f.configure(family=family, size=size)
+            with open(self.filepath, "w", encoding="utf-8") as f:
+                json.dump(config, f, indent=4)
+        except:
+            pass
+
+class BibleApp(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+
+        # Config
+        self.config_manager = ConfigManager()
+        self.config_data = self.config_manager.load()
+
+        # Window Setup
+        self.title("말씀 암송 프로그램")
+        self.geometry("1200x800")
+        self.minsize(800, 600)
+        
+        # Theme Setup
+        ctk.set_appearance_mode(self.config_data["theme"])
+        
+        # Icon
+        try:
+            if sys.platform == "win32":
+                ico = resource_path("samuel_icon.ico")
+                if Path(ico).exists():
+                    self.iconbitmap(ico)
         except Exception:
             pass
 
-    # ttk 위젯(버튼/라벨 등)에도 적용
-    try:
-        style = ttk.Style(root)
-        style.configure(".", font=(family, size))
-        style.configure("TButton", font=(family, size))
-    except Exception:
-        pass
+        # Data State
+        self.original_scriptures = []
+        self.original_filenames = []
+        self.scripture = []
+        self.wrong_verses = []
+        
+        self.day_num = 0
+        self.left_verse = 0
+        self.fail_num = 0
+        
+        self.current_mode = 1
+        self.blank_num = 5
+        self.whole_level_num = 1
+        
+        self.current_problem = ""
+        self.current_answers = []
+        self.current_reference = ""
+        self.problem_num = 0
+        self.attempts = 0
+        self.problem_completed = False
 
-init_ui_fonts(root, family="맑은 고딕", size=13)
+        # Font State
+        self.font_family = "맑은 고딕"
+        self.font_size = self.config_data["font_size"]
 
-font_size = 30
-font_form = "맑은 고딕"
-font_style_var = tk.StringVar(value="맑은 고딕")
+        # Load Data
+        self.load_data()
 
-# 볼드체 상태 변수
-bold_var = tk.BooleanVar(value=False)
+        # UI Setup
+        self.create_menu()
+        self.create_widgets()
+        
+        # Restore last session
+        last_idx = self.config_data.get("last_day_index", 0)
+        if 0 <= last_idx < len(self.original_filenames):
+            self.select_day(last_idx)
+            
+        # Bind close event
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-def update_font():
-    selected_font = font_style_var.get()
-    selected_size = font_size_var.get()
-    is_bold = bold_var.get()
-    f = tkFont.Font(
-        family=selected_font,
-        size=selected_size,
-        weight='bold' if is_bold else 'normal',
-        slant='roman'
-    )
-    answer_text_box.config(font=f)
-    problem_text_box.config(font=f)
+    def load_data(self):
+        bundled_data_dir = resource_path("data")
+        if getattr(sys, 'frozen', False):
+            local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+        else:
+            local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
-# ADD: 글꼴/크기/진하게/초기화 통합 팝업
-def open_font_popup():
-    win = tk.Toplevel(root)
-    win.title("글꼴 설정")
-    win.resizable(False, False)
-    
-    include_vertical = tk.BooleanVar(value=False)
-    qvar = tk.StringVar(value="")
+        target_files = {}
+        
+        def scan_dir(d):
+            if os.path.exists(d):
+                for f in os.listdir(d):
+                    if f.lower().endswith(".txt"):
+                        target_files[f] = os.path.join(d, f)
 
-    # 좌상단: 검색 입력 + @포함 체크
-    tk.Label(win, text="검색:").grid(row=0, column=0, padx=8, pady=6, sticky="w")
-    entry = ttk.Entry(win, textvariable=qvar, width=26)
-    entry.grid(row=0, column=1, padx=4, pady=6, sticky="we")
-    chk = ttk.Checkbutton(win, text="@ 세로쓰기 포함", variable=include_vertical)
-    chk.grid(row=0, column=2, padx=8, pady=6, sticky="e")
+        scan_dir(bundled_data_dir)
+        scan_dir(local_data_dir)
+        
+        # Scan Custom Paths
+        for path in self.config_data.get("custom_data_paths", []):
+            scan_dir(path)
+        
+        # Ensure day1.txt exists
+        if "day1.txt" not in target_files:
+            if not os.path.exists(local_data_dir):
+                os.makedirs(local_data_dir)
+            day1_path = os.path.join(local_data_dir, "day1.txt")
+            try:
+                with open(day1_path, "w", encoding="utf-8") as f:
+                    sample_data = """(요 4:24)^하나님은 영이시니 예배하는 자가 신령과 진정으로 예배할지니라"""
+                    f.write(sample_data)
+                target_files["day1.txt"] = day1_path
+            except:
+                pass
 
-    # 폰트 리스트
-    lst = tk.Listbox(win, height=14, width=34, activestyle="dotbox", exportselection=False)
-    lst.grid(row=1, column=0, columnspan=3, padx=8, pady=(0,8), sticky="nsew")
-    sb = ttk.Scrollbar(win, orient="vertical", command=lst.yview)
-    sb.grid(row=1, column=3, sticky="ns", pady=(0,8))
-    lst.config(yscrollcommand=sb.set)
+        self.original_scriptures = []
+        self.original_filenames = []
+        
+        sorted_files = sorted(target_files.keys())
+        for fname in sorted_files:
+            p = target_files[fname]
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    lines = [line.strip() for line in f.readlines() if line.strip()]
+                self.original_scriptures.append(lines)
+                self.original_filenames.append(fname)
+            except:
+                pass
 
-    # 미리보기
-    sample = tk.Label(win, text="가나다 ABC 123 — Preview")
-    sample.grid(row=2, column=0, columnspan=3, padx=8, pady=(0,4))
+    def create_menu(self):
+        menubar = tk.Menu(self)
+        
+        # Management Menu
+        manage_menu = tk.Menu(menubar, tearoff=0)
+        
+        # Day Selection Submenu
+        self.day_menu = tk.Menu(manage_menu, tearoff=0)
+        manage_menu.add_cascade(label="일차 선택", menu=self.day_menu)
+        manage_menu.add_separator()
+        
+        manage_menu.add_command(label="일차 추가", command=self.open_add_day_popup)
+        manage_menu.add_command(label="구절 추가", command=self.open_add_verse_popup)
+        manage_menu.add_command(label="구절 삭제", command=self.delete_verse_popup)
+        manage_menu.add_command(label="구절 수정", command=self.open_edit_verse_popup)
+        manage_menu.add_command(label="파일 삭제", command=self.delete_file_popup)
+        manage_menu.add_separator()
+        manage_menu.add_command(label="데이터 폴더 등록", command=self.register_data_folder)
+        manage_menu.add_command(label="데이터 폴더 열기", command=self.open_data_folder)
+        menubar.add_cascade(label="관리", menu=manage_menu)
+        
+        # View Menu (Theme)
+        view_menu = tk.Menu(menubar, tearoff=0)
+        view_menu.add_command(label="Light 모드", command=lambda: self.set_theme("Light"))
+        view_menu.add_command(label="Dark 모드", command=lambda: self.set_theme("Dark"))
+        menubar.add_cascade(label="보기", menu=view_menu)
 
-    # 크기 슬라이더 + 진하게 + 초기화/적용/닫기
-    ctrl = tk.Frame(win)
-    ctrl.grid(row=3, column=0, columnspan=3, pady=6, padx=8, sticky="we")
+        self.config(menu=menubar)
+        self.refresh_day_menu()
 
-    tk.Label(ctrl, text="크기:").pack(side="left")
+    def refresh_day_menu(self):
+        self.day_menu.delete(0, tk.END)
+        for i, fname in enumerate(self.original_filenames):
+            label = fname.replace(".txt", "")
+            self.day_menu.add_command(label=label, command=lambda idx=i: self.select_day(idx))
+        
+        # Update ComboBox if exists
+        if hasattr(self, 'day_combo'):
+            self.day_combo.configure(values=[f.replace(".txt", "") for f in self.original_filenames])
 
-    size_value_label = tk.Label(ctrl, text=str(font_size_var.get()))
-    size_value_label.pack(side=tk.LEFT)
+    def register_data_folder(self):
+        from tkinter import filedialog
+        folder_path = filedialog.askdirectory(title="데이터 폴더 선택")
+        if not folder_path:
+            return
+            
+        # Normalize path
+        folder_path = os.path.normpath(folder_path)
+        
+        # Check if already registered
+        current_paths = self.config_data.get("custom_data_paths", [])
+        if folder_path in current_paths:
+            messagebox.showinfo("알림", "이미 등록된 폴더입니다.")
+            return
+            
+        # Add to config
+        current_paths.append(folder_path)
+        self.config_data["custom_data_paths"] = current_paths
+        self.config_manager.save(self.config_data)
+        
+        # Reload data
+        self.load_data()
+        self.refresh_day_menu()
+        messagebox.showinfo("성공", f"폴더가 등록되었습니다.\n{folder_path}")
 
-    def update_size_label(val=None):
-        size = int(float(size_scale.get()))
-        size_value_label.config(text=str(size))
-        apply_preview()
+    def create_widgets(self):
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
-    size_scale = ttk.Scale(
-        ctrl, from_=8, to=100, value=font_size_var.get(),
-        command=update_size_label
-    )
-    size_scale.pack(side="left", padx=6)
-
-    bold_chk = ttk.Checkbutton(
-        ctrl, text="진하게", variable=bold_var,
-        command=lambda: apply_preview()
-    )
-    bold_chk.pack(side="left", padx=10)
-
-    ttk.Button(ctrl, text="초기화", command=lambda: do_reset()).pack(side="right", padx=4)
-    ttk.Button(ctrl, text="적용", command=lambda: do_apply()).pack(side="right", padx=4)
-    ttk.Button(ctrl, text="닫기", command=win.destroy).pack(side="right", padx=4)
-
-    # 레이아웃 확장
-    win.grid_columnconfigure(1, weight=1)
-    win.grid_rowconfigure(1, weight=1)
-
-    # 내부 상태
-    all_fonts = get_all_fonts(root, include_vertical.get())
-    filtered = all_fonts[:]
-
-    def populate(items, keep_current=True):
-        lst.delete(0, tk.END)
-        for f in items:
-            lst.insert(tk.END, f)
-        if keep_current and font_style_var.get() in items:
-            idx = items.index(font_style_var.get())
-            lst.selection_set(idx); lst.see(idx)
-        elif items:
-            lst.selection_set(0)
-
-    def current_family():
-        sel = lst.curselection()
-        if sel:
-            return lst.get(sel[0])
-        # 선택 없으면 현재 전역값
-        return font_style_var.get()
-
-    def apply_preview():
-        fam = current_family()
-        size = int(round(float(size_scale.get())))
-        f = tkFont.Font(
-            family=fam, size=size,
-            weight='bold' if bold_var.get() else 'normal',
-            slant='roman'
+        # Top Frame
+        self.top_frame = ctk.CTkFrame(self)
+        self.top_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=(20, 10))
+        
+        # Day Selection ComboBox
+        self.day_var = ctk.StringVar(value="")
+        self.day_combo = ctk.CTkComboBox(
+            self.top_frame, 
+            variable=self.day_var,
+            values=[f.replace(".txt", "") for f in self.original_filenames],
+            command=self.on_day_combo_change,
+            width=200,
+            font=(self.font_family, 16)
         )
-        sample.config(font=f)
+        self.day_combo.pack(side="left", padx=(0, 20))
 
-    def refresh():
-        nonlocal all_fonts, filtered
-        all_fonts = get_all_fonts(root, include_vertical.get())
-        q = qvar.get().lower()
-        filtered = [f for f in all_fonts if q in f.lower()]
-        populate(filtered)
-        apply_preview()
+        # Mode Buttons
+        modes = [("빈칸", self.open_blank_level), ("구절", lambda: self.set_mode(2)), 
+                 ("장절", lambda: self.set_mode(3)), ("전체", self.open_whole_level)]
+        
+        for text, cmd in modes:
+            ctk.CTkButton(self.top_frame, text=text, command=cmd, width=80, height=35).pack(side="left", padx=5)
 
-    def on_select(_=None):
-        apply_preview()
+        # Font Controls
+        ctk.CTkButton(self.top_frame, text="가+", command=self.increase_font, width=40, height=35).pack(side="right", padx=5)
+        ctk.CTkButton(self.top_frame, text="가-", command=self.decrease_font, width=40, height=35).pack(side="right", padx=5)
 
-    def on_search(_=None):
-        refresh()
+        # Problem Area
+        self.problem_frame = ctk.CTkFrame(self)
+        self.problem_frame.grid(row=1, column=0, sticky="nsew", padx=20, pady=10)
+        self.problem_frame.grid_columnconfigure(0, weight=1)
+        self.problem_frame.grid_rowconfigure(0, weight=1)
 
-    def on_toggle_vertical():
-        refresh()
+        self.problem_text = ctk.CTkTextbox(
+            self.problem_frame,
+            font=(self.font_family, self.font_size),
+            wrap="word",
+            state="disabled"
+        )
+        self.problem_text.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        
+        self.problem_text.tag_config("correct", foreground="green")
+        self.problem_text.tag_config("wrong", foreground="red")
 
-    def do_reset():
-        reset_font()
-        refresh()
+        # Answer Area
+        self.answer_entry = ctk.CTkEntry(
+            self,
+            placeholder_text="정답을 입력하세요...",
+            font=(self.font_family, self.font_size),
+            height=50
+        )
+        self.answer_entry.grid(row=2, column=0, sticky="ew", padx=20, pady=10)
+        self.answer_entry.bind("<Return>", lambda e: self.submit_answer())
+        self.answer_entry.bind("<space>", self.on_space_key)
 
-    def do_apply():
-        fam = current_family()
-        font_style_var.set(fam)
-        font_size_var.set(int(round(float(size_scale.get()))))
-        update_font()
+        # Bottom Frame
+        self.bottom_frame = ctk.CTkFrame(self)
+        self.bottom_frame.grid(row=3, column=0, sticky="ew", padx=20, pady=(0, 20))
+        
+        self.status_label = ctk.CTkLabel(self.bottom_frame, text="남은 구절: 0 | 틀린 갯수: 0", font=("맑은 고딕", 16))
+        self.status_label.pack(side="left", padx=20, pady=10)
+        
+        ctk.CTkButton(self.bottom_frame, text="초기화", command=self.day_reset, fg_color="#C0392B", hover_color="#E74C3C").pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="스킵", command=self.skip_problem, fg_color="#F39C12", hover_color="#F1C40F").pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="틀린 구절", command=self.show_wrong_verses).pack(side="right", padx=20)
 
-    # 바인딩
-    lst.bind("<<ListboxSelect>>", on_select)
-    entry.bind("<KeyRelease>", on_search)
-    chk.config(command=on_toggle_vertical)
-    size_scale.bind("<ButtonRelease-1>", lambda e: apply_preview())
+    def on_day_combo_change(self, choice):
+        full_name = choice + ".txt"
+        if full_name in self.original_filenames:
+            idx = self.original_filenames.index(full_name)
+            self.select_day(idx)
 
-    # 초기 채움
-    populate(filtered)
-    apply_preview()
+    def select_day(self, index):
+        if 0 <= index < len(self.original_scriptures):
+            self.day_num = index + 1
+            self.scripture = list(self.original_scriptures[index])
+            self.left_verse = len(self.scripture)
+            
+            # Sync ComboBox
+            if hasattr(self, 'day_combo') and index < len(self.original_filenames):
+                current_name = self.original_filenames[index].replace(".txt", "")
+                self.day_combo.set(current_name)
+                
+            self.update_status()
+            self.day_reset()
 
-def get_all_fonts(root, include_vertical=False):
-    fams = sorted(tkFont.families(root))
-    return fams if include_vertical else [f for f in fams if not f.startswith('@')]
+    def update_status(self):
+        self.status_label.configure(text=f"남은 구절: {self.left_verse} | 틀린 갯수: {self.fail_num}")
 
+    def day_reset(self):
+        if self.day_num > 0:
+            idx = self.day_num - 1
+            if idx < len(self.original_scriptures):
+                self.scripture = list(self.original_scriptures[idx])
+                self.left_verse = len(self.scripture)
+        else:
+            self.scripture = []
+            self.left_verse = 0
+            
+        self.fail_num = 0
+        self.wrong_verses = []
+        self.update_status()
+        self.display_problem()
 
-    # 확인 버튼
-    ok_btn = ttk.Button(win, text="확인", command=win.destroy)
-    ok_btn.pack(pady=(0, 8))
+    def set_mode(self, mode):
+        self.current_mode = mode
+        self.display_problem()
 
-def on_space_key(event):
-    if event.keycode == 229:  # Windows IME 조합 처리키
-        return
-    if event.char == " ":
-        root.after_idle(submit_answer)
-        return "break"  # space 입력 자체는 막고, 제출로만 처리
+    def display_problem(self):
+        if not self.scripture:
+            self.problem_text.configure(state="normal")
+            self.problem_text.delete("1.0", "end")
+            self.problem_text.insert("end", "선택된 구절이 없거나 모든 구절을 완료했습니다.")
+            self.problem_text.configure(state="disabled")
+            return
 
+        self.problem_num = random.randint(0, len(self.scripture)-1)
+        text, answers, ref = self.create_blank_problem(self.scripture[self.problem_num], self.current_mode)
+        
+        self.current_problem = text
+        self.current_answers = answers
+        self.current_reference = ref
+        self.attempts = 0
+        self.problem_completed = False
+        
+        self.problem_text.configure(state="normal")
+        self.problem_text.delete("1.0", "end")
+        self.problem_text.insert("end", self.current_problem)
+        self.problem_text.configure(state="disabled")
+        
+        self.answer_entry.delete(0, "end")
+        self.answer_entry.focus_set()
 
-# 문제 텍스트박스 + 스크롤
-problem_frame = tk.Frame(root)
-problem_frame.grid(row=1, column=0, sticky="nsew", padx=12, pady=(8, 6))
-problem_frame.grid_rowconfigure(0, weight=1)
-problem_frame.grid_columnconfigure(0, weight=1)
+    def create_blank_problem(self, scripture_line, mode):
+        reference, verse = scripture_line.split('^')
+        words = verse.split()
+        
+        if mode == 1: # Blank Mode
+            num_words = len(words)
+            num_blanks = int(num_words * max(self.blank_num, 0) * 0.1)
+            num_blanks = max(0, min(num_blanks, num_words))
+            maskable_idx = [i for i, w in enumerate(words) if WORD_TOKEN_RE.search(w)]
+            num_blanks = min(num_blanks, len(maskable_idx))
+            blank_indices = sorted(random.sample(maskable_idx, num_blanks)) if num_blanks else []
 
-problem_text_box = tk.Text(
-    problem_frame,
-    font=(font_form, font_size),
-    wrap=tk.WORD,
-    state=tk.DISABLED
-)
-problem_text_box.grid(row=0, column=0, sticky="nsew")
+            answers = [norm_token(words[i]) for i in blank_indices]
+            problem_words = [(mask_len_keep_punct(w) if i in blank_indices else w) for i, w in enumerate(words)]
+            
+            ref_view = ref_masked(reference, masked=False)
+            return ref_view + " " + " ".join(problem_words), answers, reference
 
-problem_scroll = ttk.Scrollbar(problem_frame, orient="vertical", command=problem_text_box.yview)
-problem_scroll.grid(row=0, column=1, sticky="ns")
-problem_text_box.config(yscrollcommand=problem_scroll.set)
+        elif mode == 2: # Verse Mode
+            answers = [norm_token(w) for w in words if WORD_TOKEN_RE.search(w)]
+            problem_words = [(mask_one_keep_punct(w) if WORD_TOKEN_RE.search(w) else w) for w in words]
+            ref_view = ref_masked(reference, masked=False)
+            return ref_view + " " + " ".join(problem_words), answers, reference
 
-# 답안 텍스트박스
-answer_text_box = tk.Text(root, height=1, width=30, font=(font_form, font_size), wrap=tk.WORD)
-answer_text_box.grid(row=2, column=0, sticky="we", padx=12, pady=(0, 10))
-answer_text_box.unbind("<space>")
-answer_text_box.bind("<space>", on_space_key)
-answer_text_box.bind("<Return>", lambda e: (root.after_idle(submit_answer), "break")[1])
-answer_text_box.bind("<KP_Enter>", lambda e: (root.after_idle(submit_answer), "break")[1])
+        elif mode == 3: # Reference Mode
+            book, chap, verse_part = parse_ref_parts(reference)
+            _, verse_parts = split_verse_parts(verse_part)
+            ref_view = ref_masked(reference, masked=True)
+            answers = [book, chap] + verse_parts
+            return ref_view + " " + " ".join(words), answers, reference
 
-def select_course(course_number):
-    global selected_scriptures
-    selected_scriptures = [[], [], [], [], [], []]
+        elif mode == 4: # Whole Mode
+            n = min(self.whole_level_num, len(words))
+            rand_index = random.randint(0, len(words) - n)
+            visible_words = words[rand_index:rand_index + n]
+            
+            problem_words = []
+            i = 0
+            first_occurrence = True
+            while i < len(words):
+                if first_occurrence and i <= len(words) - n and words[i:i+n] == visible_words:
+                    problem_words.extend(visible_words)
+                    first_occurrence = False
+                    i += n
+                else:
+                    problem_words.append(mask_one_keep_punct(words[i]))
+                    i += 1
+            
+            ref_view = ref_masked(reference, masked=True)
+            book, chap, verse_part = parse_ref_parts(reference)
+            _, verse_parts = split_verse_parts(verse_part)
+            answers = [book, chap] + verse_parts
+            
+            i = 0
+            skipped_once = False
+            while i < len(words):
+                if (not skipped_once) and i <= len(words) - n and words[i:i+n] == visible_words:
+                    skipped_once = True
+                    i += n
+                    continue
+                w = words[i]
+                if WORD_TOKEN_RE.search(w):
+                    answers.append(norm_token(w))
+                i += 1
+                
+            return ref_view + " " + " ".join(problem_words), answers, reference
+            
+        return "", [], ""
 
-    # 과정을 인자로 받았을 경우 (팝업 없이 처리)
-    if course_number :
-        for i, scripture_list in enumerate(original_scriptures):
-            for scripture in scripture_list:
-                split_data = scripture.split("\\", 1)
-                if len(split_data) == 2:
-                    number, content = split_data
-                    if int(number) <= course_number:
-                        selected_scriptures[i].append(content)
-        course = str(course_number) + "과정"
-        course_label.config(text = course, padx = 18)
+    def submit_answer(self):
+        user_answer = self.answer_entry.get().strip()
+        
+        if not self.scripture or not self.current_answers:
+            return
 
-def create_slider_window(title, min_value, max_value, update_func):
-    """슬라이더를 표시하는 새 창을 생성."""
-    slider_window = tk.Toplevel(root)
-    slider_window.title(title + " 슬라이더")
-    
-    slider = tk.Scale(
-        slider_window,
-        from_=min_value,
-        to=max_value,
-        orient="horizontal",
-        label=title,
-        command=update_func
-    )
-    slider.pack(padx=10, pady=10)
+        if self.problem_completed:
+            self.next_problem()
+            return
 
-def skip_problem():
-    display_problem(current_mode)
+        if norm_token(user_answer) == norm_token(self.current_answers[0]):
+            self.replace_blank_with_answer(self.current_answers[0], True)
+            self.current_answers.pop(0)
+            self.answer_entry.delete(0, "end")
+            self.attempts = 0
+            if not self.current_answers:
+                self.problem_completed = True
+        else:
+            self.attempts += 1
+            self.answer_entry.delete(0, "end")
+            if self.attempts >= 3:
+                self.handle_wrong_answer()
 
-def mode_info():
-    messagebox.showinfo("도움말",
-                        "시작하는 방법 : 일차를 선택하여 목록에 추가 -> 모드 선택\n\n"
-                        "구절이 표시되는 텍스트박스에는 답을 입력할 수 없습니다.\n"
-                        "구절 텍스트박스 아래에 있는 답안 텍스트박스에 입력해 주세요.\n\n"
-                        "제출 : [ Space / Enter ]\n"
-                        "문자 그대로 일치해야 정답이 인정됩니다.\n"
-                        "세 번 틀린 후에 정답이 공개됩니다.\n\n"
-                        "한 어절 이상 공개된 구절은 틀린 구절 목록에 저장되며,\n"
-                        "틀린 구절만 복습할 수 있습니다.\n\n"
-                        "1. 빈칸 모드\n구절의 n%를 글자수가 표시되는 빈칸으로 대체합니다.\n0% : 빈칸 없음(암기용)\n100% : 글자수가 표시되는 구절 모드\n\n"
-                        "2. 구절 모드\n장절을 공개하고 모든 구절을 한 글자의 빈칸으로 대체합니다.\n\n"
-                        "3. 장절 모드\n구절을 공개하고 장절을 빈칸으로 대체합니다.\n\n"
-                        "4. 전체 모드\n구절의 연속된 n어절만 공개하고 모두 빈칸으로 대체합니다.")
+    def handle_wrong_answer(self):
+        wrong_verse = {
+            'reference': self.current_reference,
+            'verse': self.scripture[self.problem_num].split('^')[1],
+            'full_text': self.scripture[self.problem_num]
+        }
+        if not any(w['full_text'] == wrong_verse['full_text'] for w in self.wrong_verses):
+            self.wrong_verses.append(wrong_verse)
+        
+        self.replace_blank_with_answer(self.current_answers[0], False)
+        self.current_answers.pop(0)
+        self.fail_num += 1
+        self.update_status()
+        self.attempts = 0
+        if not self.current_answers:
+            self.problem_completed = True
 
-root.title("전도상담부 암송 외우기")
+    def replace_blank_with_answer(self, answer, correct):
+        try:
+            test_index = self.current_problem.index('_')
+        except ValueError:
+            return
 
-def show_about():
-    messagebox.showinfo("정보", "전도상담부 암송")
-# 메뉴바 생성
-menu_bar = tk.Menu(root)
+        self.current_problem = re.sub(r'(_+)', answer, self.current_problem, count=1)
+        
+        self.problem_text.configure(state="normal")
+        self.problem_text.delete("1.0", "end")
+        self.problem_text.insert("end", self.current_problem)
+        
+        # Highlight
+        start_idx = f"1.0 + {test_index} chars"
+        end_idx = f"1.0 + {test_index + len(answer)} chars"
+        tag = "correct" if correct else "wrong"
+        self.problem_text.tag_add(tag, start_idx, end_idx)
+        
+        self.problem_text.configure(state="disabled")
 
-# '일차' 메뉴 생성
-day_menu = tk.Menu(menu_bar, tearoff=0)
+    def next_problem(self):
+        try:
+            self.scripture.pop(self.problem_num)
+            self.left_verse -= 1
+        except:
+            pass
+        self.update_status()
+        self.display_problem()
+        self.answer_entry.delete(0, "end")
 
-day_menu.add_command(label="1일차 하나님 성경", command=lambda: select_day(1))
+    def skip_problem(self):
+        self.display_problem()
 
-day_menu.add_command(label="전체", command=lambda : select_day(1))  # 전체도 1일차
-day_menu.add_separator()
-day_menu.add_command(label="초기화", command=lambda : day_reset())
+    def on_space_key(self, event):
+        if event.char == " ":
+            self.after(10, self.submit_answer)
+            return "break"
 
-menu_bar.add_cascade(label="일차", menu=day_menu)
+    # --- Popups ---
+    def open_add_verse_popup(self):
+        if not self.original_filenames:
+            messagebox.showinfo("알림", "일차(파일)를 먼저 추가해주세요.")
+            return
 
-menu_bar.add_command(label="정보", command=show_about)
-root.bind("<F1>", lambda e: show_about())
+        win = ctk.CTkToplevel(self)
+        win.title("구절 추가")
+        win.geometry("400x500")
+        win.grab_set()
 
-font_size_var = tk.IntVar(value=30)  # 기본 크기 설정
+        ctk.CTkLabel(win, text="장절 (예: (요 3:16))").pack(pady=(10, 0))
+        ref_entry = ctk.CTkEntry(win, width=300)
+        ref_entry.pack(pady=5)
 
+        ctk.CTkLabel(win, text="구절 내용").pack(pady=(10, 0))
+        verse_text = ctk.CTkTextbox(win, height=100, width=300)
+        verse_text.pack(pady=5)
 
-# 메뉴바 설정
-root.config(menu=menu_bar)
+        ctk.CTkLabel(win, text="저장할 파일").pack(pady=(10, 0))
+        file_var = ctk.StringVar(value=self.original_filenames[0])
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var)
+        file_cb.pack(pady=5)
 
-# 모드 선택 버튼
-mode_buttons_frame = tk.Frame(root)
-mode_buttons_frame.grid(row=0, column=0, sticky="we", padx=12, pady=(8, 4))
+        def save():
+            ref = ref_entry.get().strip()
+            content = verse_text.get("1.0", "end").strip()
+            fname = file_var.get().strip()
+            
+            if not ref or not content:
+                messagebox.showwarning("경고", "내용을 입력해주세요.")
+                return
+            
+            if not (ref.startswith("(") and ref.endswith(")")):
+                messagebox.showwarning("경고", "장절 형식이 올바르지 않습니다. 예: (요 3:16)")
+                return
 
-blank_num = 5
-blank_mode_button = tk.Button(mode_buttons_frame, text="빈칸 모드", command=lambda: blank_level())
-blank_mode_button.pack(side=tk.LEFT, padx=5)
+            if getattr(sys, 'frozen', False):
+                local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+            else:
+                local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+            
+            if not os.path.exists(local_data_dir):
+                os.makedirs(local_data_dir)
+                
+            p = os.path.join(local_data_dir, fname)
+            
+            try:
+                need_newline = False
+                if os.path.exists(p):
+                    with open(p, "rb") as f:
+                        try:
+                            f.seek(-1, os.SEEK_END)
+                            if f.read(1) != b'\n':
+                                need_newline = True
+                        except:
+                            pass
+                
+                with open(p, "a", encoding="utf-8") as f:
+                    if need_newline:
+                        f.write("\n")
+                    f.write(f"{ref}^{content}")
+                
+                messagebox.showinfo("성공", "저장되었습니다.")
+                self.load_data()
+                self.refresh_day_menu()
+                win.destroy()
+            except Exception as e:
+                messagebox.showerror("오류", str(e))
 
-verse_mode_button = tk.Button(mode_buttons_frame, text="구절 모드", command=lambda: set_mode(2))
-verse_mode_button.pack(side=tk.LEFT, padx=5)
+        ctk.CTkButton(win, text="저장", command=save).pack(pady=20)
 
-reference_mode_button = tk.Button(mode_buttons_frame, text="장절 모드", command=lambda: set_mode(3))
-reference_mode_button.pack(side=tk.LEFT, padx=5)
+    def open_add_day_popup(self):
+        win = ctk.CTkToplevel(self)
+        win.title("일차 추가")
+        win.geometry("300x200")
+        win.grab_set()
 
-full_mode_button = tk.Button(mode_buttons_frame, text="전체 모드", command=lambda: whole_level())
-full_mode_button.pack(side=tk.LEFT, padx=5)
+        ctk.CTkLabel(win, text="일차 이름 (예: day2)").pack(pady=10)
+        name_entry = ctk.CTkEntry(win)
+        name_entry.pack(pady=5)
 
-info_button = tk.Button(mode_buttons_frame, text="도움말", command=lambda: mode_info())
-info_button.pack(side=tk.LEFT, padx=5)
+        def create():
+            name = name_entry.get().strip()
+            if not name:
+                return
+            if not name.endswith(".txt"):
+                name += ".txt"
+            
+            if getattr(sys, 'frozen', False):
+                local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+            else:
+                local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+            
+            if not os.path.exists(local_data_dir):
+                os.makedirs(local_data_dir)
+            
+            p = os.path.join(local_data_dir, name)
+            if os.path.exists(p):
+                messagebox.showwarning("경고", "이미 존재하는 파일입니다.")
+                return
+                
+            try:
+                with open(p, "w", encoding="utf-8") as f:
+                    pass
+                messagebox.showinfo("성공", "생성되었습니다.")
+                self.load_data()
+                self.refresh_day_menu()
+                win.destroy()
+            except Exception as e:
+                messagebox.showerror("오류", str(e))
 
-text_frame = tk.Frame(root)
-text_frame.grid(row=3, column=0, sticky="we", padx=12, pady=(0, 8))
+        ctk.CTkButton(win, text="생성", command=create).pack(pady=20)
 
-left_verse = 0
-left_verse_label = tk.Label(text_frame, text="남은 구절 : "+str(left_verse))
-left_verse_label.pack(side=tk.LEFT, padx=5)
+    def delete_verse_popup(self):
+        if not self.original_filenames:
+            return
+        
+        win = ctk.CTkToplevel(self)
+        win.title("구절 삭제")
+        win.geometry("500x600")
+        win.grab_set()
 
-fail_num = 0
-fail_num_label = tk.Label(text_frame, text="틀린 갯수 : "+str(fail_num))
-fail_num_label.pack(side=tk.LEFT)
+        ctk.CTkLabel(win, text="파일 선택").pack(pady=5)
+        file_var = ctk.StringVar(value=self.original_filenames[0])
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var, command=lambda x: load_verses(x))
+        file_cb.pack(pady=5)
 
-reset_button = tk.Button(text_frame, text="초기화", command=day_reset)
-reset_button.pack(side=tk.LEFT, padx=5)
+        list_frame = ctk.CTkScrollableFrame(win, width=450, height=400)
+        list_frame.pack(pady=10)
+        
+        self.check_vars = []
+        
+        def load_verses(fname):
+            for w in list_frame.winfo_children():
+                w.destroy()
+            self.check_vars = []
+            
+            if fname in self.original_filenames:
+                idx = self.original_filenames.index(fname)
+                verses = self.original_scriptures[idx]
+                for i, v in enumerate(verses):
+                    var = ctk.IntVar()
+                    self.check_vars.append((i, var))
+                    ctk.CTkCheckBox(list_frame, text=v[:40]+"...", variable=var).pack(anchor="w", pady=2)
 
-skip_button = tk.Button(text_frame, text="스킵", command=skip_problem)
-skip_button.pack(side=tk.LEFT, padx=5)
+        load_verses(file_var.get())
 
-wrong_verses_button = tk.Button(text_frame, text="틀린 구절", command=show_wrong_verses)
-wrong_verses_button.pack(side=tk.RIGHT, padx=5)
+        def delete():
+            fname = file_var.get()
+            if fname not in self.original_filenames: return
+            
+            idx = self.original_filenames.index(fname)
+            verses = self.original_scriptures[idx]
+            to_delete_indices = [i for i, var in self.check_vars if var.get() == 1]
+            
+            if not to_delete_indices:
+                return
 
-current_mode = 1
-problem_num = 0
-problem_completed = False
-display_problem(current_mode)
-root.mainloop()
+            if not messagebox.askyesno("확인", f"{len(to_delete_indices)}개의 구절을 삭제하시겠습니까?"):
+                return
+
+            new_verses = [v for i, v in enumerate(verses) if i not in to_delete_indices]
+            
+            if getattr(sys, 'frozen', False):
+                local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+            else:
+                local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+            
+            p = os.path.join(local_data_dir, fname)
+            
+            try:
+                with open(p, "w", encoding="utf-8") as f:
+                    for v in new_verses:
+                        f.write(v + "\n")
+                
+                messagebox.showinfo("성공", "삭제되었습니다.")
+                self.load_data()
+                self.refresh_day_menu()
+                if self.day_num > 0:
+                    self.select_day(self.day_num - 1)
+                win.destroy()
+            except Exception as e:
+                messagebox.showerror("오류", str(e))
+
+        ctk.CTkButton(win, text="삭제", command=delete, fg_color="#C0392B", hover_color="#E74C3C").pack(pady=10)
+
+    def delete_file_popup(self):
+        if not self.original_filenames: return
+        
+        win = ctk.CTkToplevel(self)
+        win.title("파일 삭제")
+        win.geometry("300x150")
+        win.grab_set()
+
+        ctk.CTkLabel(win, text="삭제할 파일").pack(pady=10)
+        file_var = ctk.StringVar(value=self.original_filenames[0])
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var)
+        file_cb.pack(pady=5)
+
+        def delete():
+            fname = file_var.get()
+            if not messagebox.askyesno("확인", f"정말 '{fname}'을 삭제하시겠습니까?"):
+                return
+            
+            if getattr(sys, 'frozen', False):
+                local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+            else:
+                local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+            
+            p = os.path.join(local_data_dir, fname)
+            try:
+                os.remove(p)
+                messagebox.showinfo("성공", "삭제되었습니다.")
+                self.load_data()
+                self.refresh_day_menu()
+                self.day_reset()
+                win.destroy()
+            except Exception as e:
+                messagebox.showerror("오류", str(e))
+
+        ctk.CTkButton(win, text="삭제", command=delete, fg_color="#C0392B", hover_color="#E74C3C").pack(pady=10)
+
+    def open_edit_verse_popup(self):
+        if not self.original_filenames: return
+        
+        win = ctk.CTkToplevel(self)
+        win.title("구절 수정")
+        win.geometry("500x600")
+        win.grab_set()
+
+        ctk.CTkLabel(win, text="파일 선택").pack(pady=5)
+        file_var = ctk.StringVar(value=self.original_filenames[0])
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var, command=lambda x: load_verses(x))
+        file_cb.pack(pady=5)
+
+        list_frame = ctk.CTkScrollableFrame(win, width=450, height=200)
+        list_frame.pack(pady=10)
+
+        edit_frame = ctk.CTkFrame(win)
+        edit_frame.pack(pady=10, padx=10, fill="x")
+        
+        ctk.CTkLabel(edit_frame, text="수정할 내용").pack()
+        edit_text = ctk.CTkTextbox(edit_frame, height=100)
+        edit_text.pack(fill="x", padx=5)
+        
+        self.selected_verse_idx = -1
+
+        def load_verses(fname):
+            for w in list_frame.winfo_children():
+                w.destroy()
+            self.selected_verse_idx = -1
+            edit_text.delete("1.0", "end")
+            
+            if fname in self.original_filenames:
+                idx = self.original_filenames.index(fname)
+                verses = self.original_scriptures[idx]
+                for i, v in enumerate(verses):
+                    btn = ctk.CTkButton(list_frame, text=v[:40]+"...", command=lambda idx=i, val=v: select_verse(idx, val), fg_color="transparent", border_width=1, text_color=("black", "white"))
+                    btn.pack(anchor="w", pady=2, fill="x")
+
+        def select_verse(idx, val):
+            self.selected_verse_idx = idx
+            edit_text.delete("1.0", "end")
+            edit_text.insert("end", val)
+
+        load_verses(file_var.get())
+
+        def save_edit():
+            if self.selected_verse_idx == -1: return
+            new_content = edit_text.get("1.0", "end").strip()
+            if not new_content: return
+            
+            fname = file_var.get()
+            idx = self.original_filenames.index(fname)
+            self.original_scriptures[idx][self.selected_verse_idx] = new_content
+            
+            if getattr(sys, 'frozen', False):
+                local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+            else:
+                local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+            
+            p = os.path.join(local_data_dir, fname)
+            try:
+                with open(p, "w", encoding="utf-8") as f:
+                    for v in self.original_scriptures[idx]:
+                        f.write(v + "\n")
+                messagebox.showinfo("성공", "수정되었습니다.")
+                self.load_data()
+                self.refresh_day_menu()
+                if self.day_num > 0:
+                    self.select_day(self.day_num - 1)
+                win.destroy()
+            except Exception as e:
+                messagebox.showerror("오류", str(e))
+
+        ctk.CTkButton(win, text="수정 저장", command=save_edit).pack(pady=10)
+
+    def open_data_folder(self):
+        if getattr(sys, 'frozen', False):
+            local_data_dir = os.path.join(os.path.dirname(sys.executable), "data")
+        else:
+            local_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+        
+        if not os.path.exists(local_data_dir):
+            os.makedirs(local_data_dir)
+        os.startfile(local_data_dir)
+
+    def open_blank_level(self):
+        win = ctk.CTkToplevel(self)
+        win.title("빈칸 난이도")
+        win.geometry("300x400")
+        win.grab_set()
+        
+        for i in range(11):
+            ctk.CTkButton(win, text=f"{i}0%", command=lambda x=i: set_level(x, win)).pack(pady=2)
+
+        def set_level(x, w):
+            self.blank_num = x + 1
+            self.set_mode(1)
+            w.destroy()
+
+    def open_whole_level(self):
+        win = ctk.CTkToplevel(self)
+        win.title("어절 수")
+        win.geometry("300x300")
+        win.grab_set()
+        
+        for i in range(1, 6):
+            ctk.CTkButton(win, text=f"{i}어절", command=lambda x=i: set_level(x, win)).pack(pady=5)
+
+        def set_level(x, w):
+            self.whole_level_num = x
+            self.set_mode(4)
+            w.destroy()
+
+    def show_mode_info(self):
+        info = """
+        1. 빈칸 모드: 구절의 일부를 빈칸으로 가립니다.
+        2. 구절 모드: 장절만 보여주고 내용은 모두 가립니다.
+        3. 장절 모드: 내용은 보여주고 장절만 가립니다.
+        4. 전체 모드: 일부 어절만 보여주고 나머지는 가립니다.
+        """
+        messagebox.showinfo("도움말", info)
+
+    def increase_font(self):
+        self.font_size += 2
+        self.update_font()
+
+    def decrease_font(self):
+        if self.font_size > 10:
+            self.font_size -= 2
+            self.update_font()
+
+    def update_font(self):
+        self.problem_text.configure(font=(self.font_family, self.font_size))
+        self.answer_entry.configure(font=(self.font_family, self.font_size))
+
+    def set_theme(self, theme):
+        ctk.set_appearance_mode(theme)
+        self.config_data["theme"] = theme
+
+    def show_wrong_verses(self):
+        if not self.wrong_verses:
+            messagebox.showinfo("알림", "틀린 구절이 없습니다.")
+            return
+        
+        win = ctk.CTkToplevel(self)
+        win.title("틀린 구절 모음")
+        win.geometry("600x400")
+        
+        text_box = ctk.CTkTextbox(win, font=(self.font_family, 18))
+        text_box.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        for i, w in enumerate(self.wrong_verses, 1):
+            text_box.insert("end", f"{i}. {w['reference']} {w['verse']}\n\n")
+        text_box.configure(state="disabled")
+        
+        def review():
+            self.scripture = [w['full_text'] for w in self.wrong_verses]
+            self.left_verse = len(self.scripture)
+            self.fail_num = 0
+            self.wrong_verses = []
+            self.update_status()
+            self.display_problem()
+            win.destroy()
+            
+        ctk.CTkButton(win, text="복습하기", command=review).pack(pady=10)
+
+    def on_closing(self):
+        # Save settings
+        self.config_data["font_size"] = self.font_size
+        if self.day_num > 0:
+            self.config_data["last_day_index"] = self.day_num - 1
+        self.config_manager.save(self.config_data)
+        self.destroy()
+
+if __name__ == "__main__":
+    app = BibleApp()
+    app.mainloop()
