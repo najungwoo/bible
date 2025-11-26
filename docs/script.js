@@ -744,22 +744,8 @@ btnPaste.addEventListener('click', () => {
     inputRef.value = "";
     inputVerse.value = "";
     tempVerses = [];
-    const text = inputVerse.value.trim();
-
-    if (!ref || !text) {
-        alert("장절과 내용을 모두 입력해주세요.");
-        return;
-    }
-
-    // Format: (Ref)^Text
-    const formatted = `(${ref})^${text}`;
-    tempVerses.push(formatted);
-
-    inputRef.value = "";
-    inputVerse.value = "";
-    inputRef.focus();
-
     renderVerseList();
+    pasteTitle.focus();
 });
 
 function renderVerseList() {
