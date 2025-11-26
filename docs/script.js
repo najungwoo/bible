@@ -359,7 +359,7 @@ function saveDataToStorage() {
 }
 
 // Data Version - Increment this to force update default data for users
-const DATA_VERSION = "1.3";
+const DATA_VERSION = "1.4";
 
 function loadDataFromStorage() {
     try {
@@ -433,9 +433,9 @@ function dayReset() {
             // Filter by level (e.g., "1\(...")
             currentScripture = allVerses.filter(line => {
                 // Check if line starts with "Level\"
-                // Note: In JS string, backslash is escaped.
-                // Format: "1\(..."
-                return line.startsWith(selectedLevel + "\\(");
+                // Data format: "1\(Reference)^Verse"
+                // In the actual string, there's one backslash
+                return line.startsWith(selectedLevel + "\(");
             });
         }
 
