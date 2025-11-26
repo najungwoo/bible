@@ -432,9 +432,11 @@ function dayReset() {
         } else {
             // Cumulative filtering: 1 to maxLevel
             const maxLevel = parseInt(selectedLevel, 10);
-            // Regex to match levels 1 to maxLevel. 
-            // Since levels are single digits (1-4), [1-maxLevel] works.
-            const levelRegex = new RegExp(`^[1-${maxLevel}]\\(`);
+            // Regex to match levels 1 to maxLevel followed by backslash and open paren
+            // Data format: "1\(..."
+            // We need to match digit + backslash + (
+            // In JS string, \\\\ becomes \\ in regex, which matches literal \
+            const levelRegex = new RegExp(`^[1-${maxLevel}]\\\\\\(`);
             currentScripture = allVerses.filter(line => levelRegex.test(line));
         }
         leftVerse = currentScripture.length;

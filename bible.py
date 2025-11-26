@@ -507,9 +507,21 @@ class BibleApp(ctk.CTk):
                     self.scripture = list(raw_verses)
                 else:
                     # Extract level number (e.g., "1과정" -> "1")
-                    target_level = level_choice.replace("과정", "")
-                    prefix = f"{target_level}\\"
-                    self.scripture = [v for v in raw_verses if v.startswith(prefix)]
+                    target_level_str = level_choice.replace("과정", "")
+                    try:
+                        target_level = int(target_level_str)
+                    except ValueError:
+                        target_level = 4 # Default to max if error
+
+                    self.scripture = []
+                    for v in raw_verses:
+                        # Check if v starts with a number <= target_level
+                        # v format: "1\(..."
+                        m = re.match(r'^(\d+)\\', v)
+                        if m:
+                            level = int(m.group(1))
+                            if level <= target_level:
+                                self.scripture.append(v)
                 
                 self.left_verse = len(self.scripture)
         else:
