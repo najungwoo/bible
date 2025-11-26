@@ -139,79 +139,49 @@ button:active {
     justify-content: space-between;
     align-items: center;
     font-size: 0.9rem;
+    padding: 5px;
 }
 
-#verseList li:last-child {
-    border-bottom: none;
+h1 {
+    font-size: 1.1rem;
 }
 
-.btn-delete-verse {
-    background-color: transparent;
-    color: var(--accent-color);
-    border: none;
-    cursor: pointer;
+.controls-top {
+    gap: 5px;
+}
+
+.btn-file,
+select {
+    font-size: 0.8rem;
+    padding: 6px 8px;
+}
+
+.problem-area {
     font-size: 1.2rem;
-    padding: 0 5px;
-    flex-grow: 0;
+    padding: 15px;
+    min-height: 120px;
 }
 
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
+.btn-mode,
+.btn-action,
+.btn-font {
+    padding: 12px 5px;
+    font-size: 0.85rem;
 }
 
-.btn-save {
-    background-color: var(--primary-color);
-    color: white;
-    width: 100%;
+.input-area input {
+    font-size: 1rem;
+    padding: 12px;
 }
 
-/* Mobile Optimizations */
-@media (max-width: 600px) {
-    .container {
-        padding: 5px;
-    }
+footer {
+    gap: 8px;
+    padding-bottom: 10px;
+}
 
-    h1 {
-        font-size: 1.1rem;
-    }
-
-    .controls-top {
-        gap: 5px;
-    }
-
-    .btn-file,
-    select {
-        font-size: 0.8rem;
-        padding: 6px 8px;
-    }
-
-    .problem-area {
-        font-size: 1.2rem;
-        padding: 15px;
-        min-height: 120px;
-    }
-
-    .btn-mode,
-    .btn-action,
-    .btn-font {
-        padding: 12px 5px;
-        font-size: 0.85rem;
-    }
-
-    .input-area input {
-        font-size: 1rem;
-        padding: 12px;
-    }
-
-    footer {
-        gap: 8px;
-        padding-bottom: 10px;
-    }
-
-    .font-controls button {
-        width: 44px;
-    }
+.font-controls button {
+    width: 44px;
+}
 }
 
 @media (max-height: 600px) {

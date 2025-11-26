@@ -681,43 +681,6 @@ function nextProblem() {
     displayProblem();
 }
 
-// --- Event Listeners ---
-
-fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        loadFiles(e.target.files);
-    }
-});
-
-daySelect.addEventListener('change', (e) => {
-    selectDay(parseInt(e.target.value));
-});
-
-levelSelect.addEventListener('change', () => {
-    dayReset(); // Re-filter based on new level
-});
-
-answerInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        submitAnswer();
-    } else if (e.key === ' ') {
-        // Prevent space from being typed if it's meant to submit (optional, but mimicking python behavior)
-        // But in web, space is useful. Let's stick to Enter for submit, 
-        // or maybe allow space to trigger submit if input is not empty?
-        // Python version: space triggers submit after 10ms.
-        // Let's keep standard web behavior: Enter to submit.
-    }
-});
-
-modeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        modeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentMode = parseInt(btn.dataset.mode);
-        displayProblem();
-    });
-});
-
 // Set default active mode
 document.querySelector('.btn-mode[data-mode="1"]').classList.add('active');
 
