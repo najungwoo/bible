@@ -4,6 +4,107 @@
     --primary-color: #3498db;
     --secondary-color: #2c3e50;
     --accent-color: #e74c3c;
+    --success-color: #2ecc71;
+    --warning-color: #f1c40f;
+    --card-bg: #2d2d2d;
+    --input-bg: #3d3d3d;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #444;
+}
+
+h1 {
+    font-size: 1.2rem;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.controls-top {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-file {
+    background-color: var(--secondary-color);
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    color: var(--text-color);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+select {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 1px solid #555;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    max-width: 150px;
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+}
+
+.correct {
+    color: var(--success-color);
+    color: #888;
+}
+
+footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+}
+
+.mode-controls,
+.action-controls,
+.font-controls {
     display: flex;
     gap: 5px;
     justify-content: center;
@@ -139,49 +240,79 @@ button:active {
     justify-content: space-between;
     align-items: center;
     font-size: 0.9rem;
-    padding: 5px;
 }
 
-h1 {
-    font-size: 1.1rem;
+#verseList li:last-child {
+    border-bottom: none;
 }
 
-.controls-top {
-    gap: 5px;
-}
-
-.btn-file,
-select {
-    font-size: 0.8rem;
-    padding: 6px 8px;
-}
-
-.problem-area {
+.btn-delete-verse {
+    background-color: transparent;
+    color: var(--accent-color);
+    border: none;
+    cursor: pointer;
     font-size: 1.2rem;
-    padding: 15px;
-    min-height: 120px;
+    padding: 0 5px;
+    flex-grow: 0;
 }
 
-.btn-mode,
-.btn-action,
-.btn-font {
-    padding: 12px 5px;
-    font-size: 0.85rem;
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
 }
 
-.input-area input {
-    font-size: 1rem;
-    padding: 12px;
+.btn-save {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
 }
 
-footer {
-    gap: 8px;
-    padding-bottom: 10px;
-}
+/* Mobile Optimizations */
+@media (max-width: 600px) {
+    .container {
+        padding: 5px;
+    }
 
-.font-controls button {
-    width: 44px;
-}
+    h1 {
+        font-size: 1.1rem;
+    }
+
+    .controls-top {
+        gap: 5px;
+    }
+
+    .btn-file,
+    select {
+        font-size: 0.8rem;
+        padding: 6px 8px;
+    }
+
+    .problem-area {
+        font-size: 1.2rem;
+        padding: 15px;
+        min-height: 120px;
+    }
+
+    .btn-mode,
+    .btn-action,
+    .btn-font {
+        padding: 12px 5px;
+        font-size: 0.85rem;
+    }
+
+    .input-area input {
+        font-size: 1rem;
+        padding: 12px;
+    }
+
+    footer {
+        gap: 8px;
+        padding-bottom: 10px;
+    }
+
+    .font-controls button {
+        width: 44px;
+    }
 }
 
 @media (max-height: 600px) {

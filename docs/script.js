@@ -681,6 +681,43 @@ function nextProblem() {
     displayProblem();
 }
 
+// --- Event Listeners ---
+
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        loadFiles(e.target.files);
+    }
+});
+
+daySelect.addEventListener('change', (e) => {
+    selectDay(parseInt(e.target.value));
+});
+
+levelSelect.addEventListener('change', () => {
+    dayReset(); // Re-filter based on new level
+});
+
+answerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        submitAnswer();
+    } else if (e.key === ' ') {
+        // Prevent space from being typed if it's meant to submit (optional, but mimicking python behavior)
+        // But in web, space is useful. Let's stick to Enter for submit, 
+        // or maybe allow space to trigger submit if input is not empty?
+        // Python version: space triggers submit after 10ms.
+        // Let's keep standard web behavior: Enter to submit.
+    }
+});
+
+modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        modeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMode = parseInt(btn.dataset.mode);
+        displayProblem();
+    });
+});
+
 // Set default active mode
 document.querySelector('.btn-mode[data-mode="1"]').classList.add('active');
 
@@ -698,6 +735,122 @@ btnWrong.addEventListener('click', () => {
     failNum = 0;
     wrongVerses = [];
     updateStatus();
+    displayProblem();
+});
+
+btnFontUp.addEventListener('click', () => {
+    fontSize += 2;
+    problemArea.style.fontSize = fontSize + 'px';
+});
+
+btnFontDown.addEventListener('click', () => {
+    if (fontSize > 10) fontSize -= 2;
+    problemArea.style.fontSize = fontSize + 'px';
+});
+
+// Paste Modal Logic
+btnPaste.addEventListener('click', () => {
+    pasteModal.style.display = "block";
+    pasteTitle.value = "";
+    inputRef.value = "";
+    inputVerse.value = "";
+    tempVerses = [];
+    renderVerseList();
+    pasteTitle.focus();
+});
+
+closePasteModal.addEventListener('click', () => {
+    pasteModal.style.display = "none";
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target == pasteModal) {
+        pasteModal.style.display = "none";
+    }
+});
+
+// Add Verse to List
+btnAddVerse.addEventListener('click', () => {
+    const ref = inputRef.value.trim();
+    const text = inputVerse.value.trim();
+
+    if (!ref || !text) {
+        alert("장절과 내용을 모두 입력해주세요.");
+        return;
+    }
+
+    // Format: (Ref)^Text
+    const formatted = `(${ref})^${text}`;
+    tempVerses.push(formatted);
+
+    inputRef.value = "";
+    inputVerse.value = "";
+    inputRef.focus();
+
+    renderVerseList();
+});
+
+function renderVerseList() {
+    verseList.innerHTML = "";
+    if (tempVerses.length === 0) {
+        verseList.innerHTML = '<p class="list-placeholder">추가된 구절이 없습니다.</p>';
+        return;
+    }
+
+    tempVerses.forEach((v, i) => {
+        const div = document.createElement('div');
+        div.className = 'verse-item';
+
+        // Display friendly text
+        let display = v;
+        if (v.includes(')^')) {
+            display = v.replace(')^', ') ');
+        }
+
+        div.innerHTML = `
+            <span>${display}</span>
+            <button class="btn-delete-verse" data-index="${i}">❌</button>
+        `;
+        verseList.appendChild(div);
+    });
+
+    // Add delete listeners
+    document.querySelectorAll('.btn-delete-verse').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.dataset.index);
+            tempVerses.splice(idx, 1);
+            renderVerseList();
+        });
+    });
+}
+
+btnSavePaste.addEventListener('click', () => {
+    let title = pasteTitle.value.trim();
+
+    if (tempVerses.length === 0) {
+        alert("최소 한 개 이상의 구절을 추가해주세요.");
+        return;
+    }
+
+    if (!title) {
+        title = `Day ${originalScriptures.length + 1} (직접 입력)`;
+    }
+
+    // Store data
+    originalScriptures.push([...tempVerses]);
+    originalFilenames.push(title);
+
+    // Add to dropdown
+    const option = document.createElement('option');
+    option.value = originalScriptures.length - 1;
+    option.textContent = title;
+    daySelect.appendChild(option);
+
+    // Save and Select
+    saveDataToStorage();
+    daySelect.value = originalScriptures.length - 1;
+    selectDay(originalScriptures.length - 1);
+
     // Close Modal
     pasteModal.style.display = "none";
 });
