@@ -91,30 +91,6 @@ main {
 
 .correct {
     color: var(--success-color);
-}
-
-.wrong {
-    color: var(--accent-color);
-}
-
-.input-area input {
-    width: 100%;
-    padding: 15px;
-    font-size: 1.2rem;
-    background-color: var(--input-bg);
-    border: 2px solid #555;
-    border-radius: 8px;
-    color: var(--text-color);
-}
-
-.input-area input:focus {
-    border-color: var(--primary-color);
-    outline: none;
-}
-
-.status-bar {
-    text-align: center;
-    font-size: 0.9rem;
     color: #888;
 }
 
