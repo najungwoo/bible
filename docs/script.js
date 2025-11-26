@@ -21,7 +21,6 @@ let problemCompleted = false;
 let leftVerse = 0;
 let failNum = 0;
 let wrongVerses = [];
-let hintCount = 0; // Track hint usage for current problem
 
 // DOM Elements
 const fileInput = document.getElementById('fileInput');
@@ -476,7 +475,6 @@ function displayProblem() {
     currentReference = ref;
     attempts = 0;
     problemCompleted = false;
-    hintCount = 0; // Reset hint counter for new problem
 
     renderProblem(currentProblem);
     answerInput.value = "";
@@ -746,6 +744,36 @@ modeBtns.forEach(btn => {
 });
 
 // Set default active mode
+document.querySelector('.btn-mode[data-mode="1"]').classList.add('active');
+
+btnReset.addEventListener('click', dayReset);
+
+// Hint button: shows progressive hints in answer input placeholder
+btnHint.addEventListener('click', () => {
+    if (currentScripture.length === 0 || currentAnswers.length === 0 || problemCompleted) {
+        return;
+    }
+
+    const answer = currentAnswers[0];
+    let hint = '';
+
+    if (hintCount === 0) {
+        hint = `힌트: ${answer.charAt(0)}...`;
+    } else if (hintCount === 1) {
+        const halfLen = Math.ceil(answer.length / 2);
+        hint = `힌트: ${answer.substring(0, halfLen)}...`;
+    } else {
+        hint = `정답: ${answer}`;
+    }
+
+    hintCount++;
+    if (hintCount > 2) hintCount = 2; // Cap at 3 hints
+
+    answerInput.placeholder = hint;
+    answerInput.focus();
+});
+
+btnSkip.addEventListener('click', displayProblem);
 
 btnWrong.addEventListener('click', () => {
     if (wrongVerses.length === 0) {
