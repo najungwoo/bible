@@ -78,20 +78,6 @@ select {
     background-color: var(--secondary-color);
     color: var(--text-color);
     border: 1px solid #555;
-    padding: 8px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    max-width: 150px;
-}
-
-main {
-    flex-grow: 1;
-    display: flex;
-}
-
-.correct {
-    color: var(--success-color);
-    color: #888;
 }
 
 footer {
