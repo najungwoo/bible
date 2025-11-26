@@ -50,282 +50,259 @@ h1 {
 }
 
 .controls-top {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
 
-.btn-file {
-    background-color: var(--secondary-color);
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    color: var(--text-color);
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-input[type="file"] {
-    display: none;
-}
-
-select {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    border: 1px solid #555;
-    padding: 8px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    max-width: 150px;
-}
-
-main {
-    flex-grow: 1;
-    display: flex;
-}
-
-.correct {
-    color: var(--success-color);
-    color: #888;
-}
-
-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #444;
-}
-
-.mode-controls,
-.action-controls,
-.font-controls {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-}
-
-button {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    flex-grow: 1;
-    transition: background 0.2s;
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-.btn-mode.active {
-    background-color: var(--primary-color);
-    font-weight: bold;
-}
-
-.btn-action.reset {
-    background-color: #c0392b;
-}
-
-.btn-action.skip {
-    background-color: #f39c12;
-    color: #2c3e50;
-}
-
-.btn-action.wrong {
-    background-color: var(--secondary-color);
-}
-
-.btn-font {
-    flex-grow: 0;
-    width: 50px;
-}
-
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-    color: #fff;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Easy Input Styles */
-.easy-input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.input-row {
-    display: flex;
-    gap: 5px;
-}
-
-.input-row input {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #555;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-}
-
-#inputRef {
-    width: 30%;
-}
-
-#inputVerse {
-    flex-grow: 1;
-}
-
-#pasteTitle {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #555;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-}
-
-.btn-add {
-    background-color: var(--success-color);
-    color: white;
-    width: auto;
-    padding: 0 15px;
-    flex-grow: 0;
-}
-
-.verse-list-container {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #444;
-    border-radius: 5px;
-    padding: 5px;
-    background-color: #222;
-}
-
-#verseList {
-    list-style: none;
-}
-
-#verseList li {
-    padding: 5px;
-    border-bottom: 1px solid #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-}
-
-#verseList li:last-child {
-    border-bottom: none;
-}
-
-.btn-delete-verse {
-    background-color: transparent;
-    color: var(--accent-color);
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0 5px;
-    flex-grow: 0;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.btn-save {
-    background-color: var(--primary-color);
-    color: white;
-    width: 100%;
-}
-
-/* Mobile Optimizations */
-@media (max-width: 600px) {
-    .container {
-        padding: 5px;
-    }
-
-    h1 {
-        font-size: 1.1rem;
-    }
-
-    .controls-top {
-        gap: 5px;
-    }
-
-    .btn-file,
     select {
-        font-size: 0.8rem;
-        padding: 6px 8px;
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        border: 1px solid #555;
+        padding: 8px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        max-width: 150px;
     }
 
-    .problem-area {
-        font-size: 1.2rem;
-        padding: 15px;
-        min-height: 120px;
+    main {
+        flex-grow: 1;
+        display: flex;
     }
 
-    .btn-mode,
-    .btn-action,
-    .btn-font {
-        padding: 12px 5px;
-        font-size: 0.85rem;
-    }
-
-    .input-area input {
-        font-size: 1rem;
-        padding: 12px;
+    .correct {
+        color: var(--success-color);
+        color: #888;
     }
 
     footer {
-        gap: 8px;
-        padding-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #444;
     }
 
-    .font-controls button {
-        width: 44px;
-    }
-}
-
-@media (max-height: 600px) {
-    .problem-area {
-        min-height: 100px;
-        font-size: 1.2rem;
-    }
-
-    footer {
+    .mode-controls,
+    .action-controls,
+    .font-controls {
+        display: flex;
         gap: 5px;
+        justify-content: center;
     }
 
     button {
-        padding: 8px;
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        flex-grow: 1;
+        transition: background 0.2s;
     }
-}
+
+    button:active {
+        transform: scale(0.98);
+    }
+
+    .btn-mode.active {
+        background-color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    .btn-action.reset {
+        background-color: #c0392b;
+    }
+
+    .btn-action.skip {
+        background-color: #f39c12;
+        color: #2c3e50;
+    }
+
+    .btn-action.wrong {
+        background-color: var(--secondary-color);
+    }
+
+    .btn-font {
+        flex-grow: 0;
+        width: 50px;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #fff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Easy Input Styles */
+    .easy-input-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-row {
+        display: flex;
+        gap: 5px;
+    }
+
+    .input-row input {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #555;
+        background-color: var(--input-bg);
+        color: var(--text-color);
+    }
+
+    #inputRef {
+        width: 30%;
+    }
+
+    #inputVerse {
+        flex-grow: 1;
+    }
+
+    #pasteTitle {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #555;
+        background-color: var(--input-bg);
+        color: var(--text-color);
+    }
+
+    .btn-add {
+        background-color: var(--success-color);
+        color: white;
+        width: auto;
+        padding: 0 15px;
+        flex-grow: 0;
+    }
+
+    .verse-list-container {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #444;
+        border-radius: 5px;
+        padding: 5px;
+        background-color: #222;
+    }
+
+    #verseList {
+        list-style: none;
+    }
+
+    #verseList li {
+        padding: 5px;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+
+    #verseList li:last-child {
+        border-bottom: none;
+    }
+
+    .btn-delete-verse {
+        background-color: transparent;
+        color: var(--accent-color);
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0 5px;
+        flex-grow: 0;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-save {
+        background-color: var(--primary-color);
+        color: white;
+        width: 100%;
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 600px) {
+        .container {
+            padding: 5px;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+        }
+
+        .controls-top {
+            gap: 5px;
+        }
+
+        .btn-file,
+        select {
+            font-size: 0.8rem;
+            padding: 6px 8px;
+        }
+
+        .problem-area {
+            font-size: 1.2rem;
+            padding: 15px;
+            min-height: 120px;
+        }
+
+        .btn-mode,
+        .btn-action,
+        .btn-font {
+            padding: 12px 5px;
+            font-size: 0.85rem;
+        }
+
+        .input-area input {
+            font-size: 1rem;
+            padding: 12px;
+        }
+
+        footer {
+            gap: 8px;
+            padding-bottom: 10px;
+        }
+
+        .font-controls button {
+            width: 44px;
+        }
+    }
+
+    @media (max-height: 600px) {
+        .problem-area {
+            min-height: 100px;
+            font-size: 1.2rem;
+        }
+
+        footer {
+            gap: 5px;
+        }
+
+        button {
+            padding: 8px;
+        }
+    }
