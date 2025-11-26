@@ -359,7 +359,7 @@ function saveDataToStorage() {
 }
 
 // Data Version - Increment this to force update default data for users
-const DATA_VERSION = "1.4";
+const DATA_VERSION = "1.5";
 
 function loadDataFromStorage() {
     try {
@@ -430,12 +430,11 @@ function dayReset() {
         if (selectedLevel === "all") {
             currentScripture = [...allVerses];
         } else {
-            // Filter by level (e.g., "1\(...")
+            // Filter by level (e.g., "1\\(...")
             currentScripture = allVerses.filter(line => {
-                // Check if line starts with "Level\"
-                // Data format: "1\(Reference)^Verse"
-                // In the actual string, there's one backslash
-                return line.startsWith(selectedLevel + "\(");
+                // Data format in file: "1\(Reference)^Verse"
+                // In JavaScript string, we need "\\" to represent single backslash
+                return line.startsWith(selectedLevel + "\\(");
             });
         }
 
