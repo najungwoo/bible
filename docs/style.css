@@ -4,20 +4,6 @@
     --primary-color: #3498db;
     --secondary-color: #2c3e50;
     --accent-color: #e74c3c;
-    --success-color: #2ecc71;
-    --warning-color: #f1c40f;
-    --card-bg: #2d2d2d;
-    --input-bg: #3d3d3d;
-}
-
-* {
-    padding-top: 10px;
-    border-top: 1px solid #444;
-}
-
-.mode-controls,
-.action-controls,
-.font-controls {
     display: flex;
     gap: 5px;
     justify-content: center;
