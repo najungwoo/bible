@@ -665,11 +665,17 @@ function replaceBlankWithAnswer(answer, correct) {
     const match = currentProblem.match(/(_+)/);
     if (match) {
         const placeholder = match[0];
-        const replacement = `<span class="${correct ? 'correct' : 'wrong'}">${answer}</span>`;
+        const replacement = `<span class="${correct ? 'correct' : 'wrong'}">${escapeHtml(answer)}</span>`;
         // Replace only the first occurrence
         currentProblem = currentProblem.replace(placeholder, replacement);
-        problemArea.innerHTML = currentProblem;
+        problemArea.innerHTML = escapeHtml(currentProblem).replace(/&lt;span class="(correct|wrong)"&gt;(.*?)&lt;\/span&gt;/g, '<span class="$1">$2</span>');
     }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function nextProblem() {
