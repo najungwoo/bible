@@ -729,23 +729,6 @@ btnPaste.addEventListener('click', () => {
     inputRef.value = "";
     inputVerse.value = "";
     tempVerses = [];
-    renderVerseList();
-    pasteTitle.focus();
-});
-
-closePasteModal.addEventListener('click', () => {
-    pasteModal.style.display = "none";
-});
-
-window.addEventListener('click', (e) => {
-    if (e.target == pasteModal) {
-        pasteModal.style.display = "none";
-    }
-});
-
-// Add Verse to List
-btnAddVerse.addEventListener('click', () => {
-    const ref = inputRef.value.trim();
     const text = inputVerse.value.trim();
 
     if (!ref || !text) {
