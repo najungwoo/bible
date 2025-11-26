@@ -38,6 +38,7 @@ const modeBtns = document.querySelectorAll('.btn-mode');
 
 // Paste Modal Elements
 const btnPaste = document.getElementById('btnPaste');
+const btnDelete = document.getElementById('btnDelete');
 const pasteModal = document.getElementById('pasteModal');
 const closePasteModal = document.querySelector('.close');
 const btnSavePaste = document.getElementById('btnSavePaste');
@@ -811,6 +812,67 @@ btnSavePaste.addEventListener('click', () => {
 
     // Close Modal
     pasteModal.style.display = "none";
+});
+
+// Add Verse in Modal
+btnAddVerse.addEventListener('click', () => {
+    const ref = inputRef.value.trim();
+    const text = inputVerse.value.trim();
+
+    if (!ref || !text) {
+        alert("장절과 내용을 모두 입력해주세요.");
+        return;
+    }
+
+    // Format: (Ref)^Text
+    const formatted = `(${ref})^${text}`;
+    tempVerses.push(formatted);
+
+    inputRef.value = "";
+    inputVerse.value = "";
+    inputRef.focus();
+
+    renderVerseList();
+});
+
+// Delete Day Logic
+btnDelete.addEventListener('click', () => {
+    if (currentDayIndex === -1) {
+        alert("삭제할 일차를 선택해주세요.");
+        return;
+    }
+
+    const dayName = originalFilenames[currentDayIndex];
+    if (confirm(`정말 '${dayName}'을(를) 삭제하시겠습니까?`)) {
+        originalScriptures.splice(currentDayIndex, 1);
+        originalFilenames.splice(currentDayIndex, 1);
+        saveDataToStorage();
+
+        // Re-render dropdown
+        daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
+        originalFilenames.forEach((name, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = name.replace('.txt', '');
+            daySelect.appendChild(option);
+        });
+
+        // Reset view
+        currentDayIndex = -1;
+        daySelect.value = "";
+        dayReset();
+    }
+});
+
+// Close Modal Logic
+closePasteModal.addEventListener('click', () => {
+    pasteModal.style.display = "none";
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target == pasteModal) {
+        pasteModal.style.display = "none";
+    }
 });
 
 // Add shake animation style dynamically
