@@ -87,30 +87,6 @@ select {
 main {
     flex-grow: 1;
     display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 20px 0;
-    overflow-y: auto;
-}
-
-.problem-area {
-    background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 10px;
-    min-height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    line-height: 1.6;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    flex-grow: 1;
-}
-
-.placeholder {
-    color: #777;
-    font-size: 1rem;
 }
 
 .correct {

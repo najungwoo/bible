@@ -430,14 +430,13 @@ function dayReset() {
         if (selectedLevel === "all") {
             currentScripture = [...allVerses];
         } else {
-            // Filter by level (e.g., "1\(...)")
-            currentScripture = allVerses.filter(line => {
-                // Data format in file: "1\(Reference)^Verse"
-                // In JavaScript, "\\" represents a single backslash
-                return line.startsWith(selectedLevel + "\\(");
-            });
+            // Cumulative filtering: 1 to maxLevel
+            const maxLevel = parseInt(selectedLevel, 10);
+            // Regex to match levels 1 to maxLevel. 
+            // Since levels are single digits (1-4), [1-maxLevel] works.
+            const levelRegex = new RegExp(`^[1-${maxLevel}]\\(`);
+            currentScripture = allVerses.filter(line => levelRegex.test(line));
         }
-
         leftVerse = currentScripture.length;
     } else {
         currentScripture = [];
@@ -478,7 +477,6 @@ function displayProblem() {
 }
 
 function renderProblem(text) {
-    // Simple rendering, can be improved to highlight specific parts
     problemArea.textContent = text;
     problemArea.style.fontSize = fontSize + 'px';
 }
