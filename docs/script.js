@@ -695,6 +695,10 @@ daySelect.addEventListener('change', (e) => {
     }
 });
 
+levelSelect.addEventListener('change', () => {
+    dayReset();
+});
+
 fileInput.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
         loadFiles(e.target.files);
