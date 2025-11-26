@@ -415,14 +415,17 @@ function createProblem(line, mode) {
     return ["", [], ""];
 }
 
+let autoAdvanceTimer = null;
+
 function submitAnswer() {
     const userAnswer = answerInput.value.trim();
-    if (currentScripture.length === 0 || currentAnswers.length === 0) return;
 
     if (problemCompleted) {
         nextProblem();
         return;
     }
+
+    if (currentScripture.length === 0 || currentAnswers.length === 0) return;
 
     if (normToken(userAnswer) === normToken(currentAnswers[0])) {
         replaceBlankWithAnswer(currentAnswers[0], true);
@@ -432,7 +435,7 @@ function submitAnswer() {
         if (currentAnswers.length === 0) {
             problemCompleted = true;
             // Auto-advance
-            setTimeout(nextProblem, 500);
+            autoAdvanceTimer = setTimeout(nextProblem, 500);
         }
     } else {
         attempts++;
@@ -481,6 +484,10 @@ function replaceBlankWithAnswer(answer, correct) {
 }
 
 function nextProblem() {
+    if (autoAdvanceTimer) {
+        clearTimeout(autoAdvanceTimer);
+        autoAdvanceTimer = null;
+    }
     currentScripture.splice(problemNum, 1);
     leftVerse--;
     updateStatus();
