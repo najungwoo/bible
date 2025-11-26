@@ -149,326 +149,350 @@ button:active {
 
 .btn-file input[type="file"] {
     display: none;
+}
 
-    .input-area {
-        margin: 10px 0;
-    }
+.btn-file.delete {
+    background-color: #c0392b;
+}
 
-    .input-area input {
-        width: 100%;
-        padding: 12px;
-        font-size: 1rem;
-        background-color: var(--input-bg);
-        color: var(--text-color);
-        border: 1px solid #555;
-        border-radius: 5px;
-    }
+.problem-area {
+    flex-grow: 1;
+    display: block;
+    font-size: 1.5rem;
+    padding: 20px;
+    text-align: center;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    margin: 10px 0;
+    min-height: 200px;
+    line-height: 1.8;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
 
-    .status-bar {
-        text-align: center;
+.placeholder {
+    color: #888;
+}
+
+.input-area {
+    margin: 10px 0;
+}
+
+.input-area input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid #555;
+    border-radius: 5px;
+}
+
+.status-bar {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #999;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-content h2 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.close {
+    color: #aaa;
+    align-self: flex-end;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close:hover,
+.close:focus {
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Easy Input Styles */
+.easy-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.input-row {
+    display: flex;
+    gap: 5px;
+}
+
+.input-row input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+#inputRef {
+    width: 30%;
+}
+
+#inputVerse {
+    flex-grow: 1;
+}
+
+#newDayTitle {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+.btn-add {
+    background-color: var(--success-color);
+    color: white;
+    width: auto;
+    padding: 0 15px;
+    flex-grow: 0;
+}
+
+.verse-list-container {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #222;
+}
+
+#verseList {
+    list-style: none;
+}
+
+.verse-item {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.verse-item:last-child {
+    border-bottom: none;
+}
+
+.btn-delete-verse {
+    background-color: transparent;
+    color: var(--accent-color);
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 5px;
+    flex-grow: 0;
+}
+
+.list-placeholder {
+    color: #666;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-save {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+    padding: 10px;
+}
+
+.full-width-select {
+    width: 100%;
+}
+
+/* Responsive Design */
+
+/* Tablet & Large Mobile (Landscape) */
+@media (max-width: 768px) {
+    .container {
         padding: 10px;
+        max-width: 100%;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .controls-top {
+        gap: 8px;
+    }
+
+    .btn-file,
+    select {
         font-size: 0.9rem;
-        color: #999;
-    }
-
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        align-items: center;
-        justify-content: center;
-    }
-
-    .modal-content {
-        background-color: var(--card-bg);
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 90%;
-        max-width: 500px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .modal-content h2 {
-        color: var(--primary-color);
-        font-size: 1.2rem;
-    }
-
-    .close {
-        color: #aaa;
-        align-self: flex-end;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-        line-height: 1;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: #fff;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    /* Easy Input Styles */
-    .easy-input-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .input-group label {
-        font-size: 0.9rem;
-        color: #999;
-    }
-
-    .input-group input,
-    .input-group select {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #555;
-        background-color: var(--input-bg);
-        color: var(--text-color);
-        font-size: 0.9rem;
-    }
-
-    .input-row {
-        display: flex;
-        gap: 5px;
-    }
-
-    .input-row input {
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #555;
-        background-color: var(--input-bg);
-        color: var(--text-color);
-    }
-
-    #inputRef {
-        width: 30%;
-    }
-
-    #inputVerse {
+        padding: 8px 10px;
         flex-grow: 1;
     }
 
-    #newDayTitle {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #555;
-        background-color: var(--input-bg);
-        color: var(--text-color);
-    }
-
-    .btn-add {
-        background-color: var(--success-color);
-        color: white;
-        width: auto;
-        padding: 0 15px;
-        flex-grow: 0;
-    }
-
-    .verse-list-container {
-        max-height: 200px;
-        overflow-y: auto;
-        border: 1px solid #444;
-        border-radius: 5px;
-        padding: 5px;
-        background-color: #222;
-    }
-
-    #verseList {
-        list-style: none;
-    }
-
-    .verse-item {
-        padding: 8px;
-        border-bottom: 1px solid #333;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.9rem;
-    }
-
-    .verse-item:last-child {
-        border-bottom: none;
-    }
-
-    .btn-delete-verse {
-        background-color: transparent;
-        color: var(--accent-color);
-        border: none;
-        cursor: pointer;
-        font-size: 1.2rem;
-        padding: 0 5px;
-        flex-grow: 0;
-    }
-
-    .list-placeholder {
-        color: #666;
-        text-align: center;
+    .problem-area {
+        font-size: 1.4rem;
         padding: 20px;
+    }
+
+    .mode-controls button,
+    .action-controls button {
+        padding: 12px;
         font-size: 0.9rem;
     }
+}
 
-    .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
+/* Mobile (Portrait) */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
     }
 
-    .btn-save {
-        background-color: var(--primary-color);
-        color: white;
+    .controls-top {
+        gap: 5px;
+    }
+
+    .btn-file,
+    select {
+        font-size: 0.8rem;
+        padding: 6px;
+        width: 48%;
+    }
+
+    #btnAddDay,
+    #btnOpenAddVerse,
+    #btnDelete,
+    label[for="fileInput"] {
         width: 100%;
+    }
+
+    .problem-area {
+        font-size: 1.2rem;
+        padding: 15px;
+        min-height: 150px;
+    }
+
+    .input-area input {
+        font-size: 1rem;
+        padding: 12px;
+    }
+
+    footer {
+        gap: 8px;
+    }
+
+    .mode-controls,
+    .action-controls {
+        flex-wrap: wrap;
+    }
+
+    .mode-controls button,
+    .action-controls button {
+        flex-grow: 1;
+        width: 48%;
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+
+    .font-controls {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .font-controls button {
+        width: 48%;
+    }
+}
+
+/* Small Height Screens (Landscape Mobile) */
+@media (max-height: 500px) {
+    .container {
+        padding: 5px;
+    }
+
+    header {
+        padding: 5px 0;
+    }
+
+    .problem-area {
+        min-height: 80px;
+        font-size: 1.1rem;
         padding: 10px;
     }
 
-    .full-width-select {
-        width: 100%;
+    footer {
+        padding-top: 5px;
     }
 
-    /* Responsive Design */
-
-    /* Tablet & Large Mobile (Landscape) */
-    @media (max-width: 768px) {
-        .container {
-            padding: 10px;
-            max-width: 100%;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-        }
-
-        .controls-top {
-            gap: 8px;
-        }
-
-        .btn-file,
-        select {
-            font-size: 0.9rem;
-            padding: 8px 10px;
-            flex-grow: 1;
-        }
-
-        .problem-area {
-            font-size: 1.4rem;
-            padding: 20px;
-        }
-
-        .mode-controls button,
-        .action-controls button {
-            padding: 12px;
-            font-size: 0.9rem;
-        }
+    button {
+        padding: 6px;
     }
-
-    /* Mobile (Portrait) */
-    @media (max-width: 480px) {
-        h1 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
-
-        .controls-top {
-            gap: 5px;
-        }
-
-        .btn-file,
-        select {
-            font-size: 0.8rem;
-            padding: 6px;
-            width: 48%;
-        }
-
-        #btnAddDay,
-        #btnOpenAddVerse,
-        #btnDelete,
-        label[for="fileInput"] {
-            width: 100%;
-        }
-
-        .problem-area {
-            font-size: 1.2rem;
-            padding: 15px;
-            min-height: 150px;
-        }
-
-        .input-area input {
-            font-size: 1rem;
-            padding: 12px;
-        }
-
-        footer {
-            gap: 8px;
-        }
-
-        .mode-controls,
-        .action-controls {
-            flex-wrap: wrap;
-        }
-
-        .mode-controls button,
-        .action-controls button {
-            flex-grow: 1;
-            width: 48%;
-            padding: 10px;
-            font-size: 0.85rem;
-        }
-
-        .font-controls {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-        }
-
-        .font-controls button {
-            width: 48%;
-        }
-    }
-
-    /* Small Height Screens (Landscape Mobile) */
-    @media (max-height: 500px) {
-        .container {
-            padding: 5px;
-        }
-
-        header {
-            padding: 5px 0;
-        }
-
-        .problem-area {
-            min-height: 80px;
-            font-size: 1.1rem;
-            padding: 10px;
-        }
-
-        footer {
-            padding-top: 5px;
-        }
-
-        button {
-            padding: 6px;
-        }
-    }
+}
