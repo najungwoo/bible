@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>말씀 암송 (Bible Memory)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>말씀 암송</h1>
+            <div class="controls-top">
+                <label for="fileInput" class="btn-file">
+                    📂 파일 열기
+                    <input type="file" id="fileInput" accept=".txt" multiple>
+                </label>
+                <button id="btnPaste" class="btn-file">📋 붙여넣기</button>
+                <select id="daySelect">
+                    <option value="" disabled selected>일차 선택</option>
+                </select>
+            </div>
+        </header>
+
+        <main>
+            <div id="problemArea" class="problem-area">
+                <p class="placeholder">파일을 열거나 붙여넣기로 시작하세요.</p>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="answerInput" placeholder="정답을 입력하세요..." autocomplete="off">
+            </div>
+
+            <div class="status-bar">
+                <span id="statusText">남은 구절: 0 | 틀린 갯수: 0</span>
+            </div>
+        </main>
+
+        <footer>
+            <div class="mode-controls">
+                <button class="btn-mode" data-mode="1">빈칸</button>
+                <button class="btn-mode" data-mode="2">구절</button>
+                <button class="btn-mode" data-mode="3">장절</button>
+                <button class="btn-mode" data-mode="4">전체</button>
+            </div>
+            <div class="action-controls">
+                <button id="btnReset" class="btn-action reset">초기화</button>
+                <button id="btnSkip" class="btn-action skip">스킵</button>
+                <button id="btnWrong" class="btn-action wrong">틀린 구절</button>
+            </div>
+            <div class="font-controls">
+                <!DOCTYPE html>
+                <html lang="ko">
+
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>말씀 암송 (Bible Memory)</title>
+                    <link rel="stylesheet" href="style.css">
+                </head>
+
+                <body>
+                    <div class="container">
+                        <header>
+                            <h1>말씀 암송</h1>
+                            <div class="controls-top">
+                                <label for="fileInput" class="btn-file">
+                                    📂 파일 열기
+                                    <input type="file" id="fileInput" accept=".txt" multiple>
+                                </label>
+                                <button id="btnPaste" class="btn-file">📋 붙여넣기</button>
+                                <select id="daySelect">
+                                    <option value="" disabled selected>일차 선택</option>
+                                </select>
+                            </div>
+                        </header>
+
+                        <main>
+                            <div id="problemArea" class="problem-area">
+                                <p class="placeholder">파일을 열거나 붙여넣기로 시작하세요.</p>
+                            </div>
+
+                            <div class="input-area">
+                                <input type="text" id="answerInput" placeholder="정답을 입력하세요..." autocomplete="off">
+                            </div>
+
+                            <div class="status-bar">
+                                <span id="statusText">남은 구절: 0 | 틀린 갯수: 0</span>
+                            </div>
+                        </main>
+
+                        <footer>
+                            <div class="mode-controls">
+                                <button class="btn-mode" data-mode="1">빈칸</button>
+                                <button class="btn-mode" data-mode="2">구절</button>
+                                <button class="btn-mode" data-mode="3">장절</button>
+                                <button class="btn-mode" data-mode="4">전체</button>
+                            </div>
+                            <div class="action-controls">
+                                <button id="btnReset" class="btn-action reset">초기화</button>
+                                <button id="btnSkip" class="btn-action skip">스킵</button>
+                                <button id="btnWrong" class="btn-action wrong">틀린 구절</button>
+                            </div>
+                            <div class="font-controls">
+
+                </html>
