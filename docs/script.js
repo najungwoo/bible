@@ -430,10 +430,10 @@ function dayReset() {
         if (selectedLevel === "all") {
             currentScripture = [...allVerses];
         } else {
-            // Filter by level (e.g., "1\\(...")
+            // Filter by level (e.g., "1\(...)")
             currentScripture = allVerses.filter(line => {
                 // Data format in file: "1\(Reference)^Verse"
-                // In JavaScript string, we need "\\" to represent single backslash
+                // In JavaScript, "\\" represents a single backslash
                 return line.startsWith(selectedLevel + "\\(");
             });
         }
