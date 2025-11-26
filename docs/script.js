@@ -683,6 +683,21 @@ function nextProblem() {
 
 
 
+
+// --- Event Listeners ---
+
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        loadFiles(e.target.files);
+    }
+});
+
+answerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        submitAnswer();
+    }
+});
+
 modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         modeBtns.forEach(b => b.classList.remove('active'));
