@@ -201,7 +201,30 @@ class BibleApp(ctk.CTk):
             day1_path = os.path.join(local_data_dir, "day1.txt")
             try:
                 with open(day1_path, "w", encoding="utf-8") as f:
-                    sample_data = """(요 4:24)^하나님은 영이시니 예배하는 자가 신령과 진정으로 예배할지니라"""
+                    sample_data = """1\(요 5:39)^너희가 성경에서 영생을 얻는줄 생각하고 성경을 상고하거니와 이 성경이 곧 내게 대하여 증거하는 것이로다
+1\(롬 10:17)^그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라
+1\(사 34:16)^너희는 여호와의 책을 자세히 읽어보라 이것들이 하나도 빠진 것이 없고 하나도 그 짝이 없는 것이 없으리니 이는 여호와의 입이 이를 명하셨고 그의 신이 이것들을 모으셨음이라
+1\(딤후 3:16-17)^모든 성경은 하나님의 감동으로 된 것으로 교훈과 책망과 바르게 함과 의로 교육하기에 유익하니 이는 하나님의 사람으로 온전케 하며 모든 선한 일을 행하기에 온전케 하려 함이니라
+1\(벧후 1:20-21)^먼저 알 것은 경의 모든 예언은 사사로이 풀 것이 아니니 예언은 언제든지 사람의 뜻으로 낸 것이 아니요 오직 성령의 감동하심을 입은 사람들이 하나님께 받아 말한 것임이니라
+1\(딤전 6:16)^오직 그에게만 죽지 아니함이 있고 가까이 가지 못할 빛에 거하시고 아무 사람도 보지 못하였고 또 볼 수 없는 자시니 그에게 존귀와 영원한 능력을 돌릴찌어다 아멘
+1\(히 3:4)^집마다 지은 이가 있으니 만물을 지으신 이는 하나님이시라
+1\(롬 1:20)^창세로부터 그의 보이지 아니하는 것들 곧 그의 영원하신 능력과 신성이 그 만드신 만물에 분명히 보여 알게 되나니 그러므로 저희가 핑계치 못할찌니라
+1\(욥 38:31)^네가 묘성을 매어 떨기 되게 하겠느냐 삼성의 띠를 풀겠느냐
+1\(욥 26:7)^그는 북편 하늘을 허공에 펴시며 땅을 공간에 다시며
+2\(레 11:6)^토끼도 새김질은 하되 굽이 갈라지지 아니하였으므로 너희에게 부정하고
+2\(욥 39:26)^매가 떠올라서 날개를 펼쳐 남방으로 향하는 것이 어찌 네 지혜로 말미암음이냐
+1\(살전 5:23)^평강의 하나님이 친히 너희로 온전히 거룩하게 하시고 또 너희 온 영과 혼과 몸이 우리 주 예수 그리스도 강림하실 때에 흠없게 보전되기를 원하노라
+1\(롬 1:19)^이는 하나님을 알만한 것이 저희 속에 보임이라 하나님께서 이를 저희에게 보이셨느니라
+1\(롬 2:15)^이런 이들은 그 양심이 증거가 되어 그 생각들이 서로 혹은 송사하며 혹은 변명하여 그 마음에 새긴 율법의 행위를 나타내느니라
+1\(전 3:11)^하나님이 모든 것을 지으시되 때를 따라 아름답게 하셨고 또 사람에게 영원을 사모하는 마음을 주셨느니라 그러나 하나님의 하시는 일의 시종을 사람으로 측량할 수 없게 하셨도다
+1\(욥 19:26)^나의 이 가죽, 이것이 썩은 후에 내가 육체 밖에서 하나님을 보리라
+2\(창 1:27)^하나님이 자기 형상 곧 하나님의 형상대로 사람을 창조하시되 남자와 여자를 창조하시고
+3\(출 33:20)^또 가라사대 네가 내 얼굴을 보지 못하리니 나를 보고 살 자가 없음이니라
+3\(욥 36:27-28)^그가 물을 가늘게 이끌어 올리신즉 그것이 안개 되어 비를 이루고 그것이 공중에서 내려 사람 위에 쏟아지느니라
+3\(욥 36:30-31)^그가 번개 빛으로 자기의 사면에 두르시며 바다 밑도 가리우시며 이런 것들로 만민을 징벌하시며 이런 것들로 식물을 풍비히 주시느니라
+4\(사 45:18)^여호와는 하늘을 창조하신 하나님이시며 땅도 조성하시고 견고케 하시되 헛되이 창조치 아니하시고 사람으로 거하게 지으신 자시니라 그 말씀에 나는 여호와라 나 외에 다른 이가 없느니라
+4\(사 40:26)^너희는 눈을 높이 들어 누가 이 모든 것을 창조하였나 보라 주께서는 수효대로 만상을 이끌어 내시고 각각 그 이름을 부르시나니 그의 권세가 크고 그의 능력이 강하므로 하나도 빠짐이 없느니라
+4\(전 12:7)^흙은 여전히 땅으로 돌아가고 신은 그 주신 하나님께로 돌아가기 전에 기억하라"""
                     f.write(sample_data)
                 target_files["day1.txt"] = day1_path
             except:
@@ -385,7 +408,19 @@ class BibleApp(ctk.CTk):
             width=200,
             font=(self.font_family, 16)
         )
-        self.day_combo.pack(side="left", padx=(0, 20))
+        self.day_combo.pack(side="left", padx=(0, 10))
+
+        # Level Selection ComboBox
+        self.level_var = ctk.StringVar(value="전체")
+        self.level_combo = ctk.CTkComboBox(
+            self.top_frame,
+            variable=self.level_var,
+            values=["전체", "1과정", "2과정", "3과정", "4과정"],
+            command=self.on_level_combo_change,
+            width=100,
+            font=(self.font_family, 16)
+        )
+        self.level_combo.pack(side="left", padx=(0, 20))
 
         # Mode Buttons
         modes = [("빈칸", self.open_blank_level), ("구절", lambda: self.set_mode(2)), 
@@ -443,18 +478,19 @@ class BibleApp(ctk.CTk):
             idx = self.original_filenames.index(full_name)
             self.select_day(idx)
 
+    def on_level_combo_change(self, choice):
+        self.day_reset()
+
     def select_day(self, index):
         if 0 <= index < len(self.original_scriptures):
             self.day_num = index + 1
-            self.scripture = list(self.original_scriptures[index])
-            self.left_verse = len(self.scripture)
+            # self.scripture is set in day_reset now
             
             # Sync ComboBox
             if hasattr(self, 'day_combo') and index < len(self.original_filenames):
                 current_name = self.original_filenames[index].replace(".txt", "")
                 self.day_combo.set(current_name)
                 
-            self.update_status()
             self.day_reset()
 
     def update_status(self):
@@ -464,7 +500,17 @@ class BibleApp(ctk.CTk):
         if self.day_num > 0:
             idx = self.day_num - 1
             if idx < len(self.original_scriptures):
-                self.scripture = list(self.original_scriptures[idx])
+                raw_verses = self.original_scriptures[idx]
+                level_choice = self.level_var.get()
+                
+                if level_choice == "전체":
+                    self.scripture = list(raw_verses)
+                else:
+                    # Extract level number (e.g., "1과정" -> "1")
+                    target_level = level_choice.replace("과정", "")
+                    prefix = f"{target_level}\\"
+                    self.scripture = [v for v in raw_verses if v.startswith(prefix)]
+                
                 self.left_verse = len(self.scripture)
         else:
             self.scripture = []
@@ -505,7 +551,10 @@ class BibleApp(ctk.CTk):
         self.answer_entry.focus_set()
 
     def create_blank_problem(self, scripture_line, mode):
-        reference, verse = scripture_line.split('^')
+        # Handle Level prefix: "1\(Ref)^Text"
+        clean_line = re.sub(r'^\d+\\', '', scripture_line)
+        
+        reference, verse = clean_line.split('^')
         words = verse.split()
         
         if mode == 1: # Blank Mode

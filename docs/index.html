@@ -12,83 +12,89 @@
     <div class="container">
         <header>
             <h1>말씀 암송</h1>
-            <p class="placeholder">파일을 열거나 붙여넣기로 시작하세요.</p>
+            <div class="controls-top">
+                <label for="fileInput" class="btn-file">
+                    📂 파일 열기
+                    <input type="file" id="fileInput" accept=".txt" multiple>
+                </label>
+                <button id="btnPaste" class="btn-file">📋 붙여넣기</button>
+                <select id="daySelect">
+                    <option value="" disabled selected>일차 선택</option>
+                </select>
+                <select id="levelSelect">
+                    <option value="all" selected>전체 과정</option>
+                    <option value="1">1과정</option>
+                    <option value="2">2과정</option>
+                    <option value="3">3과정</option>
+                    <option value="4">4과정</option>
+                </select>
+            </div>
+        </header>
+
+        <main>
+            <div id="problemArea" class="problem-area">
+                <p class="placeholder">파일을 열거나 붙여넣기로 시작하세요.</p>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="answerInput" placeholder="정답을 입력하세요..." autocomplete="off">
+            </div>
+
+            <div class="status-bar">
+                <span id="statusText">남은 구절: 0 | 틀린 갯수: 0</span>
+            </div>
+        </main>
+
+        <footer>
+            <div class="mode-controls">
+                <button class="btn-mode" data-mode="1">빈칸</button>
+                <button class="btn-mode" data-mode="2">구절</button>
+                <button class="btn-mode" data-mode="3">장절</button>
+                <button class="btn-mode" data-mode="4">전체</button>
+            </div>
+            <div class="action-controls">
+                <button id="btnReset" class="btn-action reset">초기화</button>
+                <button id="btnSkip" class="btn-action skip">스킵</button>
+                <button id="btnWrong" class="btn-action wrong">틀린 구절</button>
+            </div>
+            <div class="font-controls">
+                <button id="btnFontDown" class="btn-font">A-</button>
+                <button id="btnFontUp" class="btn-font">A+</button>
+            </div>
+        </footer>
     </div>
 
-    <div class="input-area">
-        <input type="text" id="answerInput" placeholder="정답을 입력하세요..." autocomplete="off">
-    </div>
+    <!-- Paste Modal -->
+    <div id="pasteModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>말씀 직접 입력</h2>
 
-    <div class="status-bar">
-        <span id="statusText">남은 구절: 0 | 틀린 갯수: 0</span>
-    </div>
-    </main>
+            <div class="easy-input-container">
+                <div class="input-group">
+                    <input type="text" id="pasteTitle" placeholder="제목 (예: Day 1) - 선택사항">
+                </div>
 
-    <footer>
-        <div class="mode-controls">
-            <button class="btn-mode" data-mode="1">빈칸</button>
-            <button class="btn-mode" data-mode="2">구절</button>
-            <button class="btn-mode" data-mode="3">장절</button>
-            <button class="btn-mode" data-mode="4">전체</button>
+                <div class="input-row">
+                    <input type="text" id="inputRef" placeholder="장절 (예: 요 3:16)">
+                    <input type="text" id="inputVerse" placeholder="말씀 본문">
+                    <button id="btnAddVerse" class="btn-add">추가</button>
+                </div>
+
+                <div class="verse-list-container">
+                    <ul id="verseList">
+                        <!-- Added verses will appear here -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="btnSavePaste" class="btn-save">적용하기</button>
+            </div>
         </div>
-        <div class="action-controls">
-            <button id="btnReset" class="btn-action reset">초기화</button>
-            <button id="btnSkip" class="btn-action skip">스킵</button>
-            <button id="btnWrong" class="btn-action wrong">틀린 구절</button>
-        </div>
-        <div class="font-controls">
-            <!DOCTYPE html>
-            <html lang="ko">
+    </div>
 
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>말씀 암송 (Bible Memory)</title>
-                <link rel="stylesheet" href="style.css">
-            </head>
+    <script src="script.js"></script>
+</body>
 
-            <body>
-                <div class="container">
-                    <header>
-                        <h1>말씀 암송</h1>
-                        <div class="controls-top">
-                            <label for="fileInput" class="btn-file">
-                                📂 파일 열기
-                                <input type="file" id="fileInput" accept=".txt" multiple>
-                            </label>
-                            <button id="btnPaste" class="btn-file">📋 붙여넣기</button>
-                            <select id="daySelect">
-                                <option value="" disabled selected>일차 선택</option>
-                            </select>
-                        </div>
-                    </header>
-
-                    <main>
-                        <div id="problemArea" class="problem-area">
-                            <p class="placeholder">파일을 열거나 붙여넣기로 시작하세요.</p>
-                        </div>
-
-                        <div class="input-area">
-                            <input type="text" id="answerInput" placeholder="정답을 입력하세요..." autocomplete="off">
-                        </div>
-
-                        <div class="status-bar">
-                            <span id="statusText">남은 구절: 0 | 틀린 갯수: 0</span>
-                        </div>
-                    </main>
-
-                    <footer>
-                        <div class="mode-controls">
-                            <button class="btn-mode" data-mode="1">빈칸</button>
-                            <button class="btn-mode" data-mode="2">구절</button>
-                            <button class="btn-mode" data-mode="3">장절</button>
-                            <button class="btn-mode" data-mode="4">전체</button>
-                        </div>
-                        <div class="action-controls">
-                            <button id="btnReset" class="btn-action reset">초기화</button>
-                            <button id="btnSkip" class="btn-action skip">스킵</button>
-                            <button id="btnWrong" class="btn-action wrong">틀린 구절</button>
-                        </div>
-                        <div class="font-controls">
-
-            </html>
+</html>
