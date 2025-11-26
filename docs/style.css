@@ -82,6 +82,11 @@ main {
     font-weight: bold;
 }
 
+.hint-text {
+    color: var(--warning-color);
+    font-weight: bold;
+}
+
 footer {
     display: flex;
     flex-direction: column;
@@ -125,6 +130,11 @@ button:active {
 
 .btn-action.skip {
     background-color: #f39c12;
+    color: #2c3e50;
+}
+
+.btn-action.hint {
+    background-color: var(--warning-color);
     color: #2c3e50;
 }
 

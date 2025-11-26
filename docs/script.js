@@ -21,6 +21,7 @@ let problemCompleted = false;
 let leftVerse = 0;
 let failNum = 0;
 let wrongVerses = [];
+let hintCount = 0; // Track hint usage for current problem
 
 // DOM Elements
 const fileInput = document.getElementById('fileInput');
@@ -30,6 +31,7 @@ const problemArea = document.getElementById('problemArea');
 const answerInput = document.getElementById('answerInput');
 const statusText = document.getElementById('statusText');
 const btnReset = document.getElementById('btnReset');
+const btnHint = document.getElementById('btnHint');
 const btnSkip = document.getElementById('btnSkip');
 const btnWrong = document.getElementById('btnWrong');
 const btnFontUp = document.getElementById('btnFontUp');
@@ -474,6 +476,7 @@ function displayProblem() {
     currentReference = ref;
     attempts = 0;
     problemCompleted = false;
+    hintCount = 0; // Reset hint counter for new problem
 
     renderProblem(currentProblem);
     answerInput.value = "";
@@ -746,6 +749,69 @@ modeBtns.forEach(btn => {
 document.querySelector('.btn-mode[data-mode="1"]').classList.add('active');
 
 btnReset.addEventListener('click', dayReset);
+
+btnHint.addEventListener('click', () => {
+    if (currentScripture.length === 0 || currentAnswers.length === 0) {
+        return;
+    }
+
+    // Get the first answer that needs to be entered
+    const answer = currentAnswers[0];
+
+    // Progressive hints based on hintCount
+    let hint = '';
+    if (hintCount === 0) {
+        // First hint: show first character
+        hint = answer.charAt(0);
+    } else if (hintCount === 1) {
+        // Second hint: show first half
+        const halfLen = Math.ceil(answer.length / 2);
+        hint = answer.substring(0, halfLen);
+    } else {
+        // Third hint: show full answer
+        hint = answer;
+    }
+
+    hintCount++;
+
+    // Display hint in the input field or show as hint text
+    const currentText = problemArea.textContent;
+    const match = currentText.match(/(_+)/);
+
+    if (match) {
+        const blankIndex = currentText.indexOf(match[0]);
+        const beforeBlank = currentText.substring(0, blankIndex);
+        const afterBlank = currentText.substring(blankIndex + match[0].length);
+
+        // Clear and rebuild the problem area
+        problemArea.textContent = '';
+
+        // Add text before blank
+        if (beforeBlank) {
+            problemArea.appendChild(document.createTextNode(beforeBlank));
+        }
+
+        // Add the hint with yellow color
+        const hintSpan = document.createElement('span');
+        hintSpan.className = 'hint-text';
+        hintSpan.textContent = hint;
+        problemArea.appendChild(hintSpan);
+
+        // Add underscores for remaining characters
+        const remainingLen = answer.length - hint.length;
+        if (remainingLen > 0) {
+            problemArea.appendChild(document.createTextNode('_'.repeat(remainingLen)));
+        }
+
+        // Add text after blank
+        if (afterBlank) {
+            problemArea.appendChild(document.createTextNode(afterBlank));
+        }
+    }
+
+    // Focus on input
+    answerInput.focus();
+});
 
 btnSkip.addEventListener('click', displayProblem);
 
