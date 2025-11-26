@@ -391,12 +391,11 @@ class BibleApp(ctk.CTk):
             messagebox.showerror("오류", str(e))
 
     def create_widgets(self):
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
-
+        # Use pack layout for main window
+        
         # Top Frame
         self.top_frame = ctk.CTkFrame(self)
-        self.top_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=(20, 10))
+        self.top_frame.pack(side="top", fill="x", padx=20, pady=(20, 10))
         
         # Day Selection ComboBox
         self.day_var = ctk.StringVar(value="")
@@ -435,7 +434,7 @@ class BibleApp(ctk.CTk):
 
         # Problem Area
         self.problem_frame = ctk.CTkFrame(self)
-        self.problem_frame.grid(row=1, column=0, sticky="nsew", padx=20, pady=10)
+        self.problem_frame.pack(side="top", fill="both", expand=True, padx=20, pady=10)
         self.problem_frame.grid_columnconfigure(0, weight=1)
         self.problem_frame.grid_rowconfigure(0, weight=1)
 
@@ -457,13 +456,13 @@ class BibleApp(ctk.CTk):
             font=(self.font_family, self.font_size),
             height=50
         )
-        self.answer_entry.grid(row=2, column=0, sticky="ew", padx=20, pady=10)
+        self.answer_entry.pack(side="top", fill="x", padx=20, pady=10)
         self.answer_entry.bind("<Return>", lambda e: self.submit_answer())
         self.answer_entry.bind("<space>", self.on_space_key)
 
         # Bottom Frame
         self.bottom_frame = ctk.CTkFrame(self)
-        self.bottom_frame.grid(row=3, column=0, sticky="ew", padx=20, pady=(0, 20))
+        self.bottom_frame.pack(side="bottom", fill="x", padx=20, pady=(0, 20))
         
         self.status_label = ctk.CTkLabel(self.bottom_frame, text="남은 구절: 0 | 틀린 갯수: 0", font=("맑은 고딕", 16))
         self.status_label.pack(side="left", padx=20, pady=10)
