@@ -661,21 +661,37 @@ function handleWrongAnswer() {
 }
 
 function replaceBlankWithAnswer(answer, correct) {
-    // Find first underscore sequence
-    const match = currentProblem.match(/(_+)/);
-    if (match) {
-        const placeholder = match[0];
-        const replacement = `<span class="${correct ? 'correct' : 'wrong'}">${escapeHtml(answer)}</span>`;
-        // Replace only the first occurrence
-        currentProblem = currentProblem.replace(placeholder, replacement);
-        problemArea.innerHTML = escapeHtml(currentProblem).replace(/&lt;span class="(correct|wrong)"&gt;(.*?)&lt;\/span&gt;/g, '<span class="$1">$2</span>');
-    }
-}
+    // Find first underscore sequence in the current display
+    const currentText = problemArea.textContent;
+    const match = currentText.match(/(_+)/);
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    if (match) {
+        const blankIndex = currentText.indexOf(match[0]);
+        const beforeBlank = currentText.substring(0, blankIndex);
+        const afterBlank = currentText.substring(blankIndex + match[0].length);
+
+        // Clear and rebuild the problem area
+        problemArea.textContent = '';
+
+        // Add text before blank
+        if (beforeBlank) {
+            problemArea.appendChild(document.createTextNode(beforeBlank));
+        }
+
+        // Add the answer with color
+        const answerSpan = document.createElement('span');
+        answerSpan.className = correct ? 'correct' : 'wrong';
+        answerSpan.textContent = answer;
+        problemArea.appendChild(answerSpan);
+
+        // Add text after blank
+        if (afterBlank) {
+            problemArea.appendChild(document.createTextNode(afterBlank));
+        }
+
+        // Update currentProblem to match what's displayed
+        currentProblem = currentText.replace(match[0], answer);
+    }
 }
 
 function nextProblem() {
