@@ -590,6 +590,7 @@ class BibleApp(ctk.CTk):
             self.attempts = 0
             if not self.current_answers:
                 self.problem_completed = True
+                self.after(500, self.next_problem)
         else:
             self.attempts += 1
             self.answer_entry.delete(0, "end")
@@ -612,6 +613,7 @@ class BibleApp(ctk.CTk):
         self.attempts = 0
         if not self.current_answers:
             self.problem_completed = True
+            self.after(500, self.next_problem)
 
     def replace_blank_with_answer(self, answer, correct):
         try:
