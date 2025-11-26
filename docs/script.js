@@ -688,6 +688,13 @@ function nextProblem() {
 
 // --- Event Listeners ---
 
+daySelect.addEventListener('change', (e) => {
+    const index = parseInt(e.target.value);
+    if (!isNaN(index)) {
+        selectDay(index);
+    }
+});
+
 fileInput.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
         loadFiles(e.target.files);
