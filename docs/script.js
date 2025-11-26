@@ -193,21 +193,28 @@ function loadFiles(files) {
 function saveDataToStorage() {
     localStorage.setItem('bible_scriptures', JSON.stringify(originalScriptures));
     localStorage.setItem('bible_filenames', JSON.stringify(originalFilenames));
+    localStorage.setItem('bible_data_version', DATA_VERSION);
 }
+
+// Data Version - Increment this to force update default data for users
+const DATA_VERSION = "1.2";
 
 function loadDataFromStorage() {
     try {
+        const storedVersion = localStorage.getItem('bible_data_version');
         const storedScriptures = localStorage.getItem('bible_scriptures');
         const storedFilenames = localStorage.getItem('bible_filenames');
 
-        if (storedScriptures && storedFilenames) {
+        // Check if we need to force update (version mismatch or no data)
+        if (storedVersion === DATA_VERSION && storedScriptures && storedFilenames) {
             originalScriptures = JSON.parse(storedScriptures);
             originalFilenames = JSON.parse(storedFilenames);
         } else {
-            // Load Default Data
+            // Load Default Data (Force Update)
+            console.log("Updating data to version " + DATA_VERSION);
             originalScriptures = Object.values(DEFAULT_DATA);
             originalFilenames = Object.keys(DEFAULT_DATA);
-            saveDataToStorage(); // Save default data to storage
+            saveDataToStorage();
         }
 
         daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
