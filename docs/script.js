@@ -37,18 +37,19 @@ const btnFontDown = document.getElementById('btnFontDown');
 const modeBtns = document.querySelectorAll('.btn-mode');
 
 // Paste Modal Elements
-const btnPaste = document.getElementById('btnPaste');
+// Paste Modal Elements (Removed)
+// const btnPaste = document.getElementById('btnPaste');
 const btnDelete = document.getElementById('btnDelete');
-const pasteModal = document.getElementById('pasteModal');
-const closePasteModal = document.querySelector('.close');
-const btnSavePaste = document.getElementById('btnSavePaste');
+// const pasteModal = document.getElementById('pasteModal');
+// const closePasteModal = document.querySelector('.close');
+// const btnSavePaste = document.getElementById('btnSavePaste');
 
 // Easy Input Elements
-const pasteTitle = document.getElementById('pasteTitle');
+// const pasteTitle = document.getElementById('pasteTitle');
 const inputRef = document.getElementById('inputRef');
 const inputVerse = document.getElementById('inputVerse');
-const btnAddVerse = document.getElementById('btnAddVerse');
-const verseList = document.getElementById('verseList');
+// const btnAddVerse = document.getElementById('btnAddVerse');
+// const verseList = document.getElementById('verseList');
 
 let tempVerses = []; // Store verses temporarily before saving
 
@@ -738,87 +739,86 @@ btnFontDown.addEventListener('click', () => {
     problemArea.style.fontSize = fontSize + 'px';
 });
 
-// Paste Modal Logic
-btnPaste.addEventListener('click', () => {
-    pasteModal.style.display = "block";
-    pasteTitle.value = "";
-    inputRef.value = "";
-    inputVerse.value = "";
-    tempVerses = [];
-    renderVerseList();
-    pasteTitle.focus();
+// --- Add Day Modal Logic ---
+const btnAddDay = document.getElementById('btnAddDay');
+const addDayModal = document.getElementById('addDayModal');
+const closeAddDay = document.getElementById('closeAddDay');
+const btnSaveDay = document.getElementById('btnSaveDay');
+const newDayTitle = document.getElementById('newDayTitle');
+
+btnAddDay.addEventListener('click', () => {
+    addDayModal.style.display = "block";
+    newDayTitle.value = "";
+    newDayTitle.focus();
 });
 
-function renderVerseList() {
-    verseList.innerHTML = "";
-    if (tempVerses.length === 0) {
-        verseList.innerHTML = '<p class="list-placeholder">추가된 구절이 없습니다.</p>';
-        return;
-    }
+closeAddDay.addEventListener('click', () => {
+    addDayModal.style.display = "none";
+});
 
-    tempVerses.forEach((v, i) => {
-        const div = document.createElement('div');
-        div.className = 'verse-item';
-
-        // Display friendly text
-        let display = v;
-        if (v.includes(')^')) {
-            display = v.replace(')^', ') ');
-        }
-
-        div.innerHTML = `
-            <span>${display}</span>
-            <button class="btn-delete-verse" data-index="${i}">❌</button>
-        `;
-        verseList.appendChild(div);
-    });
-
-    // Add delete listeners
-    document.querySelectorAll('.btn-delete-verse').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const idx = parseInt(e.target.dataset.index);
-            tempVerses.splice(idx, 1);
-            renderVerseList();
-        });
-    });
-}
-
-btnSavePaste.addEventListener('click', () => {
-    let title = pasteTitle.value.trim();
-
-    if (tempVerses.length === 0) {
-        alert("최소 한 개 이상의 구절을 추가해주세요.");
-        return;
-    }
-
+btnSaveDay.addEventListener('click', () => {
+    const title = newDayTitle.value.trim();
     if (!title) {
-        title = `Day ${originalScriptures.length + 1} (직접 입력)`;
+        alert("일차 제목을 입력해주세요.");
+        return;
     }
 
-    // Store data
-    originalScriptures.push([...tempVerses]);
+    // Create new empty day
+    originalScriptures.push([]);
     originalFilenames.push(title);
-
-    // Add to dropdown
-    const option = document.createElement('option');
-    option.value = originalScriptures.length - 1;
-    option.textContent = title;
-    daySelect.appendChild(option);
-
-    // Save and Select
     saveDataToStorage();
+
+    // Update dropdowns
+    updateDaySelect();
+
+    // Select the new day
     daySelect.value = originalScriptures.length - 1;
     selectDay(originalScriptures.length - 1);
 
-    // Close Modal
-    pasteModal.style.display = "none";
+    addDayModal.style.display = "none";
 });
 
-// Add Verse in Modal
-btnAddVerse.addEventListener('click', () => {
+// --- Add Verse Modal Logic ---
+const btnOpenAddVerse = document.getElementById('btnOpenAddVerse');
+const addVerseModal = document.getElementById('addVerseModal');
+const closeAddVerse = document.getElementById('closeAddVerse');
+const targetDaySelect = document.getElementById('targetDaySelect');
+const btnAddVerseToDay = document.getElementById('btnAddVerseToDay');
+
+btnOpenAddVerse.addEventListener('click', () => {
+    // Populate target day select
+    targetDaySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
+    originalFilenames.forEach((name, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = name.replace('.txt', '');
+        targetDaySelect.appendChild(option);
+    });
+
+    // Pre-select current day if valid
+    if (currentDayIndex !== -1) {
+        targetDaySelect.value = currentDayIndex;
+    }
+
+    addVerseModal.style.display = "block";
+    inputRef.value = "";
+    inputVerse.value = "";
+    inputRef.focus();
+});
+
+closeAddVerse.addEventListener('click', () => {
+    addVerseModal.style.display = "none";
+});
+
+btnAddVerseToDay.addEventListener('click', () => {
+    const targetIndex = parseInt(targetDaySelect.value);
     const ref = inputRef.value.trim();
     const text = inputVerse.value.trim();
 
+    if (isNaN(targetIndex)) {
+        alert("추가할 일차를 선택해주세요.");
+        return;
+    }
     if (!ref || !text) {
         alert("장절과 내용을 모두 입력해주세요.");
         return;
@@ -826,14 +826,43 @@ btnAddVerse.addEventListener('click', () => {
 
     // Format: (Ref)^Text
     const formatted = `(${ref})^${text}`;
-    tempVerses.push(formatted);
 
+    // Add to selected day
+    originalScriptures[targetIndex].push(formatted);
+    saveDataToStorage();
+
+    alert("추가되었습니다!");
+
+    // Clear inputs but keep modal open for more additions
     inputRef.value = "";
     inputVerse.value = "";
     inputRef.focus();
 
-    renderVerseList();
+    // If we added to the currently viewed day, refresh the view
+    if (targetIndex === currentDayIndex) {
+        dayReset();
+    }
 });
+
+// Close modals on outside click
+window.addEventListener('click', (e) => {
+    if (e.target == addDayModal) {
+        addDayModal.style.display = "none";
+    }
+    if (e.target == addVerseModal) {
+        addVerseModal.style.display = "none";
+    }
+});
+
+function updateDaySelect() {
+    daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
+    originalFilenames.forEach((name, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = name.replace('.txt', '');
+        daySelect.appendChild(option);
+    });
+}
 
 // Delete Day Logic
 btnDelete.addEventListener('click', () => {
@@ -849,13 +878,7 @@ btnDelete.addEventListener('click', () => {
         saveDataToStorage();
 
         // Re-render dropdown
-        daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
-        originalFilenames.forEach((name, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = name.replace('.txt', '');
-            daySelect.appendChild(option);
-        });
+        updateDaySelect();
 
         // Reset view
         currentDayIndex = -1;
@@ -865,15 +888,7 @@ btnDelete.addEventListener('click', () => {
 });
 
 // Close Modal Logic
-closePasteModal.addEventListener('click', () => {
-    pasteModal.style.display = "none";
-});
 
-window.addEventListener('click', (e) => {
-    if (e.target == pasteModal) {
-        pasteModal.style.display = "none";
-    }
-});
 
 // Add shake animation style dynamically
 const styleSheet = document.createElement("style");
