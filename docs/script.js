@@ -636,6 +636,7 @@ function submitAnswer() {
         currentAnswers.shift();
         answerInput.value = "";
         attempts = 0;
+        hintCount = 0; // Reset hint count for next blank
         if (currentAnswers.length === 0) {
             problemCompleted = true;
             // Auto-advance
@@ -673,6 +674,7 @@ function handleWrongAnswer() {
     score -= 5;
     updateStatus();
     attempts = 0;
+    hintCount = 0; // Reset hint count for next blank
     if (currentAnswers.length === 0) {
         problemCompleted = true;
     }
