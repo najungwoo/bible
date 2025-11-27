@@ -540,6 +540,8 @@ class BibleApp(ctk.CTk):
         self.display_problem()
 
     def display_problem(self):
+        self.hint_count = 0 # Reset hint count immediately
+        
         if not self.scripture:
             self.problem_text.configure(state="normal")
             self.problem_text.delete("1.0", "end")
@@ -555,7 +557,7 @@ class BibleApp(ctk.CTk):
         self.current_reference = ref
         self.attempts = 0
         self.problem_completed = False
-        self.hint_count = 0
+        # self.hint_count = 0 # Removed from here
         
         self.problem_text.configure(state="normal")
         self.problem_text.delete("1.0", "end")
@@ -745,11 +747,17 @@ class BibleApp(ctk.CTk):
         
         # Determine hint text based on hint count
         if self.hint_count == 0:
+            # Step 1: First character
             hint_text = answer[0] if answer else ""
         elif self.hint_count == 1:
-            half = (len(answer) + 1) // 2
-            hint_text = answer[:half]
+            # Step 2: Half (or full if short)
+            if len(answer) <= 2:
+                hint_text = answer
+            else:
+                half = (len(answer) + 1) // 2
+                hint_text = answer[:half]
         else:
+            # Step 3: Full answer
             hint_text = answer
         
         self.hint_count += 1
