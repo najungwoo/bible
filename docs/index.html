@@ -52,96 +52,82 @@
             <div class="mode-controls">
                 <button class="btn-mode" data-mode="1">빈칸</button>
                 <button class="btn-mode" data-mode="2">구절</button>
-                <button class="btn-mode" data-mode="3">장절</button>
-                <button class="btn-mode" data-mode="4">전체</button>
             </div>
-            <div class="action-controls">
-                <button id="btnReset" class="btn-action reset">초기화</button>
-                <button id="btnHint" class="btn-action hint">💡 힌트</button>
-                <button id="btnSkip" class="btn-action skip">스킵</button>
-                <button id="btnWrong" class="btn-action wrong">틀린 구절</button>
-            </div>
-            <div class="font-controls">
-                <button id="btnFontDown" class="btn-font">A-</button>
-                <button id="btnFontUp" class="btn-font">A+</button>
-            </div>
-        </footer>
-    </div>
 
-    <!-- Add Day Modal -->
-    <div id="addDayModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeAddDay">&times;</span>
-            <h2>일차 추가</h2>
-            <div class="easy-input-container">
-                <div class="input-group">
-                    <input type="text" id="newDayTitle" placeholder="일차 제목 (예: Day 1)">
+            <!-- Add Day Modal -->
+            <div id="addDayModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" id="closeAddDay">&times;</span>
+                    <h2>일차 추가</h2>
+                    <div class="easy-input-container">
+                        <div class="input-group">
+                            <input type="text" id="newDayTitle" placeholder="일차 제목 (예: Day 1)">
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="btnSaveDay" class="btn-save">추가하기</button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-actions">
-                <button id="btnSaveDay" class="btn-save">추가하기</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Add Verse Modal -->
-    <div id="addVerseModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeAddVerse">&times;</span>
-            <h2>장절 추가</h2>
+            <!-- Add Verse Modal -->
+            <div id="addVerseModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" id="closeAddVerse">&times;</span>
+                    <h2>장절 추가</h2>
 
-            <div class="easy-input-container">
-                <div class="input-group">
-                    <label for="targetDaySelect">추가할 일차 선택:</label>
-                    <select id="targetDaySelect" class="full-width-select">
-                        <!-- Options will be populated dynamically -->
-                    </select>
-                </div>
+                    <div class="easy-input-container">
+                        <div class="input-group">
+                            <label for="targetDaySelect">추가할 일차 선택:</label>
+                            <select id="targetDaySelect" class="full-width-select">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
 
-                <div class="input-group">
-                    <label for="inputLevel">과정 선택:</label>
-                    <select id="inputLevel" class="full-width-select">
-                        <option value="0">전체/기타</option>
-                        <option value="1">1과정</option>
-                        <option value="2">2과정</option>
-                        <option value="3">3과정</option>
-                        <option value="4">4과정</option>
-                    </select>
-                </div>
+                        <div class="input-group">
+                            <label for="inputLevel">과정 선택:</label>
+                            <select id="inputLevel" class="full-width-select">
+                                <option value="0">전체/기타</option>
+                                <option value="1">1과정</option>
+                                <option value="2">2과정</option>
+                                <option value="3">3과정</option>
+                                <option value="4">4과정</option>
+                            </select>
+                        </div>
 
-                <div class="input-row">
-                    <input type="text" id="inputRef" placeholder="장절 (예: 요 3:16)">
-                    <input type="text" id="inputVerse" placeholder="말씀 본문">
-                    <button id="btnAddVerseToDay" class="btn-add">추가</button>
+                        <div class="input-row">
+                            <input type="text" id="inputRef" placeholder="장절 (예: 요 3:16)">
+                            <input type="text" id="inputVerse" placeholder="말씀 본문">
+                            <button id="btnAddVerseToDay" class="btn-add">추가</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Delete Verse Modal -->
-    <div id="deleteVerseModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeDeleteVerse">&times;</span>
-            <h2>장절 삭제</h2>
+            <!-- Delete Verse Modal -->
+            <div id="deleteVerseModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" id="closeDeleteVerse">&times;</span>
+                    <h2>장절 삭제</h2>
 
-            <div class="easy-input-container">
-                <div class="input-group">
-                    <label for="deleteDaySelect">일차 선택:</label>
-                    <select id="deleteDaySelect" class="full-width-select">
-                        <!-- Options will be populated dynamically -->
-                    </select>
-                </div>
+                    <div class="easy-input-container">
+                        <div class="input-group">
+                            <label for="deleteDaySelect">일차 선택:</label>
+                            <select id="deleteDaySelect" class="full-width-select">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
 
-                <div class="verse-list-container">
-                    <ul id="deleteVerseList" class="verse-list">
-                        <!-- Verses will be populated here -->
-                    </ul>
+                        <div class="verse-list-container">
+                            <ul id="deleteVerseList" class="verse-list">
+                                <!-- Verses will be populated here -->
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <script src="script.js"></script>
+            <script src="script.js"></script>
 </body>
 
 </html>

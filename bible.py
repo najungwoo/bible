@@ -474,6 +474,7 @@ class BibleApp(ctk.CTk):
         ctk.CTkButton(self.bottom_frame, text="초기화", command=self.day_reset, fg_color="#C0392B", hover_color="#E74C3C").pack(side="left", padx=10)
         ctk.CTkButton(self.bottom_frame, text="💡 힌트", command=self.show_hint, fg_color="#F1C40F", hover_color="#F39C12", text_color="#2C3E50").pack(side="left", padx=10)
         ctk.CTkButton(self.bottom_frame, text="스킵", command=self.skip_problem, fg_color="#F39C12", hover_color="#F1C40F").pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="📤 점수 복사", command=self.copy_score_to_clipboard, fg_color="#2ECC71", hover_color="#27AE60").pack(side="left", padx=10)
         ctk.CTkButton(self.bottom_frame, text="틀린 구절", command=self.show_wrong_verses).pack(side="right", padx=20)
 
     def on_day_combo_change(self, choice):
@@ -747,6 +748,26 @@ class BibleApp(ctk.CTk):
 
     def skip_problem(self):
         self.display_problem()
+
+    def copy_score_to_clipboard(self):
+        if self.day_num == 0:
+            messagebox.showinfo("알림", "공유할 일차를 먼저 선택해주세요.")
+            return
+
+        day_name = self.original_filenames[self.day_num - 1].replace('.txt', '')
+        share_text = (
+            f"[말씀 암송 결과]\n"
+            f"📅 일차: {day_name}\n"
+            f"🏆 점수: {self.score}점\n"
+            f"📖 남은 구절: {self.left_verse}\n"
+            f"❌ 틀린 갯수: {self.fail_num}\n\n"
+            f"말씀 암송 화이팅! 💪"
+        )
+        
+        self.clipboard_clear()
+        self.clipboard_append(share_text)
+        self.update() # Keep clipboard content after window closes (optional but good practice)
+        messagebox.showinfo("성공", "결과가 복사되었습니다!\n카카오톡 등에 붙여넣기(Ctrl+V) 하세요.")
 
     def show_hint(self):
         """Show progressive hints for the current answer"""
