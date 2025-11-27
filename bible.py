@@ -818,8 +818,8 @@ class BibleApp(ctk.CTk):
         verse_text.pack(pady=5)
 
         ctk.CTkLabel(win, text="과정 선택").pack(pady=(10, 0))
-        level_var = ctk.StringVar(value="1")
-        level_cb = ctk.CTkComboBox(win, values=["1", "2", "3", "4"], variable=level_var, width=100)
+        level_var = ctk.StringVar(value="없음")
+        level_cb = ctk.CTkComboBox(win, values=["없음", "1", "2", "3", "4"], variable=level_var, width=100)
         level_cb.pack(pady=5)
 
         ctk.CTkLabel(win, text="저장할 파일").pack(pady=(10, 0))
@@ -865,8 +865,11 @@ class BibleApp(ctk.CTk):
                 with open(p, "a", encoding="utf-8") as f:
                     if need_newline:
                         f.write("\n")
-                    # Save with level prefix: 1\(Ref)^Content
-                    f.write(f"{level}\\{ref}^{content}")
+                    
+                    if level == "없음":
+                        f.write(f"{ref}^{content}")
+                    else:
+                        f.write(f"{level}\\{ref}^{content}")
                 
                 messagebox.showinfo("성공", "저장되었습니다.")
                 self.load_data()
