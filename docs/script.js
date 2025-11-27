@@ -1008,6 +1008,7 @@ function renderDeleteVerseList(dayIndex) {
         const levelMatch = line.match(/^(\d+)\\/);
         if (levelMatch) {
             displayLevel = levelMatch[1];
+            if (displayLevel === "0") displayLevel = "전체";
             content = line.substring(levelMatch[0].length);
         }
 
