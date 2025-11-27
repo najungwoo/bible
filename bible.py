@@ -766,14 +766,14 @@ class BibleApp(ctk.CTk):
         before_blank = self.current_problem[:blank_start]
         after_blank = self.current_problem[blank_end:]
         
-        # Update current_problem
+        # Create display text (DO NOT modify current_problem)
         remaining_underscores = '_' * (len(answer) - len(hint_text))
-        self.current_problem = before_blank + hint_text + remaining_underscores + after_blank
+        display_text = before_blank + hint_text + remaining_underscores + after_blank
         
         # Update display
         self.problem_text.configure(state="normal")
         self.problem_text.delete("1.0", "end")
-        self.problem_text.insert("end", self.current_problem)
+        self.problem_text.insert("end", display_text)
         
         # Apply hint tag to the hint text
         hint_start_idx = f"1.0 + {blank_start} chars"
