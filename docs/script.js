@@ -815,17 +815,26 @@ btnHint.addEventListener('click', () => {
     const answer = currentAnswers[0];
     let hintPart = '';
 
+    // Step 1: First char
+    // Step 2: Half length
+    // Step 3: Full answer
     if (hintCount === 0) {
         hintPart = answer.charAt(0);
     } else if (hintCount === 1) {
-        const half = Math.ceil(answer.length / 2);
-        hintPart = answer.substring(0, half);
+        // If word is short (<=2 chars), show full answer immediately at step 2
+        if (answer.length <= 2) {
+            hintPart = answer;
+        } else {
+            const half = Math.ceil(answer.length / 2);
+            hintPart = answer.substring(0, half);
+        }
     } else {
         hintPart = answer;
     }
 
     hintCount++;
     score -= 2;
+    attempts++; // Deduct attempt (increase attempt count)
     updateStatus();
 
     answerInput.placeholder = `힌트: ${hintPart}...`;
