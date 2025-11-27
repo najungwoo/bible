@@ -152,6 +152,7 @@ class BibleApp(ctk.CTk):
         self.problem_num = 0
         self.attempts = 0
         self.problem_completed = False
+        self.hint_count = 0
 
         # Font State
         self.font_family = "맑은 고딕"
@@ -448,6 +449,7 @@ class BibleApp(ctk.CTk):
         
         self.problem_text.tag_config("correct", foreground="green")
         self.problem_text.tag_config("wrong", foreground="red")
+        self.problem_text.tag_config("hint", foreground="#F1C40F", font=(self.font_family, self.font_size, "bold"))
 
         # Answer Area
         self.answer_entry = ctk.CTkEntry(
@@ -468,6 +470,7 @@ class BibleApp(ctk.CTk):
         self.status_label.pack(side="left", padx=20, pady=10)
         
         ctk.CTkButton(self.bottom_frame, text="초기화", command=self.day_reset, fg_color="#C0392B", hover_color="#E74C3C").pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="💡 힌트", command=self.show_hint, fg_color="#F1C40F", hover_color="#F39C12", text_color="#2C3E50").pack(side="left", padx=10)
         ctk.CTkButton(self.bottom_frame, text="스킵", command=self.skip_problem, fg_color="#F39C12", hover_color="#F1C40F").pack(side="left", padx=10)
         ctk.CTkButton(self.bottom_frame, text="틀린 구절", command=self.show_wrong_verses).pack(side="right", padx=20)
 
@@ -552,6 +555,7 @@ class BibleApp(ctk.CTk):
         self.current_reference = ref
         self.attempts = 0
         self.problem_completed = False
+        self.hint_count = 0
         
         self.problem_text.configure(state="normal")
         self.problem_text.delete("1.0", "end")
@@ -707,6 +711,53 @@ class BibleApp(ctk.CTk):
 
     def skip_problem(self):
         self.display_problem()
+
+    def show_hint(self):
+        """Show progressive hints for the current answer"""
+        if not self.current_answers or self.problem_completed:
+            return
+        
+        answer = self.current_answers[0]
+        
+        # Determine hint text based on hint count
+        if self.hint_count == 0:
+            hint_text = answer[0] if answer else ""
+        elif self.hint_count == 1:
+            half = (len(answer) + 1) // 2
+            hint_text = answer[:half]
+        else:
+            hint_text = answer
+        
+        self.hint_count += 1
+        
+        # Find the first blank (underscore sequence) in current problem
+        match = re.search(r'_+', self.current_problem)
+        if not match:
+            return
+        
+        blank_start = match.start()
+        blank_end = match.end()
+        
+        # Replace the blank with hint
+        before_blank = self.current_problem[:blank_start]
+        after_blank = self.current_problem[blank_end:]
+        
+        # Update current_problem
+        remaining_underscores = '_' * (len(answer) - len(hint_text))
+        self.current_problem = before_blank + hint_text + remaining_underscores + after_blank
+        
+        # Update display
+        self.problem_text.configure(state="normal")
+        self.problem_text.delete("1.0", "end")
+        self.problem_text.insert("end", self.current_problem)
+        
+        # Apply hint tag to the hint text
+        hint_start_idx = f"1.0 + {blank_start} chars"
+        hint_end_idx = f"1.0 + {blank_start + len(hint_text)} chars"
+        self.problem_text.tag_add("hint", hint_start_idx, hint_end_idx)
+        
+        self.problem_text.configure(state="disabled")
+        self.answer_entry.focus_set()
 
     def on_space_key(self, event):
         if event.char == " ":
