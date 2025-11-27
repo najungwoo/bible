@@ -1101,3 +1101,29 @@ btnDelete.addEventListener('click', () => {
 });
 
 
+
+btnSkip.addEventListener('click', () => {
+    if (currentScripture.length === 0) return;
+    nextProblem();
+});
+
+btnReset.addEventListener('click', () => {
+    if (confirm("정말 초기화 하시겠습니까?")) {
+        // Reload data from storage or default
+        loadDataFromStorage();
+        // Reset view
+        if (currentDayIndex !== -1) {
+            dayReset();
+        } else {
+            // If no day selected, clear everything
+            currentScripture = [];
+            leftVerse = 0;
+            failNum = 0;
+            wrongVerses = [];
+            score = 0;
+            updateStatus();
+            problemArea.innerHTML = '<p class="placeholder">파일을 열거나 붙여넣기로 시작하세요.</p>';
+            answerInput.disabled = true;
+        }
+    }
+});
