@@ -813,24 +813,94 @@ btnHint.addEventListener('click', () => {
     if (!currentAnswers.length || problemCompleted) return;
 
     const answer = currentAnswers[0];
-    let hintText = '';
+    let hintPart = '';
 
     if (hintCount === 0) {
-        hintText = `힌트: ${answer.charAt(0)}...`;
+        hintPart = answer.charAt(0);
     } else if (hintCount === 1) {
         const half = Math.ceil(answer.length / 2);
-        hintText = `힌트: ${answer.substring(0, half)}...`;
+        hintPart = answer.substring(0, half);
     } else {
-        hintText = `정답: ${answer}`;
+        hintPart = answer;
     }
 
     hintCount++;
     score -= 2;
     updateStatus();
 
-    answerInput.placeholder = hintText;
+    answerInput.placeholder = `힌트: ${hintPart}...`;
     answerInput.focus();
+
+    applyHintToDisplay(hintPart, answer);
 });
+
+function applyHintToDisplay(hintPart, fullAnswer) {
+    const children = Array.from(problemArea.childNodes);
+    let foundBlank = false;
+    const newContent = document.createDocumentFragment();
+
+    for (let i = 0; i < children.length; i++) {
+        const node = children[i];
+
+        if (!foundBlank) {
+            // 1. Check for existing hint span to update
+            if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hint-text')) {
+                const hintSpan = document.createElement('span');
+                hintSpan.className = 'hint-text';
+                hintSpan.style.color = '#F1C40F';
+
+                const remainingUnderscores = '_'.repeat(Math.max(0, fullAnswer.length - hintPart.length));
+                hintSpan.textContent = hintPart + remainingUnderscores;
+
+                newContent.appendChild(hintSpan);
+                foundBlank = true;
+                continue;
+            }
+
+            // 2. Check for text node with underscores
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent;
+                const match = text.match(/(_+)/);
+
+                if (match) {
+                    const blankIndex = text.indexOf(match[0]);
+                    const beforeBlank = text.substring(0, blankIndex);
+
+                    if (beforeBlank) {
+                        newContent.appendChild(document.createTextNode(beforeBlank));
+                    }
+
+                    const hintSpan = document.createElement('span');
+                    hintSpan.className = 'hint-text';
+                    hintSpan.style.color = '#F1C40F';
+
+                    const remainingUnderscores = '_'.repeat(Math.max(0, fullAnswer.length - hintPart.length));
+                    hintSpan.textContent = hintPart + remainingUnderscores;
+
+                    newContent.appendChild(hintSpan);
+
+                    const afterBlank = text.substring(blankIndex + match[0].length);
+                    if (afterBlank) {
+                        newContent.appendChild(document.createTextNode(afterBlank));
+                    }
+
+                    foundBlank = true;
+                    continue;
+                }
+            }
+        }
+
+        // Preserve existing nodes
+        if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SPAN' && !node.classList.contains('hint-text')) {
+            newContent.appendChild(document.createTextNode(node.textContent));
+        } else {
+            newContent.appendChild(node.cloneNode(true));
+        }
+    }
+
+    problemArea.textContent = '';
+    problemArea.appendChild(newContent);
+}
 
 btnWrong.addEventListener('click', () => {
     if (wrongVerses.length === 0) {
