@@ -745,32 +745,25 @@ modeBtns.forEach(btn => {
     });
 });
 
+
 btnHint.addEventListener('click', () => {
     if (!currentAnswers.length || problemCompleted) return;
 
     const answer = currentAnswers[0];
-    let hint = '';
+    let hintText = '';
 
     if (hintCount === 0) {
-        hint = answer.charAt(0);
+        hintText = `힌트: ${answer.charAt(0)}...`;
     } else if (hintCount === 1) {
         const half = Math.ceil(answer.length / 2);
-        hint = answer.substring(0, half);
+        hintText = `힌트: ${answer.substring(0, half)}...`;
     } else {
-        hint = answer;
+        hintText = `정답: ${answer}`;
     }
 
-    hintCount = Math.min(hintCount + 1, 3);
+    hintCount++;
 
-    const placeholderMatch = currentProblem.match(/(_+)/);
-    if (placeholderMatch) {
-        const remaining = answer.length - hint.length;
-        const hintHTML = `<span class="hint-text">${hint}</span>` + '_'.repeat(remaining);
-        currentProblem = currentProblem.replace(placeholderMatch[0], hintHTML);
-        problemArea.innerHTML = currentProblem;
-        problemArea.style.fontSize = fontSize + 'px';
-    }
-
+    answerInput.placeholder = hintText;
     answerInput.focus();
 });
 
