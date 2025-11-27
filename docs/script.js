@@ -22,6 +22,7 @@ let leftVerse = 0;
 let failNum = 0;
 let wrongVerses = [];
 let hintCount = 0;
+console.log('hintCount initialized:', hintCount);
 
 // DOM Elements
 const fileInput = document.getElementById('fileInput');
@@ -664,37 +665,79 @@ function handleWrongAnswer() {
 }
 
 function replaceBlankWithAnswer(answer, correct) {
-    // Find first underscore sequence in the current display
-    const currentText = problemArea.textContent;
-    const match = currentText.match(/(_+)/);
+    // Get all child nodes to handle both text and hint spans
+    const children = Array.from(problemArea.childNodes);
+    let foundBlank = false;
 
-    if (match) {
-        const blankIndex = currentText.indexOf(match[0]);
-        const beforeBlank = currentText.substring(0, blankIndex);
-        const afterBlank = currentText.substring(blankIndex + match[0].length);
+    // Build new content
+    const newContent = document.createDocumentFragment();
 
-        // Clear and rebuild the problem area
-        problemArea.textContent = '';
+    for (let i = 0; i < children.length; i++) {
+        const node = children[i];
 
-        // Add text before blank
-        if (beforeBlank) {
-            problemArea.appendChild(document.createTextNode(beforeBlank));
+        if (!foundBlank) {
+            // Check if this is a text node with underscores
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent;
+                const match = text.match(/(_+)/);
+
+                if (match) {
+                    const blankIndex = text.indexOf(match[0]);
+                    const beforeBlank = text.substring(0, blankIndex);
+                    const afterBlank = text.substring(blankIndex + match[0].length);
+
+                    // Add text before blank
+                    if (beforeBlank) {
+                        newContent.appendChild(document.createTextNode(beforeBlank));
+                    }
+
+                    // Add the answer with color
+                    const answerSpan = document.createElement('span');
+                    answerSpan.className = correct ? 'correct' : 'wrong';
+                    answerSpan.textContent = answer;
+                    newContent.appendChild(answerSpan);
+
+                    // Add text after blank
+                    if (afterBlank) {
+                        newContent.appendChild(document.createTextNode(afterBlank));
+                    }
+
+                    foundBlank = true;
+                    continue;
+                }
+            }
+            // Check if this is a hint span
+            else if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hint-text')) {
+                // Replace hint with answer
+                const answerSpan = document.createElement('span');
+                answerSpan.className = correct ? 'correct' : 'wrong';
+                answerSpan.textContent = answer;
+                newContent.appendChild(answerSpan);
+                foundBlank = true;
+
+                // Skip any underscores immediately after the hint
+                if (i + 1 < children.length && children[i + 1].nodeType === Node.TEXT_NODE) {
+                    const nextText = children[i + 1].textContent;
+                    if (nextText.match(/^_+/)) {
+                        i++; // Skip the underscore node
+                        // Add any text after the underscores
+                        const afterUnderscores = nextText.replace(/^_+/, '');
+                        if (afterUnderscores) {
+                            newContent.appendChild(document.createTextNode(afterUnderscores));
+                        }
+                    }
+                }
+                continue;
+            }
         }
 
-        // Add the answer with color
-        const answerSpan = document.createElement('span');
-        answerSpan.className = correct ? 'correct' : 'wrong';
-        answerSpan.textContent = answer;
-        problemArea.appendChild(answerSpan);
-
-        // Add text after blank
-        if (afterBlank) {
-            problemArea.appendChild(document.createTextNode(afterBlank));
-        }
-
-        // Update currentProblem to match what's displayed
-        currentProblem = currentText.replace(match[0], answer);
+        // Add node as-is if we haven't found blank or after we found it
+        newContent.appendChild(node.cloneNode(true));
     }
+
+    // Clear and update problem area
+    problemArea.textContent = '';
+    problemArea.appendChild(newContent);
 }
 
 function nextProblem() {
