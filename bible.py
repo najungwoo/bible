@@ -809,7 +809,7 @@ class BibleApp(ctk.CTk):
         win.geometry("400x500")
         win.grab_set()
 
-        ctk.CTkLabel(win, text="장절 (예: (요 3:16))").pack(pady=(10, 0))
+        ctk.CTkLabel(win, text="장절 예: (요 3:16)").pack(pady=(10, 0))
         ref_entry = ctk.CTkEntry(win, width=300)
         ref_entry.pack(pady=5)
 
