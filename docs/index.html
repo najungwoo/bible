@@ -94,7 +94,25 @@
                 <div class="input-group">
                     <label for="targetDaySelect">추가할 일차 선택:</label>
                     <select id="targetDaySelect" class="full-width-select">
-                        <button id="btnAddVerseToDay" class="btn-add">추가</button>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="inputLevel">과정 선택:</label>
+                    <select id="inputLevel" class="full-width-select">
+                        <option value="0">전체/기타</option>
+                        <option value="1">1과정</option>
+                        <option value="2">2과정</option>
+                        <option value="3">3과정</option>
+                        <option value="4">4과정</option>
+                    </select>
+                </div>
+
+                <div class="input-row">
+                    <input type="text" id="inputRef" placeholder="장절 (예: 요 3:16)">
+                    <input type="text" id="inputVerse" placeholder="말씀 본문">
+                    <button id="btnAddVerseToDay" class="btn-add">추가</button>
                 </div>
             </div>
         </div>
