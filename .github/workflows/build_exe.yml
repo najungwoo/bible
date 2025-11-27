@@ -5,6 +5,9 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -29,8 +32,41 @@ jobs:
         # Build command
         pyinstaller --noconfirm --onefile --windowed --add-data "data;data" --name "BibleMemory" bible.py
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+    - name: Get build date
+      id: date
+      run: echo "date=$(Get-Date -Format 'yyyy.MM.dd-HHmm')" >> $env:GITHUB_OUTPUT
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
       with:
-        name: BibleMemory-Windows
-        path: dist/BibleMemory.exe
+        tag_name: v${{ steps.date.outputs.date }}
+        name: BibleMemory v${{ steps.date.outputs.date }}
+        body: |
+          자동 빌드된 말씀 암송 프로그램입니다.
+          
+          **다운로드:**
+          - Windows 실행 파일: BibleMemory.exe
+          
+          **변경사항:**
+          - 최신 코드로 자동 빌드됨
+        draft: false
+        prerelease: false
+        files: dist/BibleMemory.exe
+
+    - name: Update Latest Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: latest
+        name: BibleMemory (Latest)
+        body: |
+          항상 최신 버전의 말씀 암송 프로그램입니다.
+          
+          **다운로드:**
+          - Windows 실행 파일: BibleMemory.exe
+          
+          이 릴리스는 master 브랜치에 푸시할 때마다 자동 업데이트됩니다.
+        draft: false
+        prerelease: false
+        files: dist/BibleMemory.exe
+
