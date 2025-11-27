@@ -680,20 +680,44 @@ class BibleApp(ctk.CTk):
             self.after(500, self.next_problem)
 
     def replace_blank_with_answer(self, answer, correct):
-        try:
-            test_index = self.current_problem.index('_')
-        except ValueError:
+        # Find first underscore in current problem
+        match = re.search(r'_+', self.current_problem)
+        if not match:
             return
-
-        self.current_problem = re.sub(r'(_+)', answer, self.current_problem, count=1)
+        
+        test_index = match.start()
+        
+        # Find the start of the blank (might have hint text before underscores)
+        # Look backwards from the underscore to find any non-whitespace characters
+        # that might be part of a hint
+        blank_start = test_index
+        for i in range(test_index - 1, -1, -1):
+            char = self.current_problem[i]
+            if char.isspace() or char in '()^':
+                blank_start = i + 1
+                break
+            # Check if this character could be part of a hint (alphanumeric or Korean)
+            if not (char.isalnum() or '\uac00' <= char <= '\ud7a3'):
+                blank_start = i + 1
+                break
+        else:
+            blank_start = 0
+        
+        # Find the end of the blank (after all underscores)
+        blank_end = match.end()
+        
+        # Replace the blank (hint + underscores) with answer
+        before_blank = self.current_problem[:blank_start]
+        after_blank = self.current_problem[blank_end:]
+        self.current_problem = before_blank + answer + after_blank
         
         self.problem_text.configure(state="normal")
         self.problem_text.delete("1.0", "end")
         self.problem_text.insert("end", self.current_problem)
         
         # Highlight
-        start_idx = f"1.0 + {test_index} chars"
-        end_idx = f"1.0 + {test_index + len(answer)} chars"
+        start_idx = f"1.0 + {blank_start} chars"
+        end_idx = f"1.0 + {blank_start + len(answer)} chars"
         tag = "correct" if correct else "wrong"
         self.problem_text.tag_add(tag, start_idx, end_idx)
         
