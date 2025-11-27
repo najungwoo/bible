@@ -654,6 +654,7 @@ class BibleApp(ctk.CTk):
             self.current_answers.pop(0)
             self.answer_entry.delete(0, "end")
             self.attempts = 0
+            self.hint_count = 0 # Reset hint count for next blank
             if not self.current_answers:
                 self.problem_completed = True
                 self.after(500, self.next_problem)
@@ -761,6 +762,7 @@ class BibleApp(ctk.CTk):
             hint_text = answer
         
         self.hint_count += 1
+        self.attempts += 1 # Deduct attempt for using hint
         
         # Find the first blank (underscore sequence) in current problem
         match = re.search(r'_+', self.current_problem)
