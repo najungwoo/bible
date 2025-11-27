@@ -731,8 +731,14 @@ function replaceBlankWithAnswer(answer, correct) {
             }
         }
 
-        // Add node as-is if we haven't found blank or after we found it
-        newContent.appendChild(node.cloneNode(true));
+        // Add node - if it's a span (correct/wrong/hint), extract only text content
+        if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SPAN') {
+            // Only add text content, not the styled span
+            newContent.appendChild(document.createTextNode(node.textContent));
+        } else {
+            // For text nodes and other elements, clone as-is
+            newContent.appendChild(node.cloneNode(true));
+        }
     }
 
     // Clear and update problem area
