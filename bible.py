@@ -449,7 +449,7 @@ class BibleApp(ctk.CTk):
         
         self.problem_text.tag_config("correct", foreground="green")
         self.problem_text.tag_config("wrong", foreground="red")
-        self.problem_text.tag_config("hint", foreground="#F1C40F", font=(self.font_family, self.font_size, "bold"))
+        self.problem_text.tag_config("hint", foreground="#F1C40F")
 
         # Answer Area
         self.answer_entry = ctk.CTkEntry(
