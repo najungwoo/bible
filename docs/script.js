@@ -51,7 +51,14 @@ const btnDelete = document.getElementById('btnDelete');
 // const pasteTitle = document.getElementById('pasteTitle');
 const inputRef = document.getElementById('inputRef');
 const inputVerse = document.getElementById('inputVerse');
-// const btnAddVerse = document.getElementById('btnAddVerse');
+const inputLevel = document.getElementById('inputLevel');
+
+// Delete Verse Elements
+const btnOpenDeleteVerse = document.getElementById('btnOpenDeleteVerse');
+const deleteVerseModal = document.getElementById('deleteVerseModal');
+const closeDeleteVerse = document.getElementById('closeDeleteVerse');
+const deleteDaySelect = document.getElementById('deleteDaySelect');
+const deleteVerseList = document.getElementById('deleteVerseList');
 // const verseList = document.getElementById('verseList');
 
 let tempVerses = []; // Store verses temporarily before saving
@@ -914,6 +921,7 @@ btnAddVerseToDay.addEventListener('click', () => {
     const targetIndex = parseInt(targetDaySelect.value);
     const ref = inputRef.value.trim();
     const text = inputVerse.value.trim();
+    const level = inputLevel.value;
 
     if (isNaN(targetIndex)) {
         alert("추가할 일차를 선택해주세요.");
@@ -924,8 +932,8 @@ btnAddVerseToDay.addEventListener('click', () => {
         return;
     }
 
-    // Format: (Ref)^Text
-    const formatted = `(${ref})^${text}`;
+    // Format: Level\(Ref)^Text
+    const formatted = `${level}\\(${ref})^${text}`;
 
     // Add to selected day
     originalScriptures[targetIndex].push(formatted);
@@ -944,7 +952,98 @@ btnAddVerseToDay.addEventListener('click', () => {
     }
 });
 
-// Close modals on outside click
+
+// --- Delete Verse Modal Logic ---
+
+btnOpenDeleteVerse.addEventListener('click', () => {
+    // Populate day select
+    deleteDaySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
+    originalFilenames.forEach((name, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = name.replace('.txt', '');
+        deleteDaySelect.appendChild(option);
+    });
+
+    // Pre-select current day if valid
+    if (currentDayIndex !== -1) {
+        deleteDaySelect.value = currentDayIndex;
+        renderDeleteVerseList(currentDayIndex);
+    } else {
+        deleteVerseList.innerHTML = '';
+    }
+
+    deleteVerseModal.style.display = "block";
+});
+
+closeDeleteVerse.addEventListener('click', () => {
+    deleteVerseModal.style.display = "none";
+});
+
+deleteDaySelect.addEventListener('change', (e) => {
+    const index = parseInt(e.target.value);
+    if (!isNaN(index)) {
+        renderDeleteVerseList(index);
+    }
+});
+
+function renderDeleteVerseList(dayIndex) {
+    deleteVerseList.innerHTML = '';
+    const verses = originalScriptures[dayIndex];
+
+    if (!verses || verses.length === 0) {
+        deleteVerseList.innerHTML = '<li>구절이 없습니다.</li>';
+        return;
+    }
+
+    verses.forEach((line, vIndex) => {
+        const li = document.createElement('li');
+        li.className = 'verse-item';
+
+        // Parse line to show friendly text
+        // Format: Level\(Ref)^Text
+        let displayLevel = "?";
+        let content = line;
+
+        const levelMatch = line.match(/^(\d+)\\/);
+        if (levelMatch) {
+            displayLevel = levelMatch[1];
+            content = line.substring(levelMatch[0].length);
+        }
+
+        let [ref, text] = content.split('^');
+        if (!text) text = content;
+
+        li.innerHTML = `
+            <div class="verse-info">
+                <span class="verse-level">[${displayLevel}과정]</span>
+                <span class="verse-ref">${ref}</span>
+                <span class="verse-text">${text.substring(0, 30)}...</span>
+            </div>
+            <button class="btn-delete-item" onclick="deleteVerse(${dayIndex}, ${vIndex})">삭제</button>
+        `;
+        deleteVerseList.appendChild(li);
+    });
+}
+
+// Global function for delete button onclick
+window.deleteVerse = function (dayIndex, verseIndex) {
+    if (!confirm("정말 이 구절을 삭제하시겠습니까?")) return;
+
+    // Remove verse
+    originalScriptures[dayIndex].splice(verseIndex, 1);
+    saveDataToStorage();
+
+    // Re-render list
+    renderDeleteVerseList(dayIndex);
+
+    // If we deleted from the currently viewed day, refresh the view
+    if (dayIndex === currentDayIndex) {
+        dayReset();
+    }
+};
+
+// Update window click to close new modal
 window.addEventListener('click', (e) => {
     if (e.target == addDayModal) {
         addDayModal.style.display = "none";
@@ -952,7 +1051,11 @@ window.addEventListener('click', (e) => {
     if (e.target == addVerseModal) {
         addVerseModal.style.display = "none";
     }
+    if (e.target == deleteVerseModal) {
+        deleteVerseModal.style.display = "none";
+    }
 });
+
 
 function updateDaySelect() {
     daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
@@ -987,9 +1090,6 @@ btnDelete.addEventListener('click', () => {
     }
 });
 
-// Close Modal Logic
-
-
 // Add shake animation style dynamically
 const styleSheet = document.createElement("style");
 styleSheet.innerText = `
@@ -1009,6 +1109,59 @@ styleSheet.innerText = `
 .shake {
   animation: shake 0.5s;
   animation-iteration-count: 1;
+}
+/* Verse List Styles */
+.verse-list {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.verse-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+.verse-item:last-child {
+    border-bottom: none;
+}
+.verse-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex: 1;
+}
+.verse-level {
+    font-weight: bold;
+    color: #3498db;
+    min-width: 50px;
+}
+.verse-ref {
+    font-weight: bold;
+    min-width: 80px;
+}
+.verse-text {
+    color: #666;
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+.btn-delete-item {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-delete-item:hover {
+    background-color: #c0392b;
 }
 `;
 document.head.appendChild(styleSheet);

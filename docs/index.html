@@ -19,6 +19,7 @@
                 </label>
                 <button id="btnAddDay" class="btn-file">📅 일차 추가</button>
                 <button id="btnOpenAddVerse" class="btn-file">➕ 장절 추가</button>
+                <button id="btnOpenDeleteVerse" class="btn-file delete">➖ 장절 삭제</button>
                 <button id="btnDelete" class="btn-file delete">🗑️ 일차 삭제</button>
                 <select id="daySelect">
                     <option value="" disabled selected>일차 선택</option>
@@ -97,10 +98,43 @@
                     </select>
                 </div>
 
+                <div class="input-group">
+                    <label for="inputLevel">과정 선택:</label>
+                    <select id="inputLevel" class="full-width-select">
+                        <option value="1">1과정</option>
+                        <option value="2">2과정</option>
+                        <option value="3">3과정</option>
+                        <option value="4">4과정</option>
+                    </select>
+                </div>
+
                 <div class="input-row">
                     <input type="text" id="inputRef" placeholder="장절 (예: 요 3:16)">
                     <input type="text" id="inputVerse" placeholder="말씀 본문">
                     <button id="btnAddVerseToDay" class="btn-add">추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Verse Modal -->
+    <div id="deleteVerseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeDeleteVerse">&times;</span>
+            <h2>장절 삭제</h2>
+
+            <div class="easy-input-container">
+                <div class="input-group">
+                    <label for="deleteDaySelect">일차 선택:</label>
+                    <select id="deleteDaySelect" class="full-width-select">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+
+                <div class="verse-list-container">
+                    <ul id="deleteVerseList" class="verse-list">
+                        <!-- Verses will be populated here -->
+                    </ul>
                 </div>
             </div>
         </div>
