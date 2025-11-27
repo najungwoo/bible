@@ -22,6 +22,7 @@ let leftVerse = 0;
 let failNum = 0;
 let wrongVerses = [];
 let hintCount = 0;
+let score = 0;
 console.log('hintCount initialized:', hintCount);
 
 // DOM Elements
@@ -458,12 +459,13 @@ function dayReset() {
     }
     failNum = 0;
     wrongVerses = [];
+    score = 0;
     updateStatus();
     displayProblem();
 }
 
 function updateStatus() {
-    statusText.textContent = `남은 구절: ${leftVerse} | 틀린 갯수: ${failNum}`;
+    statusText.textContent = `남은 구절: ${leftVerse} | 틀린 갯수: ${failNum} | 점수: ${score}`;
 }
 
 function displayProblem() {
@@ -628,6 +630,8 @@ function submitAnswer() {
     if (currentScripture.length === 0 || currentAnswers.length === 0) return;
 
     if (normToken(userAnswer) === normToken(currentAnswers[0])) {
+        score += 10;
+        updateStatus();
         replaceBlankWithAnswer(currentAnswers[0], true);
         currentAnswers.shift();
         answerInput.value = "";
@@ -643,6 +647,8 @@ function submitAnswer() {
         if (attempts >= 3) {
             handleWrongAnswer();
         } else {
+            score -= 1;
+            updateStatus();
             // Visual feedback for wrong answer?
             problemArea.classList.add('shake');
             setTimeout(() => problemArea.classList.remove('shake'), 500);
@@ -664,6 +670,7 @@ function handleWrongAnswer() {
     replaceBlankWithAnswer(currentAnswers[0], false);
     currentAnswers.shift();
     failNum++;
+    score -= 5;
     updateStatus();
     attempts = 0;
     if (currentAnswers.length === 0) {
@@ -818,6 +825,8 @@ btnHint.addEventListener('click', () => {
     }
 
     hintCount++;
+    score -= 2;
+    updateStatus();
 
     answerInput.placeholder = hintText;
     answerInput.focus();
