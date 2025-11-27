@@ -1,3 +1,37 @@
+# Python
 __pycache__/
-build/
+*.py[cod]
+*$py.class
+*.so
+.Python
 *.pyc
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.zip
+settings.json
+build_log.txt
+
+# Keep data folder but ignore backup files
+data/*.bak
+data/*.tmp
