@@ -140,7 +140,9 @@ class BibleApp(ctk.CTk):
         
         self.day_num = 0
         self.left_verse = 0
+        self.left_verse = 0
         self.fail_num = 0
+        self.score = 0
         
         self.current_mode = 1
         self.blank_num = 5
@@ -466,7 +468,7 @@ class BibleApp(ctk.CTk):
         self.bottom_frame = ctk.CTkFrame(self)
         self.bottom_frame.pack(side="bottom", fill="x", padx=20, pady=(0, 20))
         
-        self.status_label = ctk.CTkLabel(self.bottom_frame, text="남은 구절: 0 | 틀린 갯수: 0", font=("맑은 고딕", 16))
+        self.status_label = ctk.CTkLabel(self.bottom_frame, text="남은 구절: 0 | 틀린 갯수: 0 | 점수: 0", font=("맑은 고딕", 16))
         self.status_label.pack(side="left", padx=20, pady=10)
         
         ctk.CTkButton(self.bottom_frame, text="초기화", command=self.day_reset, fg_color="#C0392B", hover_color="#E74C3C").pack(side="left", padx=10)
@@ -496,7 +498,7 @@ class BibleApp(ctk.CTk):
             self.day_reset()
 
     def update_status(self):
-        self.status_label.configure(text=f"남은 구절: {self.left_verse} | 틀린 갯수: {self.fail_num}")
+        self.status_label.configure(text=f"남은 구절: {self.left_verse} | 틀린 갯수: {self.fail_num} | 점수: {self.score}")
 
     def day_reset(self):
         if self.day_num > 0:
@@ -532,6 +534,7 @@ class BibleApp(ctk.CTk):
             
         self.fail_num = 0
         self.wrong_verses = []
+        self.score = 0
         self.update_status()
         self.display_problem()
 
@@ -652,6 +655,8 @@ class BibleApp(ctk.CTk):
         if norm_token(user_answer) == norm_token(self.current_answers[0]):
             self.replace_blank_with_answer(self.current_answers[0], True)
             self.current_answers.pop(0)
+            self.score += 10
+            self.update_status()
             self.answer_entry.delete(0, "end")
             self.attempts = 0
             self.hint_count = 0 # Reset hint count for next blank
@@ -663,6 +668,9 @@ class BibleApp(ctk.CTk):
             self.answer_entry.delete(0, "end")
             if self.attempts >= 3:
                 self.handle_wrong_answer()
+            else:
+                self.score -= 1
+                self.update_status()
 
     def handle_wrong_answer(self):
         wrong_verse = {
@@ -676,6 +684,7 @@ class BibleApp(ctk.CTk):
         self.replace_blank_with_answer(self.current_answers[0], False)
         self.current_answers.pop(0)
         self.fail_num += 1
+        self.score -= 5
         self.update_status()
         self.attempts = 0
         if not self.current_answers:
@@ -762,6 +771,8 @@ class BibleApp(ctk.CTk):
             hint_text = answer
         
         self.hint_count += 1
+        self.score -= 2
+        self.update_status()
         self.attempts += 1 # Deduct attempt for using hint
         
         # Find the first blank (underscore sequence) in current problem
