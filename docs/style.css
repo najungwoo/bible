@@ -39,6 +39,10 @@ body {
     padding: 10px;
 }
 
+/* ========================================
+   Header & Controls
+   ======================================== */
+
 header {
     display: flex;
     flex-direction: column;
@@ -68,12 +72,105 @@ select {
     border-radius: 5px;
     font-size: 0.9rem;
     max-width: 150px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
+
+select:hover {
+    border-color: #888;
+    background-color: #34495e;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* ========================================
+   Main Content
+   ======================================== */
 
 main {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+}
+
+.problem-area {
+    flex-grow: 1;
+    display: block;
+    font-size: 1.5rem;
+    padding: 20px;
+    text-align: center;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    margin: 10px 0;
+    min-height: 200px;
+    line-height: 1.8;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    /* 긴 내용 스크롤 처리 */
+    overflow-y: auto;
+    transition: box-shadow 0.3s ease;
+}
+
+.problem-area:hover {
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.1);
+}
+
+/* 커스텀 스크롤바 (다크 모드) */
+.problem-area::-webkit-scrollbar,
+.verse-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.problem-area::-webkit-scrollbar-track,
+.verse-list-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.problem-area::-webkit-scrollbar-thumb,
+.verse-list-container::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+.problem-area::-webkit-scrollbar-thumb:hover,
+.verse-list-container::-webkit-scrollbar-thumb:hover {
+    background: #2980b9;
+}
+
+.placeholder {
+    color: #888;
+}
+
+.input-area {
+    margin: 10px 0;
+}
+
+.input-area input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid #555;
+    border-radius: 5px;
+}
+
+.input-area input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.status-bar {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #999;
 }
 
 .correct {
@@ -90,6 +187,10 @@ main {
     color: var(--warning-color);
     font-weight: bold;
 }
+
+/* ========================================
+   Footer & Buttons
+   ======================================== */
 
 footer {
     display: flex;
@@ -116,15 +217,30 @@ button {
     cursor: pointer;
     font-size: 0.9rem;
     flex-grow: 1;
-    transition: background 0.2s;
+    transition: all 0.3s ease;
     /* 버튼 텍스트 수직 중앙 정렬 보장 */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
+button:hover {
+    background-color: #34495e;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 button:active {
     transform: scale(0.98);
+}
+
+button:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .btn-mode.active {
@@ -132,8 +248,16 @@ button:active {
     font-weight: bold;
 }
 
+.btn-mode.active:hover {
+    background-color: #2980b9;
+}
+
 .btn-action.reset {
     background-color: #c0392b;
+}
+
+.btn-action.reset:hover {
+    background-color: #a93226;
 }
 
 .btn-action.skip {
@@ -141,9 +265,17 @@ button:active {
     color: #2c3e50;
 }
 
+.btn-action.skip:hover {
+    background-color: #e67e22;
+}
+
 .btn-action.hint {
     background-color: var(--warning-color);
     color: #2c3e50;
+}
+
+.btn-action.hint:hover {
+    background-color: #f39c12;
 }
 
 .btn-action.wrong {
@@ -163,6 +295,21 @@ button:active {
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-file:hover {
+    background-color: #34495e;
+    transform: translateY(-1px);
+}
+
+.btn-file:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.btn-file:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .btn-file input[type="file"] {
@@ -173,49 +320,14 @@ button:active {
     background-color: #c0392b;
 }
 
-.problem-area {
-    flex-grow: 1;
-    display: block;
-    font-size: 1.5rem;
-    padding: 20px;
-    text-align: center;
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    margin: 10px 0;
-    min-height: 200px;
-    line-height: 1.8;
-    word-break: keep-all;
-    overflow-wrap: break-word;
-    /* 긴 내용 스크롤 처리 */
-    overflow-y: auto;
+.btn-file.delete:hover {
+    background-color: #a93226;
 }
 
-.placeholder {
-    color: #888;
-}
+/* ========================================
+   Modals
+   ======================================== */
 
-.input-area {
-    margin: 10px 0;
-}
-
-.input-area input {
-    width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    border: 1px solid #555;
-    border-radius: 5px;
-}
-
-.status-bar {
-    text-align: center;
-    padding: 10px;
-    font-size: 0.9rem;
-    color: #999;
-}
-
-/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -227,6 +339,21 @@ button:active {
     background-color: rgba(0, 0, 0, 0.7);
     align-items: center;
     justify-content: center;
+}
+
+.modal.show {
+    display: flex !important;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .modal-content {
@@ -242,6 +369,7 @@ button:active {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    transition: all 0.3s ease;
 }
 
 .modal-content h2 {
@@ -256,13 +384,15 @@ button:active {
     font-weight: bold;
     cursor: pointer;
     line-height: 1;
+    transition: all 0.3s ease;
 }
 
 .close:hover,
 .close:focus {
-    color: #fff;
+    color: var(--accent-color);
     text-decoration: none;
     cursor: pointer;
+    transform: rotate(90deg);
 }
 
 /* Easy Input Styles */
@@ -286,12 +416,20 @@ button:active {
 .input-group input,
 .input-group select {
     width: 100%;
-    padding: 10px;
+    padding: 8px 12px !important;
+    /* 크기 조정 */
     border-radius: 5px;
     border: 1px solid #555;
     background-color: var(--input-bg);
     color: var(--text-color);
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
 .input-row {
@@ -300,11 +438,13 @@ button:active {
 }
 
 .input-row input {
-    padding: 10px;
+    padding: 8px 12px !important;
+    /* 크기 조정 */
     border-radius: 5px;
     border: 1px solid #555;
     background-color: var(--input-bg);
     color: var(--text-color);
+    font-size: 0.9rem !important;
 }
 
 #inputRef {
@@ -317,62 +457,25 @@ button:active {
 
 #newDayTitle {
     width: 100%;
-    padding: 10px;
+    padding: 8px 12px !important;
+    /* 크기 조정 */
     border-radius: 5px;
     border: 1px solid #555;
     background-color: var(--input-bg);
     color: var(--text-color);
+    font-size: 0.9rem !important;
 }
 
 .btn-add {
     background-color: var(--success-color);
     color: white;
     width: auto;
-    padding: 0 15px;
+    padding: 6px 12px !important;
+    /* 크기 조정 */
+    font-size: 0.85rem !important;
+    min-height: 32px !important;
     flex-grow: 0;
-}
-
-.verse-list-container {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #444;
-    border-radius: 5px;
-    padding: 5px;
-    background-color: #222;
-}
-
-#verseList {
-    list-style: none;
-}
-
-.verse-item {
-    padding: 8px;
-    border-bottom: 1px solid #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-}
-
-.verse-item:last-child {
-    border-bottom: none;
-}
-
-.btn-delete-verse {
-    background-color: transparent;
-    color: var(--accent-color);
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0 5px;
-    flex-grow: 0;
-}
-
-.list-placeholder {
-    color: #666;
-    text-align: center;
-    padding: 20px;
-    font-size: 0.9rem;
+    transition: all 0.3s ease;
 }
 
 .modal-actions {
@@ -385,21 +488,36 @@ button:active {
     background-color: var(--primary-color);
     color: white;
     width: 100%;
-    padding: 10px;
+    padding: 10px 16px !important;
+    /* 크기 조정 */
+    font-size: 0.9rem !important;
+    min-height: 40px !important;
+    transition: all 0.3s ease;
 }
 
 .full-width-select {
     width: 100%;
 }
 
-/* Consolidated Verse List Styles */
+/* ========================================
+   Verse List
+   ======================================== */
+
+.verse-list-container {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #222;
+}
+
 .verse-list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-/* .verse-item 스타일은 위에서 정의된 것과 중복되지 않도록 통합 */
 .verse-item {
     display: flex;
     justify-content: space-between;
@@ -447,20 +565,26 @@ button:active {
     background-color: var(--accent-color);
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 4px 8px !important;
+    /* 크기 조정 */
     border-radius: 4px;
     cursor: pointer;
     margin-left: 10px;
     flex-shrink: 0;
-    /* 터치 개선 */
-    min-height: 30px;
+    font-size: 0.8rem !important;
+    min-height: 28px !important;
+    flex-grow: 0 !important;
+    transition: all 0.3s ease;
 }
 
 .btn-delete-item:hover {
     background-color: #c0392b;
 }
 
-/* Shake Animation */
+/* ========================================
+   Animations
+   ======================================== */
+
 @keyframes shake {
     0% {
         transform: translate(1px, 1px) rotate(0deg);
@@ -512,7 +636,9 @@ button:active {
     animation-iteration-count: 1;
 }
 
-/* Responsive Design */
+/* ========================================
+   Responsive Design
+   ======================================== */
 
 /* Tablet & Large Mobile (Landscape) */
 @media (max-width: 768px) {
@@ -645,182 +771,4 @@ button:active {
     button {
         padding: 6px;
     }
-}
-/* ==========================================
-   추가 UI 개선 사항
-   ========================================== */
-
-/* 1. 버튼 호버 효과 */
-button:hover {
-    background-color: #34495e;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.btn-mode.active:hover {
-    background-color: #2980b9;
-}
-
-.btn-action.reset:hover {
-    background-color: #a93226;
-}
-
-.btn-action.skip:hover {
-    background-color: #e67e22;
-}
-
-.btn-action.hint:hover {
-    background-color: #f39c12;
-}
-
-/* 2. 입력 필드 포커스 개선 */
-.input-area input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-.input-group input:focus,
-.input-group select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-/* 3. Select 드롭다운 개선 */
-select {
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-select:hover {
-    border-color: #888;
-    background-color: #34495e;
-}
-
-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-/* 4. 커스텀 스크롤바 (다크 모드) */
-.problem-area::-webkit-scrollbar,
-.verse-list-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.problem-area::-webkit-scrollbar-track,
-.verse-list-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.problem-area::-webkit-scrollbar-thumb,
-.verse-list-container::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
-}
-
-.problem-area::-webkit-scrollbar-thumb:hover,
-.verse-list-container::-webkit-scrollbar-thumb:hover {
-    background: #2980b9;
-}
-
-/* 5. 일관된 트랜지션 */
-.btn-file,
-.btn-add,
-.btn-save,
-.btn-delete-item,
-.modal-content,
-.close {
-    transition: all 0.3s ease;
-}
-
-.btn-file:hover {
-    background-color: #34495e;
-    transform: translateY(-1px);
-}
-
-.btn-file.delete:hover {
-    background-color: #a93226;
-}
-
-/* 6. 문제 영역 개선 */
-.problem-area {
-    transition: box-shadow 0.3s ease;
-}
-
-.problem-area:hover {
-    box-shadow: 0 0 15px rgba(52, 152, 219, 0.1);
-}
-
-/* 7. 모달 개선 */
-.modal.show {
-    display: flex !important;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.close:hover {
-    color: var(--accent-color);
-    transform: rotate(90deg);
-}
-
-/* 8. 접근성 개선 - 포커스 표시 */
-button:focus,
-.btn-file:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-button:focus:not(:focus-visible),
-.btn-file:focus:not(:focus-visible) {
-    outline: none;
-}
-
-/* 9. 장절 삭제 버튼 크기 조정 */
-.btn-delete-item {
-    padding: 4px 8px !important;
-    font-size: 0.8rem !important;
-    min-height: 28px !important;
-    flex-grow: 0 !important;
-}
-
-/* 10. 모달 버튼 크기 통일 */
-.btn-add {
-    padding: 6px 12px !important;
-    font-size: 0.85rem !important;
-    min-height: 32px !important;
-}
-
-.btn-save {
-    padding: 10px 16px !important;
-    font-size: 0.9rem !important;
-    min-height: 40px !important;
-}
-
-/* 모달 입력 필드 크기 조정 */
-.input-group input,
-.input-group select {
-    padding: 8px 12px !important;
-    font-size: 0.9rem !important;
-}
-
-.input-row input {
-    padding: 8px 12px !important;
-    font-size: 0.9rem !important;
-}
-
-#newDayTitle {
-    padding: 8px 12px !important;
-    font-size: 0.9rem !important;
 }

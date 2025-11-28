@@ -397,7 +397,17 @@ class BibleApp(ctk.CTk):
         # Use pack layout for main window
         
         # Top Frame
-        self.top_frame = ctk.CTkFrame(self)
+        # Colors (Web Version Match)
+        COLOR_PRIMARY = "#3498db"
+        COLOR_SECONDARY = "#2c3e50"
+        COLOR_ACCENT = "#e74c3c"
+        COLOR_WARNING = "#f1c40f"
+        COLOR_SUCCESS = "#2ecc71"
+        COLOR_TEXT = "#e0e0e0"
+        COLOR_BG_DARK = "#1a1a1a"
+
+        # Top Frame
+        self.top_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.top_frame.pack(side="top", fill="x", padx=20, pady=(20, 10))
         
         # Day Selection ComboBox
@@ -408,7 +418,12 @@ class BibleApp(ctk.CTk):
             values=[f.replace(".txt", "") for f in self.original_filenames],
             command=self.on_day_combo_change,
             width=200,
-            font=(self.font_family, 16)
+            font=(self.font_family, 16),
+            fg_color=COLOR_SECONDARY,
+            border_color="#555",
+            button_color=COLOR_PRIMARY,
+            button_hover_color="#2980b9",
+            text_color=COLOR_TEXT
         )
         self.day_combo.pack(side="left", padx=(0, 10))
 
@@ -420,7 +435,12 @@ class BibleApp(ctk.CTk):
             values=["전체", "1과정", "2과정", "3과정", "4과정"],
             command=self.on_level_combo_change,
             width=100,
-            font=(self.font_family, 16)
+            font=(self.font_family, 16),
+            fg_color=COLOR_SECONDARY,
+            border_color="#555",
+            button_color=COLOR_PRIMARY,
+            button_hover_color="#2980b9",
+            text_color=COLOR_TEXT
         )
         self.level_combo.pack(side="left", padx=(0, 20))
 
@@ -429,14 +449,22 @@ class BibleApp(ctk.CTk):
                  ("장절", lambda: self.set_mode(3)), ("전체", self.open_whole_level)]
         
         for text, cmd in modes:
-            ctk.CTkButton(self.top_frame, text=text, command=cmd, width=80, height=35).pack(side="left", padx=5)
+            ctk.CTkButton(
+                self.top_frame, 
+                text=text, 
+                command=cmd, 
+                width=80, 
+                height=35,
+                fg_color=COLOR_SECONDARY,
+                hover_color=COLOR_PRIMARY
+            ).pack(side="left", padx=5)
 
         # Font Controls
-        ctk.CTkButton(self.top_frame, text="가+", command=self.increase_font, width=40, height=35).pack(side="right", padx=5)
-        ctk.CTkButton(self.top_frame, text="가-", command=self.decrease_font, width=40, height=35).pack(side="right", padx=5)
+        ctk.CTkButton(self.top_frame, text="가+", command=self.increase_font, width=40, height=35, fg_color=COLOR_SECONDARY, hover_color=COLOR_PRIMARY).pack(side="right", padx=5)
+        ctk.CTkButton(self.top_frame, text="가-", command=self.decrease_font, width=40, height=35, fg_color=COLOR_SECONDARY, hover_color=COLOR_PRIMARY).pack(side="right", padx=5)
 
         # Problem Area
-        self.problem_frame = ctk.CTkFrame(self)
+        self.problem_frame = ctk.CTkFrame(self, fg_color="#2d2d2d") # Card BG
         self.problem_frame.pack(side="top", fill="both", expand=True, padx=20, pady=10)
         self.problem_frame.grid_columnconfigure(0, weight=1)
         self.problem_frame.grid_rowconfigure(0, weight=1)
@@ -445,36 +473,42 @@ class BibleApp(ctk.CTk):
             self.problem_frame,
             font=(self.font_family, self.font_size),
             wrap="word",
-            state="disabled"
+            state="disabled",
+            fg_color="#2d2d2d",
+            text_color=COLOR_TEXT
         )
         self.problem_text.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
         
-        self.problem_text.tag_config("correct", foreground="green")
-        self.problem_text.tag_config("wrong", foreground="red")
-        self.problem_text.tag_config("hint", foreground="#F1C40F")
+        self.problem_text.tag_config("correct", foreground=COLOR_SUCCESS)
+        self.problem_text.tag_config("wrong", foreground=COLOR_ACCENT)
+        self.problem_text.tag_config("hint", foreground=COLOR_WARNING)
 
         # Answer Area
         self.answer_entry = ctk.CTkEntry(
             self,
             placeholder_text="정답을 입력하세요...",
             font=(self.font_family, self.font_size),
-            height=50
+            height=50,
+            fg_color="#3d3d3d",
+            border_color="#555",
+            text_color=COLOR_TEXT,
+            placeholder_text_color="#888"
         )
         self.answer_entry.pack(side="top", fill="x", padx=20, pady=10)
         self.answer_entry.bind("<Return>", lambda e: self.submit_answer())
         self.answer_entry.bind("<space>", self.on_space_key)
 
         # Bottom Frame
-        self.bottom_frame = ctk.CTkFrame(self)
+        self.bottom_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.bottom_frame.pack(side="bottom", fill="x", padx=20, pady=(0, 20))
         
-        self.status_label = ctk.CTkLabel(self.bottom_frame, text="남은 구절: 0 | 틀린 갯수: 0 | 점수: 0", font=("맑은 고딕", 16))
+        self.status_label = ctk.CTkLabel(self.bottom_frame, text="남은 구절: 0 | 틀린 갯수: 0 | 점수: 0", font=("맑은 고딕", 16), text_color="#999")
         self.status_label.pack(side="left", padx=20, pady=10)
         
-        ctk.CTkButton(self.bottom_frame, text="초기화", command=self.day_reset, fg_color="#C0392B", hover_color="#E74C3C").pack(side="left", padx=10)
-        ctk.CTkButton(self.bottom_frame, text="💡 힌트", command=self.show_hint, fg_color="#F1C40F", hover_color="#F39C12", text_color="#2C3E50").pack(side="left", padx=10)
-        ctk.CTkButton(self.bottom_frame, text="스킵", command=self.skip_problem, fg_color="#F39C12", hover_color="#F1C40F").pack(side="left", padx=10)
-        ctk.CTkButton(self.bottom_frame, text="틀린 구절", command=self.show_wrong_verses).pack(side="right", padx=20)
+        ctk.CTkButton(self.bottom_frame, text="초기화", command=self.day_reset, fg_color="#c0392b", hover_color="#a93226").pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="💡 힌트", command=self.show_hint, fg_color=COLOR_WARNING, hover_color="#f39c12", text_color="#2C3E50").pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="스킵", command=self.skip_problem, fg_color="#f39c12", hover_color="#e67e22", text_color="#2C3E50").pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="틀린 구절", command=self.show_wrong_verses, fg_color=COLOR_SECONDARY, hover_color=COLOR_PRIMARY).pack(side="right", padx=20)
 
     def on_day_combo_change(self, choice):
         full_name = choice + ".txt"
