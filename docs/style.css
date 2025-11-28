@@ -375,16 +375,23 @@ button:focus:not(:focus-visible) {
 .modal-content h2 {
     color: var(--primary-color);
     font-size: 1.2rem;
+    text-align: center;
+    /* 제목 중앙 정렬 */
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 .close {
     color: #aaa;
-    align-self: flex-end;
+    position: absolute;
+    top: 15px;
+    right: 20px;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
     line-height: 1;
     transition: all 0.3s ease;
+    z-index: 10;
 }
 
 .close:hover,
