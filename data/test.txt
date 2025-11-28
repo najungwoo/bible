@@ -1,2 +1,4 @@
-힌트버튼 구현
-exe파일에도 힌트 추가
+메뉴권한조회  total-count 필터할떄 count 가 적용이 안될떄
+
+obsMainRef 추가
+

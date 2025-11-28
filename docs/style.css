@@ -1,3 +1,6 @@
+/* 1. 구글 웹 폰트 (Noto Sans KR) 불러오기 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
 :root {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
@@ -14,7 +17,8 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    /* 폰트 적용 순서 변경: Noto Sans KR 우선 적용 */
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 }
 
 body {
@@ -113,6 +117,10 @@ button {
     font-size: 0.9rem;
     flex-grow: 1;
     transition: background 0.2s;
+    /* 버튼 텍스트 수직 중앙 정렬 보장 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 button:active {
@@ -178,6 +186,8 @@ button:active {
     line-height: 1.8;
     word-break: keep-all;
     overflow-wrap: break-word;
+    /* 긴 내용 스크롤 처리 */
+    overflow-y: auto;
 }
 
 .placeholder {
@@ -382,6 +392,126 @@ button:active {
     width: 100%;
 }
 
+/* Consolidated Verse List Styles */
+.verse-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* .verse-item 스타일은 위에서 정의된 것과 중복되지 않도록 통합 */
+.verse-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #444;
+    background-color: #2a2a2a;
+}
+
+.verse-item:last-child {
+    border-bottom: none;
+}
+
+.verse-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex: 1;
+    overflow: hidden;
+}
+
+.verse-level {
+    font-weight: bold;
+    color: var(--primary-color);
+    min-width: 50px;
+    flex-shrink: 0;
+}
+
+.verse-ref {
+    font-weight: bold;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.verse-text {
+    color: #aaa;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+}
+
+.btn-delete-item {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    flex-shrink: 0;
+    /* 터치 개선 */
+    min-height: 30px;
+}
+
+.btn-delete-item:hover {
+    background-color: #c0392b;
+}
+
+/* Shake Animation */
+@keyframes shake {
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
+}
+
+.shake {
+    animation: shake 0.5s;
+    animation-iteration-count: 1;
+}
+
 /* Responsive Design */
 
 /* Tablet & Large Mobile (Landscape) */
@@ -431,392 +561,266 @@ button:active {
 
     .btn-file,
     select {
+        font-size: 0.8rem;
+        padding: 6px;
+        width: 48%;
+        /* 모바일 터치 영역 개선 */
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #btnAddDay,
+    #btnOpenAddVerse,
+    #btnOpenDeleteVerse,
+    #btnDelete,
+    label[for="fileInput"] {
+        width: 100%;
+    }
+
+    .problem-area {
         font-size: 1.2rem;
+        padding: 15px;
+        min-height: 150px;
     }
 
-    .close {
-        color: #aaa;
-        align-self: flex-end;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-        line-height: 1;
+    .input-area input {
+        font-size: 1rem;
+        padding: 12px;
     }
 
-    .close:hover,
-    .close:focus {
-        color: #fff;
-        text-decoration: none;
-        cursor: pointer;
+    footer {
+        gap: 8px;
     }
 
-    /* Easy Input Styles */
-    .easy-input-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+    .mode-controls,
+    .action-controls {
+        flex-wrap: wrap;
     }
 
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .input-group label {
-        font-size: 0.9rem;
-        color: #999;
-    }
-
-    .input-group input,
-    .input-group select {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #555;
-        background-color: var(--input-bg);
-        color: var(--text-color);
-        font-size: 0.9rem;
-    }
-
-    .input-row {
-        display: flex;
-        gap: 5px;
-    }
-
-    .input-row input {
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #555;
-        background-color: var(--input-bg);
-        color: var(--text-color);
-    }
-
-    #inputRef {
-        width: 30%;
-    }
-
-    #inputVerse {
+    .mode-controls button,
+    .action-controls button {
         flex-grow: 1;
-    }
-
-    #newDayTitle {
-        width: 100%;
+        width: 48%;
         padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #555;
-        background-color: var(--input-bg);
-        color: var(--text-color);
+        font-size: 0.85rem;
+        /* 모바일 터치 영역 개선 */
+        min-height: 48px;
     }
 
-    .btn-add {
-        background-color: var(--success-color);
-        color: white;
-        width: auto;
-        padding: 0 15px;
-        flex-grow: 0;
+    .font-controls {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
     }
 
-    .verse-list-container {
-        max-height: 200px;
-        overflow-y: auto;
-        border: 1px solid #444;
-        border-radius: 5px;
+    .font-controls button {
+        width: 48%;
+        /* 모바일 터치 영역 개선 */
+        min-height: 48px;
+    }
+}
+
+/* Small Height Screens (Landscape Mobile) */
+@media (max-height: 500px) {
+    .container {
         padding: 5px;
-        background-color: #222;
     }
 
-    #verseList {
-        list-style: none;
+    header {
+        padding: 5px 0;
     }
 
-    .verse-item {
-        padding: 8px;
-        border-bottom: 1px solid #333;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.9rem;
-    }
-
-    .verse-item:last-child {
-        border-bottom: none;
-    }
-
-    .btn-delete-verse {
-        background-color: transparent;
-        color: var(--accent-color);
-        border: none;
-        cursor: pointer;
-        font-size: 1.2rem;
-        padding: 0 5px;
-        flex-grow: 0;
-    }
-
-    .list-placeholder {
-        color: #666;
-        text-align: center;
-        padding: 20px;
-        font-size: 0.9rem;
-    }
-
-    .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-
-    .btn-save {
-        background-color: var(--primary-color);
-        color: white;
-        width: 100%;
+    .problem-area {
+        min-height: 80px;
+        font-size: 1.1rem;
         padding: 10px;
     }
 
-    .full-width-select {
-        width: 100%;
+    footer {
+        padding-top: 5px;
     }
 
-    /* Responsive Design */
-
-    /* Tablet & Large Mobile (Landscape) */
-    @media (max-width: 768px) {
-        .container {
-            padding: 10px;
-            max-width: 100%;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-        }
-
-        .controls-top {
-            gap: 8px;
-        }
-
-        .btn-file,
-        select {
-            font-size: 0.9rem;
-            padding: 8px 10px;
-            flex-grow: 1;
-        }
-
-        .problem-area {
-            font-size: 1.4rem;
-            padding: 20px;
-        }
-
-        .mode-controls button,
-        .action-controls button {
-            padding: 12px;
-            font-size: 0.9rem;
-        }
+    button {
+        padding: 6px;
     }
+}
+/* ==========================================
+   추가 UI 개선 사항
+   ========================================== */
 
-    /* Mobile (Portrait) */
-    @media (max-width: 480px) {
-        h1 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
+/* 1. 버튼 호버 효과 */
+button:hover {
+    background-color: #34495e;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
 
-        .controls-top {
-            gap: 5px;
-        }
+.btn-mode.active:hover {
+    background-color: #2980b9;
+}
 
-        .btn-file,
-        select {
-            font-size: 0.8rem;
-            padding: 6px;
-            width: 48%;
-        }
+.btn-action.reset:hover {
+    background-color: #a93226;
+}
 
-        #btnAddDay,
-        #btnOpenAddVerse,
-        #btnOpenDeleteVerse,
-        #btnDelete,
-        label[for="fileInput"] {
-            width: 100%;
-        }
+.btn-action.skip:hover {
+    background-color: #e67e22;
+}
 
-        .problem-area {
-            font-size: 1.2rem;
-            padding: 15px;
-            min-height: 150px;
-        }
+.btn-action.hint:hover {
+    background-color: #f39c12;
+}
 
-        .input-area input {
-            font-size: 1rem;
-            padding: 12px;
-        }
+/* 2. 입력 필드 포커스 개선 */
+.input-area input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
 
-        footer {
-            gap: 8px;
-        }
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
 
-        .mode-controls,
-        .action-controls {
-            flex-wrap: wrap;
-        }
+/* 3. Select 드롭다운 개선 */
+select {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
 
-        .mode-controls button,
-        .action-controls button {
-            flex-grow: 1;
-            width: 48%;
-            padding: 10px;
-            font-size: 0.85rem;
-        }
+select:hover {
+    border-color: #888;
+    background-color: #34495e;
+}
 
-        .font-controls {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-        }
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
 
-        .font-controls button {
-            width: 48%;
-        }
+/* 4. 커스텀 스크롤바 (다크 모드) */
+.problem-area::-webkit-scrollbar,
+.verse-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.problem-area::-webkit-scrollbar-track,
+.verse-list-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.problem-area::-webkit-scrollbar-thumb,
+.verse-list-container::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+.problem-area::-webkit-scrollbar-thumb:hover,
+.verse-list-container::-webkit-scrollbar-thumb:hover {
+    background: #2980b9;
+}
+
+/* 5. 일관된 트랜지션 */
+.btn-file,
+.btn-add,
+.btn-save,
+.btn-delete-item,
+.modal-content,
+.close {
+    transition: all 0.3s ease;
+}
+
+.btn-file:hover {
+    background-color: #34495e;
+    transform: translateY(-1px);
+}
+
+.btn-file.delete:hover {
+    background-color: #a93226;
+}
+
+/* 6. 문제 영역 개선 */
+.problem-area {
+    transition: box-shadow 0.3s ease;
+}
+
+.problem-area:hover {
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.1);
+}
+
+/* 7. 모달 개선 */
+.modal.show {
+    display: flex !important;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
-
-    /* Small Height Screens (Landscape Mobile) */
-    @media (max-height: 500px) {
-        .container {
-            padding: 5px;
-        }
-
-        header {
-            padding: 5px 0;
-        }
-
-        .problem-area {
-            min-height: 80px;
-            font-size: 1.1rem;
-            padding: 10px;
-        }
-
-        footer {
-            padding-top: 5px;
-        }
-
-        button {
-            padding: 6px;
-        }
+    to {
+        opacity: 1;
     }
+}
 
-    /* Consolidated Verse List Styles */
-    .verse-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+.close:hover {
+    color: var(--accent-color);
+    transform: rotate(90deg);
+}
 
-    .verse-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #444;
-        background-color: #2a2a2a;
-    }
+/* 8. 접근성 개선 - 포커스 표시 */
+button:focus,
+.btn-file:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
 
-    .verse-item:last-child {
-        border-bottom: none;
-    }
+button:focus:not(:focus-visible),
+.btn-file:focus:not(:focus-visible) {
+    outline: none;
+}
 
-    .verse-info {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex: 1;
-        overflow: hidden;
-        /* Prevent text overflow */
-    }
+/* 9. 장절 삭제 버튼 크기 조정 */
+.btn-delete-item {
+    padding: 4px 8px !important;
+    font-size: 0.8rem !important;
+    min-height: 28px !important;
+    flex-grow: 0 !important;
+}
 
-    .verse-level {
-        font-weight: bold;
-        color: var(--primary-color);
-        min-width: 50px;
-        flex-shrink: 0;
-    }
+/* 10. 모달 버튼 크기 통일 */
+.btn-add {
+    padding: 6px 12px !important;
+    font-size: 0.85rem !important;
+    min-height: 32px !important;
+}
 
-    .verse-ref {
-        font-weight: bold;
-        min-width: 60px;
-        flex-shrink: 0;
-    }
+.btn-save {
+    padding: 10px 16px !important;
+    font-size: 0.9rem !important;
+    min-height: 40px !important;
+}
 
-    .verse-text {
-        color: #aaa;
-        font-size: 0.9rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        flex-grow: 1;
-    }
+/* 모달 입력 필드 크기 조정 */
+.input-group input,
+.input-group select {
+    padding: 8px 12px !important;
+    font-size: 0.9rem !important;
+}
 
-    .btn-delete-item {
-        background-color: var(--accent-color);
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-left: 10px;
-        flex-shrink: 0;
-    }
+.input-row input {
+    padding: 8px 12px !important;
+    font-size: 0.9rem !important;
+}
 
-    .btn-delete-item:hover {
-        background-color: #c0392b;
-    }
-
-    /* Shake Animation */
-    @keyframes shake {
-        0% {
-            transform: translate(1px, 1px) rotate(0deg);
-        }
-
-        10% {
-            transform: translate(-1px, -2px) rotate(-1deg);
-        }
-
-        20% {
-            transform: translate(-3px, 0px) rotate(1deg);
-        }
-
-        30% {
-            transform: translate(3px, 2px) rotate(0deg);
-        }
-
-        40% {
-            transform: translate(1px, -1px) rotate(1deg);
-        }
-
-        50% {
-            transform: translate(-1px, 2px) rotate(-1deg);
-        }
-
-        60% {
-            transform: translate(-3px, 1px) rotate(0deg);
-        }
-
-        70% {
-            transform: translate(3px, 1px) rotate(-1deg);
-        }
-
-        80% {
-            transform: translate(-1px, -1px) rotate(1deg);
-        }
-
-        90% {
-            transform: translate(1px, 2px) rotate(0deg);
-        }
-
-        100% {
-            transform: translate(1px, -2px) rotate(-1deg);
-        }
-    }
-
-    .shake {
-        animation: shake 0.5s;
-        animation-iteration-count: 1;
-    }
+#newDayTitle {
+    padding: 8px 12px !important;
+    font-size: 0.9rem !important;
+}
