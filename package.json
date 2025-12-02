@@ -1,0 +1,28 @@
+{
+  "name": "bible-verse-memorization-main",
+  "version": "1.0.0",
+  "description": "성경 구절을 효과적으로 암송할 수 있는 프로그램입니다.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/najungwoo/bible.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/najungwoo/bible/issues"
+  },
+  "homepage": "https://github.com/najungwoo/bible#readme",
+  "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4"
+  }
+}
