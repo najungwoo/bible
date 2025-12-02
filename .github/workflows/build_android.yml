@@ -40,9 +40,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "android/app/build/outputs/apk/debug/app-debug.apk"
-          tag: "android-latest"
-          name: "Android App (Latest Build)"
-          body: "최신 안드로이드 앱 빌드입니다. (자동 생성됨)"
-          allowUpdates: true
-          replacesArtifacts: true
+          tag: "android-v${{ github.run_number }}"
+          name: "Android App v${{ github.run_number }}"
+          body: "자동 생성된 안드로이드 앱 빌드입니다."
+          makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}
