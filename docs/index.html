@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>말씀 암송 프로그램 - Bible Verse Memorization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin: 30px 0 50px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+        }
+
+        .cta-section h2 {
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: white;
+            color: #764ba2;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5568d3;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .feature ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .section {
+            margin: 30px 0;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .usage-steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .usage-steps ol {
+            padding-left: 25px;
+        }
+
+        .usage-steps li {
+            padding: 8px 0;
+            font-size: 1.05em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            color: #666;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖 말씀 암송 프로그램</h1>
+            <p>Bible Verse Memorization</p>
+        </div>
+
+        <div class="content">
+            <div class="cta-section">
+                <h2>🚀 지금 바로 시작하세요!</h2>
+                <div class="btn-group">
+                    <a href="app.html" class="btn btn-primary">🌐 웹에서 바로 사용하기</a>
+                    <a href="https://github.com/najungwoo/bible/releases/latest/download/BibleMemory.exe"
+                        class="btn btn-secondary">💻 Windows 프로그램 다운로드</a>
+                    <a href="https://github.com/najungwoo/bible/releases/download/android-latest/app-debug.apk"
+                        class="btn btn-secondary" style="background: #3DDC84; color: white;">📱 Android 앱 다운로드</a>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>✨ 주요 기능</h2>
+                <div class="features">
+                    <div class="feature">
+                        <h3>📚 다양한 학습 모드</h3>
+                        <ul>
+                            <li>빈칸 채우기</li>
+                            <li>구절 암송</li>
+                            <li>장절 암송</li>
+                            <li>전체 암송</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature">
+                        <h3>📊 학습 관리</h3>
+                        <ul>
+                            <li>일차별 학습</li>
+                            <li>과정별 분류 (1~4과정)</li>
+                            <li>점수 시스템</li>
+                            <li>틀린 구절 복습</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature">
+                        <h3>💡 편의 기능</h3>
+                        <ul>
+                            <li>3단계 힌트</li>
+                            <li>구절 추가/삭제</li>
+                            <li>일차 관리</li>
+                            <li>글자 크기 조절</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🎯 사용 방법</h2>
+
+                <h3 style="color: #667eea; margin: 20px 0 10px 0;">웹 버전</h3>
+                <div class="usage-steps">
+                    <ol>
+                        <li>위의 "웹에서 바로 사용하기" 버튼 클릭</li>
+                        <li>일차를 선택하고 과정을 선택</li>
+                        <li>학습 모드를 선택하여 암송 시작</li>
+                        <li>모바일에서는 홈 화면에 추가하면 앱처럼 사용 가능</li>
+                    </ol>
+                </div>
+
+                <h3 style="color: #667eea; margin: 20px 0 10px 0;">Windows 프로그램</h3>
+                <div class="usage-steps">
+                    <ol>
+                        <li>위의 "Windows 프로그램 다운로드" 버튼으로 exe 파일 다운로드</li>
+                        <li>다운로드한 파일 실행 (보안 경고 시 '추가 정보' → '실행' 클릭)</li>
+                        <li>일차를 선택하고 학습 시작</li>
+                        <li>오프라인에서도 사용 가능</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>문의 및 버그 리포트: <a href="https://github.com/najungwoo/bible/issues" target="_blank">GitHub Issues</a></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">© 2025 말씀 암송 프로그램. MIT License</p>
+        </footer>
+    </div>
+</body>
+
+</html>
