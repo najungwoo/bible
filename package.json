@@ -19,10 +19,5 @@
   "bugs": {
     "url": "https://github.com/najungwoo/bible/issues"
   },
-  "homepage": "https://github.com/najungwoo/bible#readme",
-  "dependencies": {
-    "@capacitor/android": "^7.4.4",
-    "@capacitor/cli": "^7.4.4",
-    "@capacitor/core": "^7.4.4"
-  }
+  "homepage": "https://github.com/najungwoo/bible#readme"
 }
