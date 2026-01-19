@@ -1223,6 +1223,10 @@ class BibleApp(ctk.CTk):
         win = ctk.CTkToplevel(self)
         win.title("틀린 구절 모음")
         win.geometry("600x400")
+        win.transient(self)
+        win.grab_set()
+        win.lift()
+        win.focus_force()
         
         text_box = ctk.CTkTextbox(win, font=(self.font_family, 18))
         text_box.pack(fill="both", expand=True, padx=10, pady=10)
