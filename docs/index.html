@@ -13,10 +13,10 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Malgun Gothic', 'Noto Sans KR', -apple-system, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #212529;
+            background-color: #F8F9FA;
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,27 +24,30 @@
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             overflow: hidden;
+            border: 1px solid #DEE2E6;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #FFFFFF;
+            color: #212529;
             padding: 40px 30px;
             text-align: center;
+            border-bottom: 1px solid #DEE2E6;
         }
 
         .header h1 {
-            font-size: 2.5em;
+            font-size: 2.2em;
             margin-bottom: 10px;
+            color: #212529;
         }
 
         .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
+            font-size: 1.1em;
+            color: #868E96;
         }
 
         .content {
@@ -54,15 +57,17 @@
         .cta-section {
             text-align: center;
             margin: 30px 0 50px 0;
-            padding: 30px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            border-radius: 15px;
+            padding: 40px;
+            background: #E7F5FF;
+            /* Subtle Blue bg */
+            border-radius: 12px;
+            border: 1px solid #D0EBFF;
         }
 
         .cta-section h2 {
-            color: white;
-            font-size: 1.8em;
-            margin-bottom: 20px;
+            color: #1864AB;
+            font-size: 1.6em;
+            margin-bottom: 25px;
         }
 
         .btn-group {
@@ -74,68 +79,76 @@
 
         .btn {
             display: inline-block;
-            padding: 15px 35px;
-            font-size: 1.1em;
-            font-weight: bold;
+            padding: 14px 30px;
+            font-size: 1em;
+            font-weight: 600;
             text-decoration: none;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .btn-primary {
-            background: white;
-            color: #764ba2;
+            background: #339AF0;
+            color: white;
+            border: 1px solid #339AF0;
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: #228BE6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(34, 139, 230, 0.2);
         }
 
         .btn-secondary {
-            background: #667eea;
-            color: white;
+            background: white;
+            color: #495057;
+            border: 1px solid #CED4DA;
         }
 
         .btn-secondary:hover {
-            background: #5568d3;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: #F8F9FA;
+            border-color: #ADB5BD;
+            transform: translateY(-2px);
         }
 
         .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             margin: 40px 0;
         }
 
         .feature {
-            padding: 25px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 15px;
-            transition: transform 0.3s ease;
+            padding: 30px;
+            background: #FFFFFF;
+            border: 1px solid #DEE2E6;
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .feature:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+            border-color: #CED4DA;
         }
 
         .feature h3 {
-            color: #667eea;
-            font-size: 1.3em;
-            margin-bottom: 10px;
+            color: #339AF0;
+            font-size: 1.25em;
+            margin-bottom: 15px;
+            font-weight: 700;
         }
 
         .feature ul {
             list-style: none;
             padding-left: 0;
+            color: #495057;
         }
 
         .feature li {
-            padding: 5px 0;
-            padding-left: 20px;
+            padding: 6px 0;
+            padding-left: 24px;
             position: relative;
         }
 
@@ -143,41 +156,44 @@
             content: "✓";
             position: absolute;
             left: 0;
-            color: #667eea;
+            color: #2B8A3E;
+            /* Green check */
             font-weight: bold;
         }
 
         .section {
-            margin: 30px 0;
+            margin: 40px 0;
         }
 
         .section h2 {
-            color: #667eea;
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
+            color: #212529;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #E9ECEF;
         }
 
         .usage-steps {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
+            background: #F8F9FA;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #DEE2E6;
+            /* border-left: 4px solid #339AF0; */
         }
 
         .usage-steps ol {
             padding-left: 25px;
+            color: #495057;
         }
 
         .usage-steps li {
-            padding: 8px 0;
-            font-size: 1.05em;
+            padding: 6px 0;
+            font-size: 1em;
         }
 
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 2em;
+                font-size: 1.8em;
             }
 
             .btn-group {
@@ -186,6 +202,7 @@
 
             .btn {
                 width: 100%;
+                text-align: center;
             }
 
             .content {
@@ -196,12 +213,13 @@
         footer {
             text-align: center;
             padding: 30px;
-            background: #f8f9fa;
-            color: #666;
+            background: #F8F9FA;
+            color: #868E96;
+            border-top: 1px solid #DEE2E6;
         }
 
         footer a {
-            color: #667eea;
+            color: #339AF0;
             text-decoration: none;
         }
 
@@ -266,7 +284,7 @@
             <div class="section">
                 <h2>🎯 사용 방법</h2>
 
-                <h3 style="color: #667eea; margin: 20px 0 10px 0;">웹 버전</h3>
+                <h3 style="color: #339AF0; margin: 20px 0 10px 0;">웹 버전</h3>
                 <div class="usage-steps">
                     <ol>
                         <li>위의 "웹에서 바로 사용하기" 버튼 클릭</li>
@@ -276,7 +294,7 @@
                     </ol>
                 </div>
 
-                <h3 style="color: #667eea; margin: 20px 0 10px 0;">Windows 프로그램</h3>
+                <h3 style="color: #339AF0; margin: 20px 0 10px 0;">Windows 프로그램</h3>
                 <div class="usage-steps">
                     <ol>
                         <li>위의 "Windows 프로그램 다운로드" 버튼으로 exe 파일 다운로드</li>
