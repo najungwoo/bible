@@ -7,10 +7,15 @@ import sys
 import os
 import json
 import shutil
+
 from pathlib import Path
+from pathlib import Path
+import styles
 
 # --- Configuration & Constants ---
-ctk.set_appearance_mode("System")
+# --- Configuration & Constants ---
+# ctk.set_appearance_mode("System") # Removed for strictly defined light theme request
+ctk.set_appearance_mode("Light") # User requested specific light colors by default for match
 ctk.set_default_color_theme("blue")
 
 PUNCT_RE = re.compile(r'[,\-]')
@@ -121,7 +126,18 @@ class BibleApp(ctk.CTk):
         self.minsize(800, 600)
         
         # Theme Setup
-        ctk.set_appearance_mode(self.config_data["theme"])
+        # Theme Setup
+        # ctk.set_appearance_mode(self.config_data["theme"]) # Overridden by user request refactor
+        
+        # Load Theme
+        # Load Theme
+        self.current_mode = "light"
+        self.theme = styles.COLORS[self.current_mode]
+        self.configure(fg_color=self.theme['bg_app'])
+        
+        # Apply Config
+        if "WINDOW_SIZE" in styles.CONFIG:
+             self.geometry(styles.CONFIG["WINDOW_SIZE"])
         
         # Icon
         try:
@@ -140,9 +156,10 @@ class BibleApp(ctk.CTk):
         
         self.day_num = 0
         self.left_verse = 0
-        self.left_verse = 0
         self.fail_num = 0
         self.score = 0
+        self.blank_num = 6 # Default 50% (index 5 -> 50%)
+        self.whole_level_num = 1
         
         self.current_mode = 1
         self.blank_num = 5
@@ -157,7 +174,7 @@ class BibleApp(ctk.CTk):
         self.hint_count = 0
 
         # Font State
-        self.font_family = "맑은 고딕"
+        self.font_family = styles.FONTS['bible_text'][0]
         self.font_size = self.config_data["font_size"]
 
         # Load Data
@@ -204,7 +221,7 @@ class BibleApp(ctk.CTk):
             day1_path = os.path.join(local_data_dir, "day1.txt")
             try:
                 with open(day1_path, "w", encoding="utf-8") as f:
-                    sample_data = """1\(요 5:39)^너희가 성경에서 영생을 얻는줄 생각하고 성경을 상고하거니와 이 성경이 곧 내게 대하여 증거하는 것이로다
+                    sample_data = r"""1\(요 5:39)^너희가 성경에서 영생을 얻는줄 생각하고 성경을 상고하거니와 이 성경이 곧 내게 대하여 증거하는 것이로다
 1\(롬 10:17)^그러므로 믿음은 들음에서 나며 들음은 그리스도의 말씀으로 말미암았느니라
 1\(사 34:16)^너희는 여호와의 책을 자세히 읽어보라 이것들이 하나도 빠진 것이 없고 하나도 그 짝이 없는 것이 없으리니 이는 여호와의 입이 이를 명하셨고 그의 신이 이것들을 모으셨음이라
 1\(딤후 3:16-17)^모든 성경은 하나님의 감동으로 된 것으로 교훈과 책망과 바르게 함과 의로 교육하기에 유익하니 이는 하나님의 사람으로 온전케 하며 모든 선한 일을 행하기에 온전케 하려 함이니라
@@ -393,18 +410,119 @@ class BibleApp(ctk.CTk):
         except Exception as e:
             messagebox.showerror("오류", str(e))
 
+    def toggle_theme(self):
+        old_mode = self.current_mode
+        self.current_mode = "dark" if self.current_mode == "light" else "light"
+        self.theme = styles.COLORS[self.current_mode]
+        self.apply_theme(old_mode)
+        
+        # Update Toggle Button Text
+        icon = "🌙" if self.current_mode == "light" else "☀️" 
+        self.theme_btn.configure(text=icon)
+
+    def apply_theme(self, old_mode):
+        old_theme = styles.COLORS[old_mode]
+        new_theme = self.theme
+        
+        # 1. Update Root
+        current_root_bg = self.cget("fg_color")
+        if str(current_root_bg).lower() == str(old_theme['bg_app']).lower():
+            self.configure(fg_color=new_theme['bg_app'])
+            
+        # 2. Update Widgets
+        for widget in self.search_all_widgets(self):
+            try:
+                # Update fg_color (Background)
+                try:
+                    current_fg = widget.cget("fg_color")
+                    # Find matching key in old_theme
+                    for key, val in old_theme.items():
+                        if str(val).lower() == str(current_fg).lower():
+                            # Update to new theme value
+                            widget.configure(fg_color=new_theme[key])
+                            break
+                            
+                    # Special Case: Entry widget (CTkEntry uses fg_color for bg)
+                    # No extra logic needed if mapped correctly.
+                except: pass
+
+                # Update text_color
+                try:
+                    current_text = widget.cget("text_color")
+                    for key, val in old_theme.items():
+                        if str(val).lower() == str(current_text).lower():
+                            widget.configure(text_color=new_theme[key])
+                            break
+                except: pass
+                
+                # Update border_color
+                try:
+                    current_border = widget.cget("border_color")
+                    for key, val in old_theme.items():
+                         if str(val).lower() == str(current_border).lower():
+                            widget.configure(border_color=new_theme[key])
+                            break
+                except: pass
+                
+                # Update hover_color (Buttons)
+                try:
+                    current_hover = widget.cget("hover_color")
+                    for key, val in old_theme.items():
+                         if str(val).lower() == str(current_hover).lower():
+                            widget.configure(hover_color=new_theme[key])
+                            break
+                except: pass
+                
+                # Update button_color (ComboBox)
+                try:
+                    current_btn = widget.cget("button_color")
+                    for key, val in old_theme.items():
+                        if str(val).lower() == str(current_btn).lower():
+                            widget.configure(button_color=new_theme[key])
+                            break
+                except: pass
+                
+                # Update button_hover_color (ComboBox)
+                try:
+                    current_btn_hover = widget.cget("button_hover_color")
+                    for key, val in old_theme.items():
+                        if str(val).lower() == str(current_btn_hover).lower():
+                            widget.configure(button_hover_color=new_theme[key])
+                            break
+                except: pass
+                
+                # Standard Tkinter Widgets (if any)
+                if isinstance(widget, (tk.Label, tk.Button, tk.Frame, tk.Entry)):
+                    try:
+                        current_bg = widget.cget("bg")
+                        for key, val in old_theme.items():
+                             if str(val).lower() == str(current_bg).lower():
+                                widget.configure(bg=new_theme[key])
+                                break
+                                
+                        current_fg_tk = widget.cget("fg")
+                        for key, val in old_theme.items():
+                             if str(val).lower() == str(current_fg_tk).lower():
+                                widget.configure(fg=new_theme[key])
+                                if isinstance(widget, tk.Entry):
+                                    widget.configure(insertbackground=new_theme[key])
+                                break
+                    except: pass
+                 
+            except Exception as e:
+                # print(f"Error updating widget {widget}: {e}")
+                pass
+
+    def search_all_widgets(self, parent):
+        for child in parent.winfo_children():
+            yield child
+            yield from self.search_all_widgets(child)
+
     def create_widgets(self):
         # Use pack layout for main window
         
         # Top Frame
-        # Colors (Web Version Match)
-        COLOR_PRIMARY = "#3498db"
-        COLOR_SECONDARY = "#2c3e50"
-        COLOR_ACCENT = "#e74c3c"
-        COLOR_WARNING = "#f1c40f"
-        COLOR_SUCCESS = "#2ecc71"
-        COLOR_TEXT = "#e0e0e0"
-        COLOR_BG_DARK = "#1a1a1a"
+        # Colors are managed by styles.py
 
         # Top Frame
         self.top_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -418,14 +536,29 @@ class BibleApp(ctk.CTk):
             values=[f.replace(".txt", "") for f in self.original_filenames],
             command=self.on_day_combo_change,
             width=200,
-            font=(self.font_family, 16),
-            fg_color=COLOR_SECONDARY,
-            border_color="#555",
-            button_color=COLOR_PRIMARY,
-            button_hover_color="#2980b9",
-            text_color=COLOR_TEXT
+            font=styles.FONTS['body'],
+            fg_color=self.theme['bg_surface'],
+            border_color=self.theme['border'],
+            button_color=self.theme['primary_actions'],
+            button_hover_color=self.theme['primary_actions'], # darker? no field for that in provided valid styles
+            text_color=self.theme['text_main']
         )
         self.day_combo.pack(side="left", padx=(0, 10))
+
+        # Theme Toggle Button
+        self.theme_btn = ctk.CTkButton(
+            self.top_frame,
+            text="🌙",
+            width=40,
+            command=self.toggle_theme,
+            font=styles.FONTS['body'],
+            fg_color=self.theme['bg_surface'],
+            border_color=self.theme['border'],
+            text_color=self.theme['text_main'],
+            hover_color=self.theme['hover'],
+            border_width=1
+        )
+        self.theme_btn.pack(side="right", padx=0)
 
         # Level Selection ComboBox
         self.level_var = ctk.StringVar(value="전체")
@@ -435,64 +568,76 @@ class BibleApp(ctk.CTk):
             values=["전체", "1과정", "2과정", "3과정", "4과정"],
             command=self.on_level_combo_change,
             width=100,
-            font=(self.font_family, 16),
-            fg_color=COLOR_SECONDARY,
-            border_color="#555",
-            button_color=COLOR_PRIMARY,
-            button_hover_color="#2980b9",
-            text_color=COLOR_TEXT
+            font=styles.FONTS['body'],
+            fg_color=self.theme['bg_surface'],
+            border_color=self.theme['border'],
+            button_color=self.theme['primary_actions'],
+            button_hover_color=self.theme['primary_actions'],
+            text_color=self.theme['text_main']
         )
         self.level_combo.pack(side="left", padx=(0, 20))
 
         # Mode Buttons
-        modes = [("빈칸", self.open_blank_level), ("구절", lambda: self.set_mode(2)), 
-                 ("장절", lambda: self.set_mode(3)), ("전체", self.open_whole_level)]
-        
-        for text, cmd in modes:
-            ctk.CTkButton(
-                self.top_frame, 
-                text=text, 
-                command=cmd, 
-                width=80, 
-                height=35,
-                fg_color=COLOR_SECONDARY,
-                hover_color=COLOR_PRIMARY
-            ).pack(side="left", padx=5)
+        # Blank Mode (with Settings)
+        f_blank = ctk.CTkFrame(self.top_frame, fg_color="transparent")
+        f_blank.pack(side="left", padx=5)
+        ctk.CTkButton(f_blank, text="빈칸", command=lambda: self.set_mode(1), width=60, height=35, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left", padx=(0, 2))
+        ctk.CTkButton(f_blank, text="⚙️", command=self.open_blank_ratio_popup, width=30, height=35, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left")
+
+        # Verse Mode
+        ctk.CTkButton(self.top_frame, text="구절", command=lambda: self.set_mode(2), width=80, height=35, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left", padx=5)
+
+        # Ref Mode
+        ctk.CTkButton(self.top_frame, text="장절", command=lambda: self.set_mode(3), width=80, height=35, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left", padx=5)
+
+        # Whole Mode (with Settings)
+        f_whole = ctk.CTkFrame(self.top_frame, fg_color="transparent")
+        f_whole.pack(side="left", padx=5)
+        ctk.CTkButton(f_whole, text="전체", command=lambda: self.set_mode(4), width=60, height=35, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left", padx=(0, 2))
+        ctk.CTkButton(f_whole, text="⚙️", command=self.open_whole_level_popup, width=30, height=35, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left")
 
         # Font Controls
-        ctk.CTkButton(self.top_frame, text="가+", command=self.increase_font, width=40, height=35, fg_color=COLOR_SECONDARY, hover_color=COLOR_PRIMARY).pack(side="right", padx=5)
-        ctk.CTkButton(self.top_frame, text="가-", command=self.decrease_font, width=40, height=35, fg_color=COLOR_SECONDARY, hover_color=COLOR_PRIMARY).pack(side="right", padx=5)
+        # Font Controls
+        ctk.CTkButton(self.top_frame, text="가+", command=self.increase_font, width=40, height=35, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="right", padx=5)
+        ctk.CTkButton(self.top_frame, text="가-", command=self.decrease_font, width=40, height=35, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="right", padx=5)
 
         # Problem Area
-        self.problem_frame = ctk.CTkFrame(self, fg_color="#2d2d2d") # Card BG
+        self.problem_frame = ctk.CTkFrame(self, fg_color=self.theme['bg_surface']) # Card BG
         self.problem_frame.pack(side="top", fill="both", expand=True, padx=20, pady=10)
         self.problem_frame.grid_columnconfigure(0, weight=1)
         self.problem_frame.grid_rowconfigure(0, weight=1)
 
         self.problem_text = ctk.CTkTextbox(
             self.problem_frame,
-            font=(self.font_family, self.font_size),
+            font=styles.FONTS['bible_text'],
             wrap="word",
             state="disabled",
-            fg_color="#2d2d2d",
-            text_color=COLOR_TEXT
+            fg_color=self.theme['bg_surface'],
+            text_color=self.theme['text_main']
         )
         self.problem_text.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
         
-        self.problem_text.tag_config("correct", foreground=COLOR_SUCCESS)
-        self.problem_text.tag_config("wrong", foreground=COLOR_ACCENT)
-        self.problem_text.tag_config("hint", foreground=COLOR_WARNING)
+        self.problem_text.tag_config("correct", foreground=self.theme['accent_success'])
+        self.problem_text.tag_config("wrong", foreground=self.theme['accent_fail'])
+        self.problem_text.tag_config("hint", foreground=styles.COLORS['light']['text_sub']) # Or warning color if defined, prompting said accent_fail is for wrong/warning, so maybe user didn't define explicit orange hint. User said 'accent_fail' for 'warning'. But I'll stick to 'accent_fail' or just make a new one if needed. Actually user provided 'accent_fail' for 'wrong/warning'. OK. But wait, typically hint is distinct. I'll use text_sub for hint or primary. Let's use accent_fail as requesting warning, OR maybe primary_actions. Let's use accent_fail given prompt "accent_fail: warning".
+        # Prompt said: "accent_fail: #C92A2A (오답/경고 표시)". So hint (usually warning) could be red.
+        # But hint is usually orange. I'll stick to accent_fail as requested for 'warning'. Or keep 'text_sub' for subtle hint.
+        # Let's use 'primary_actions' for hint to be distinct from error. Or just text_sub.
+        # Original code had Warning (Orange).
+        # Prompt didn't specify Hint color explicitly beyond "Warning -> accent_fail".
+        # I'll use primary_actions for hint to avoid too much red.
+        self.problem_text.tag_config("hint", foreground=self.theme['primary_actions'])
 
         # Answer Area
         self.answer_entry = ctk.CTkEntry(
             self,
             placeholder_text="정답을 입력하세요...",
-            font=(self.font_family, self.font_size),
+            font=styles.FONTS['bible_text'],
             height=50,
-            fg_color="#3d3d3d",
-            border_color="#555",
-            text_color=COLOR_TEXT,
-            placeholder_text_color="#888"
+            fg_color=self.theme['bg_surface'],
+            border_color=self.theme['border'],
+            text_color=self.theme['text_main'],
+            placeholder_text_color=self.theme['text_sub']
         )
         self.answer_entry.pack(side="top", fill="x", padx=20, pady=10)
         self.answer_entry.bind("<Return>", lambda e: self.submit_answer())
@@ -502,13 +647,13 @@ class BibleApp(ctk.CTk):
         self.bottom_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.bottom_frame.pack(side="bottom", fill="x", padx=20, pady=(0, 20))
         
-        self.status_label = ctk.CTkLabel(self.bottom_frame, text="남은 구절: 0 | 틀린 갯수: 0 | 점수: 0", font=("맑은 고딕", 16), text_color="#999")
+        self.status_label = ctk.CTkLabel(self.bottom_frame, text="남은 구절: 0 | 틀린 갯수: 0 | 점수: 0", font=styles.FONTS['body'], text_color=self.theme['text_sub'])
         self.status_label.pack(side="left", padx=20, pady=10)
         
-        ctk.CTkButton(self.bottom_frame, text="초기화", command=self.day_reset, fg_color="#c0392b", hover_color="#a93226").pack(side="left", padx=10)
-        ctk.CTkButton(self.bottom_frame, text="💡 힌트", command=self.show_hint, fg_color=COLOR_WARNING, hover_color="#f39c12", text_color="#2C3E50").pack(side="left", padx=10)
-        ctk.CTkButton(self.bottom_frame, text="스킵", command=self.skip_problem, fg_color="#f39c12", hover_color="#e67e22", text_color="#2C3E50").pack(side="left", padx=10)
-        ctk.CTkButton(self.bottom_frame, text="틀린 구절", command=self.show_wrong_verses, fg_color=COLOR_SECONDARY, hover_color=COLOR_PRIMARY).pack(side="right", padx=20)
+        ctk.CTkButton(self.bottom_frame, text="초기화", command=self.day_reset, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="💡 힌트", command=self.show_hint, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="스킵", command=self.skip_problem, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="left", padx=10)
+        ctk.CTkButton(self.bottom_frame, text="틀린 구절", command=self.show_wrong_verses, fg_color=self.theme['bg_surface'], hover_color=self.theme['hover'], text_color=self.theme['text_main'], font=styles.FONTS['button']).pack(side="right", padx=20)
 
     def on_day_combo_change(self, choice):
         full_name = choice + ".txt"
@@ -853,23 +998,24 @@ class BibleApp(ctk.CTk):
         win.title("구절 추가")
         win.geometry("400x500")
         win.grab_set()
+        win.configure(fg_color=self.theme['bg_app'])
 
-        ctk.CTkLabel(win, text="장절 예: (요 3:16)").pack(pady=(10, 0))
-        ref_entry = ctk.CTkEntry(win, width=300)
+        ctk.CTkLabel(win, text="장절 예: (요 3:16)", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=(10, 0))
+        ref_entry = ctk.CTkEntry(win, width=300, font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], text_color=self.theme['text_main'])
         ref_entry.pack(pady=5)
 
-        ctk.CTkLabel(win, text="구절 내용").pack(pady=(10, 0))
-        verse_text = ctk.CTkTextbox(win, height=100, width=300)
+        ctk.CTkLabel(win, text="구절 내용", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=(10, 0))
+        verse_text = ctk.CTkTextbox(win, height=100, width=300, font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], text_color=self.theme['text_main'])
         verse_text.pack(pady=5)
 
-        ctk.CTkLabel(win, text="과정 선택").pack(pady=(10, 0))
+        ctk.CTkLabel(win, text="과정 선택", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=(10, 0))
         level_var = ctk.StringVar(value="없음")
-        level_cb = ctk.CTkComboBox(win, values=["없음", "1", "2", "3", "4"], variable=level_var, width=100)
+        level_cb = ctk.CTkComboBox(win, values=["없음", "1", "2", "3", "4"], variable=level_var, width=100, font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], button_color=self.theme['primary_actions'], text_color=self.theme['text_main'])
         level_cb.pack(pady=5)
 
-        ctk.CTkLabel(win, text="저장할 파일").pack(pady=(10, 0))
+        ctk.CTkLabel(win, text="저장할 파일", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=(10, 0))
         file_var = ctk.StringVar(value=self.original_filenames[0])
-        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var)
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var, font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], button_color=self.theme['primary_actions'], text_color=self.theme['text_main'])
         file_cb.pack(pady=5)
 
         def save():
@@ -923,16 +1069,17 @@ class BibleApp(ctk.CTk):
             except Exception as e:
                 messagebox.showerror("오류", str(e))
 
-        ctk.CTkButton(win, text="저장", command=save).pack(pady=20)
+        ctk.CTkButton(win, text="저장", command=save, fg_color=self.theme['primary_actions'], hover_color=self.theme['hover'], text_color=styles.COLORS['light']['text_main'], font=styles.FONTS['button']).pack(pady=20)
 
     def open_add_day_popup(self):
         win = ctk.CTkToplevel(self)
         win.title("일차 추가")
         win.geometry("300x200")
         win.grab_set()
+        win.configure(fg_color=self.theme['bg_app'])
 
-        ctk.CTkLabel(win, text="일차 이름 (예: day2)").pack(pady=10)
-        name_entry = ctk.CTkEntry(win)
+        ctk.CTkLabel(win, text="일차 이름 (예: day2)", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=10)
+        name_entry = ctk.CTkEntry(win, font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], text_color=self.theme['text_main'])
         name_entry.pack(pady=5)
 
         def create():
@@ -965,7 +1112,7 @@ class BibleApp(ctk.CTk):
             except Exception as e:
                 messagebox.showerror("오류", str(e))
 
-        ctk.CTkButton(win, text="생성", command=create).pack(pady=20)
+        ctk.CTkButton(win, text="생성", command=create, fg_color=self.theme['primary_actions'], hover_color=self.theme['hover'], text_color=styles.COLORS['light']['text_main'], font=styles.FONTS['button']).pack(pady=20)
 
     def delete_verse_popup(self):
         if not self.original_filenames:
@@ -975,13 +1122,14 @@ class BibleApp(ctk.CTk):
         win.title("구절 삭제")
         win.geometry("500x600")
         win.grab_set()
+        win.configure(fg_color=self.theme['bg_app'])
 
-        ctk.CTkLabel(win, text="파일 선택").pack(pady=5)
+        ctk.CTkLabel(win, text="파일 선택", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=5)
         file_var = ctk.StringVar(value=self.original_filenames[0])
-        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var, command=lambda x: load_verses(x))
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var, command=lambda x: load_verses(x), font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], button_color=self.theme['primary_actions'], text_color=self.theme['text_main'])
         file_cb.pack(pady=5)
 
-        list_frame = ctk.CTkScrollableFrame(win, width=450, height=400)
+        list_frame = ctk.CTkScrollableFrame(win, width=450, height=400, fg_color=self.theme['bg_surface'])
         list_frame.pack(pady=10)
         
         self.check_vars = []
@@ -997,7 +1145,7 @@ class BibleApp(ctk.CTk):
                 for i, v in enumerate(verses):
                     var = ctk.IntVar()
                     self.check_vars.append((i, var))
-                    ctk.CTkCheckBox(list_frame, text=v[:40]+"...", variable=var).pack(anchor="w", pady=2)
+                    ctk.CTkCheckBox(list_frame, text=v[:40]+"...", variable=var, font=styles.FONTS['body'], text_color=self.theme['text_main'], fg_color=self.theme['bg_surface'], border_color=self.theme['border']).pack(anchor="w", pady=2)
 
         load_verses(file_var.get())
 
@@ -1038,7 +1186,7 @@ class BibleApp(ctk.CTk):
             except Exception as e:
                 messagebox.showerror("오류", str(e))
 
-        ctk.CTkButton(win, text="삭제", command=delete, fg_color="#C0392B", hover_color="#E74C3C").pack(pady=10)
+        ctk.CTkButton(win, text="삭제", command=delete, fg_color=self.theme['accent_fail'], hover_color=self.theme['hover'], text_color="white", font=styles.FONTS['button']).pack(pady=10)
 
     def delete_file_popup(self):
         if not self.original_filenames: return
@@ -1047,10 +1195,11 @@ class BibleApp(ctk.CTk):
         win.title("일차 삭제")
         win.geometry("300x150")
         win.grab_set()
+        win.configure(fg_color=self.theme['bg_app'])
 
-        ctk.CTkLabel(win, text="삭제할 일차").pack(pady=10)
+        ctk.CTkLabel(win, text="삭제할 일차", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=10)
         file_var = ctk.StringVar(value=self.original_filenames[0])
-        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var)
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var, font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], button_color=self.theme['primary_actions'], text_color=self.theme['text_main'])
         file_cb.pack(pady=5)
 
         def delete():
@@ -1074,7 +1223,7 @@ class BibleApp(ctk.CTk):
             except Exception as e:
                 messagebox.showerror("오류", str(e))
 
-        ctk.CTkButton(win, text="삭제", command=delete, fg_color="#C0392B", hover_color="#E74C3C").pack(pady=10)
+        ctk.CTkButton(win, text="삭제", command=delete, fg_color=self.theme['accent_fail'], hover_color=self.theme['hover'], text_color="white", font=styles.FONTS['button']).pack(pady=10)
 
     def open_edit_verse_popup(self):
         if not self.original_filenames: return
@@ -1083,20 +1232,21 @@ class BibleApp(ctk.CTk):
         win.title("구절 수정")
         win.geometry("500x600")
         win.grab_set()
+        win.configure(fg_color=self.theme['bg_app'])
 
-        ctk.CTkLabel(win, text="파일 선택").pack(pady=5)
+        ctk.CTkLabel(win, text="파일 선택", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=5)
         file_var = ctk.StringVar(value=self.original_filenames[0])
-        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var, command=lambda x: load_verses(x))
+        file_cb = ctk.CTkComboBox(win, values=self.original_filenames, variable=file_var, command=lambda x: load_verses(x), font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], button_color=self.theme['primary_actions'], text_color=self.theme['text_main'])
         file_cb.pack(pady=5)
 
-        list_frame = ctk.CTkScrollableFrame(win, width=450, height=200)
+        list_frame = ctk.CTkScrollableFrame(win, width=450, height=200, fg_color=self.theme['bg_surface'])
         list_frame.pack(pady=10)
 
-        edit_frame = ctk.CTkFrame(win)
+        edit_frame = ctk.CTkFrame(win, fg_color=self.theme['bg_app'])
         edit_frame.pack(pady=10, padx=10, fill="x")
         
-        ctk.CTkLabel(edit_frame, text="수정할 내용").pack()
-        edit_text = ctk.CTkTextbox(edit_frame, height=100)
+        ctk.CTkLabel(edit_frame, text="수정할 내용", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack()
+        edit_text = ctk.CTkTextbox(edit_frame, height=100, font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], text_color=self.theme['text_main'])
         edit_text.pack(fill="x", padx=5)
         
         self.selected_verse_idx = -1
@@ -1111,7 +1261,7 @@ class BibleApp(ctk.CTk):
                 idx = self.original_filenames.index(fname)
                 verses = self.original_scriptures[idx]
                 for i, v in enumerate(verses):
-                    btn = ctk.CTkButton(list_frame, text=v[:40]+"...", command=lambda idx=i, val=v: select_verse(idx, val), fg_color="transparent", border_width=1, text_color=("black", "white"))
+                    btn = ctk.CTkButton(list_frame, text=v[:40]+"...", command=lambda idx=i, val=v: select_verse(idx, val), fg_color="transparent", border_width=1, text_color=self.theme['text_main'], font=styles.FONTS['body'])
                     btn.pack(anchor="w", pady=2, fill="x")
 
         def select_verse(idx, val):
@@ -1149,7 +1299,7 @@ class BibleApp(ctk.CTk):
             except Exception as e:
                 messagebox.showerror("오류", str(e))
 
-        ctk.CTkButton(win, text="수정 저장", command=save_edit).pack(pady=10)
+        ctk.CTkButton(win, text="수정 저장", command=save_edit, fg_color=self.theme['primary_actions'], hover_color=self.theme['hover'], text_color=styles.COLORS['light']['text_main'], font=styles.FONTS['button']).pack(pady=10)
 
     def open_data_folder(self):
         if getattr(sys, 'frozen', False):
@@ -1161,28 +1311,34 @@ class BibleApp(ctk.CTk):
             os.makedirs(local_data_dir)
         os.startfile(local_data_dir)
 
-    def open_blank_level(self):
+    def open_blank_ratio_popup(self):
         win = ctk.CTkToplevel(self)
-        win.title("빈칸 난이도")
+        win.title("빈칸 비율 설정")
         win.geometry("300x400")
         win.grab_set()
+        win.configure(fg_color=self.theme['bg_app'])
         
+        ctk.CTkLabel(win, text="빈칸 비율 선택", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=10)
+
         for i in range(11):
-            ctk.CTkButton(win, text=f"{i}0%", command=lambda x=i: set_level(x, win)).pack(pady=2)
+            ctk.CTkButton(win, text=f"{i}0%", command=lambda x=i: set_level(x, win), fg_color=self.theme['bg_surface'], text_color=self.theme['text_main'], font=styles.FONTS['button'], hover_color=self.theme['hover']).pack(pady=2)
 
         def set_level(x, w):
             self.blank_num = x + 1
             self.set_mode(1)
             w.destroy()
 
-    def open_whole_level(self):
+    def open_whole_level_popup(self):
         win = ctk.CTkToplevel(self)
-        win.title("어절 수")
-        win.geometry("300x300")
+        win.title("어절 수 설정")
+        win.geometry("300x350")
         win.grab_set()
+        win.configure(fg_color=self.theme['bg_app'])
+        
+        ctk.CTkLabel(win, text="보여줄 어절 수 선택", font=styles.FONTS['body'], text_color=self.theme['text_main']).pack(pady=10)
         
         for i in range(1, 6):
-            ctk.CTkButton(win, text=f"{i}어절", command=lambda x=i: set_level(x, win)).pack(pady=5)
+            ctk.CTkButton(win, text=f"{i}어절", command=lambda x=i: set_level(x, win), fg_color=self.theme['bg_surface'], text_color=self.theme['text_main'], font=styles.FONTS['button'], hover_color=self.theme['hover']).pack(pady=5)
 
         def set_level(x, w):
             self.whole_level_num = x
@@ -1225,10 +1381,11 @@ class BibleApp(ctk.CTk):
         win.geometry("600x400")
         win.transient(self)
         win.grab_set()
+        win.configure(fg_color=self.theme['bg_app'])
         win.lift()
         win.focus_force()
         
-        text_box = ctk.CTkTextbox(win, font=(self.font_family, 18))
+        text_box = ctk.CTkTextbox(win, font=styles.FONTS['body'], fg_color=self.theme['bg_surface'], text_color=self.theme['text_main'])
         text_box.pack(fill="both", expand=True, padx=10, pady=10)
         
         for i, w in enumerate(self.wrong_verses, 1):
@@ -1244,7 +1401,7 @@ class BibleApp(ctk.CTk):
             self.display_problem()
             win.destroy()
             
-        ctk.CTkButton(win, text="복습하기", command=review).pack(pady=10)
+        ctk.CTkButton(win, text="복습하기", command=review, fg_color=self.theme['primary_actions'], hover_color=self.theme['hover'], text_color=styles.COLORS['light']['text_main'], font=styles.FONTS['button']).pack(pady=10)
 
     def on_closing(self):
         # Save settings

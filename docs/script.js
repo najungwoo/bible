@@ -38,6 +38,7 @@ const btnSkip = document.getElementById('btnSkip');
 const btnWrong = document.getElementById('btnWrong');
 const btnFontUp = document.getElementById('btnFontUp');
 const btnFontDown = document.getElementById('btnFontDown');
+const btnTheme = document.getElementById('btnTheme');
 const modeBtns = document.querySelectorAll('.btn-mode');
 
 // Paste Modal Elements
@@ -501,22 +502,38 @@ function displayProblem() {
     problemNum = Math.floor(Math.random() * currentScripture.length);
     const line = currentScripture[problemNum];
 
-    let [text, answers, ref] = createProblem(line, currentMode);
+    let [refView, verseText, answers, ref] = createProblem(line, currentMode);
 
-    currentProblem = text;
+    currentProblem = verseText; // Store just verse text for logic if needed? No, logic uses currentAnswers
     currentAnswers = answers;
     currentReference = ref;
     attempts = 0;
     problemCompleted = false;
     hintCount = 0;  // Reset hint counter for new problem
 
-    renderProblem(currentProblem);
+    renderProblem(refView, verseText);
     answerInput.value = "";
     answerInput.focus();
 }
 
-function renderProblem(text) {
-    problemArea.textContent = text;
+function renderProblem(refText, verseText) {
+    problemArea.innerHTML = '';
+
+    // Create Layout
+    const refDiv = document.createElement('div');
+    refDiv.className = 'reference-block';
+    refDiv.textContent = refText;
+
+    // Append
+    problemArea.appendChild(refDiv);
+
+    // Create Verse Content Wrapper
+    const verseDiv = document.createElement('div');
+    verseDiv.className = 'verse-content';
+    verseDiv.appendChild(document.createTextNode(verseText));
+    problemArea.appendChild(verseDiv);
+
+    // problemArea.textContent = text; // OLD
     problemArea.style.fontSize = fontSize + 'px';
 }
 
@@ -554,20 +571,20 @@ function createProblem(line, mode) {
         const problemWords = words.map((w, i) => blankIndices.includes(i) ? maskLenKeepPunct(w) : w);
 
         const refView = refMasked(reference, false);
-        return [refView + " " + problemWords.join(" "), answers, reference];
+        return [refView, problemWords.join(" "), answers, reference];
     }
     else if (mode === 2) { // Verse Mode
         const answers = words.filter(w => WORD_TOKEN_RE.test(w)).map(w => normToken(w));
         const problemWords = words.map(w => WORD_TOKEN_RE.test(w) ? maskOneKeepPunct(w) : w);
         const refView = refMasked(reference, false);
-        return [refView + " " + problemWords.join(" "), answers, reference];
+        return [refView, problemWords.join(" "), answers, reference];
     }
     else if (mode === 3) { // Reference Mode
         let [book, chap, versePart] = parseRefParts(reference);
         let [_, verseParts] = splitVerseParts(versePart);
         const refView = refMasked(reference, true);
         const answers = [book, chap, ...verseParts];
-        return [refView + " " + words.join(" "), answers, reference];
+        return [refView, words.join(" "), answers, reference];
     }
     else if (mode === 4) { // Whole Mode
         const n = Math.min(wholeLevelNum, words.length);
@@ -633,10 +650,10 @@ function createProblem(line, mode) {
             i++;
         }
 
-        return [refView + " " + problemWords.join(" "), answers, reference];
+        return [refView, problemWords.join(" "), answers, reference];
     }
 
-    return ["", [], ""];
+    return ["", "", [], ""];
 }
 
 let autoAdvanceTimer = null;
@@ -703,8 +720,11 @@ function handleWrongAnswer() {
 }
 
 function replaceBlankWithAnswer(answer, correct) {
-    // Get all child nodes to handle both text and hint spans
-    const children = Array.from(problemArea.childNodes);
+    // Target the verse container specifically
+    const verseContainer = problemArea.querySelector('.verse-content');
+    if (!verseContainer) return; // Safety check
+
+    const children = Array.from(verseContainer.childNodes);
     let foundBlank = false;
 
     // Build new content
@@ -769,19 +789,22 @@ function replaceBlankWithAnswer(answer, correct) {
             }
         }
 
-        // Add node - if it's a span (correct/wrong/hint), extract only text content
-        if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SPAN') {
-            // Only add text content, not the styled span
-            newContent.appendChild(document.createTextNode(node.textContent));
-        } else {
-            // For text nodes and other elements, clone as-is
-            newContent.appendChild(node.cloneNode(true));
-        }
+        // Add node - if it's a span (correct/wrong/hint), extract only text content? 
+        // NO! We want to keep previous answers (correct/wrong) as Spans!
+        // The original code flattened them. That might have been a bug or intentional?
+        // Original: "if span ... append textContent". This removes color from previous answers??
+        // Wait, if I answer 1st blank correctly, it becomes Green Span.
+        // If I answer 2nd blank, this loop runs.
+        // It hits 1st Green Span. It strips it to text? That means it loses green color?
+        // Let's FIX this logic to preserve styling of previous answers.
+
+        // Preserve structure
+        newContent.appendChild(node.cloneNode(true));
     }
 
-    // Clear and update problem area
-    problemArea.textContent = '';
-    problemArea.appendChild(newContent);
+    // Clear and update verse container only
+    verseContainer.textContent = '';
+    verseContainer.appendChild(newContent);
 }
 
 function nextProblem() {
@@ -867,8 +890,13 @@ btnHint.addEventListener('click', () => {
     applyHintToDisplay(hintPart, answer);
 });
 
+// function applyHintToDisplay(hintPart, fullAnswer) { ... }
+// Needs update to target .verse-content as well
 function applyHintToDisplay(hintPart, fullAnswer) {
-    const children = Array.from(problemArea.childNodes);
+    const verseContainer = problemArea.querySelector('.verse-content');
+    if (!verseContainer) return;
+
+    const children = Array.from(verseContainer.childNodes);
     let foundBlank = false;
     const newContent = document.createDocumentFragment();
 
@@ -880,7 +908,7 @@ function applyHintToDisplay(hintPart, fullAnswer) {
             if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hint-text')) {
                 const hintSpan = document.createElement('span');
                 hintSpan.className = 'hint-text';
-                hintSpan.style.color = '#F1C40F';
+                // hintSpan.style.color value removed to use CSS variables
 
                 const remainingUnderscores = '_'.repeat(Math.max(0, fullAnswer.length - hintPart.length));
                 hintSpan.textContent = hintPart + remainingUnderscores;
@@ -905,7 +933,7 @@ function applyHintToDisplay(hintPart, fullAnswer) {
 
                     const hintSpan = document.createElement('span');
                     hintSpan.className = 'hint-text';
-                    hintSpan.style.color = '#F1C40F';
+                    // hintSpan.style.color value removed to use CSS variables
 
                     const remainingUnderscores = '_'.repeat(Math.max(0, fullAnswer.length - hintPart.length));
                     hintSpan.textContent = hintPart + remainingUnderscores;
@@ -925,14 +953,14 @@ function applyHintToDisplay(hintPart, fullAnswer) {
 
         // Preserve existing nodes
         if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SPAN' && !node.classList.contains('hint-text')) {
-            newContent.appendChild(document.createTextNode(node.textContent));
+            newContent.appendChild(node.cloneNode(true)); // Preserve previous answers!
         } else {
             newContent.appendChild(node.cloneNode(true));
         }
     }
 
-    problemArea.textContent = '';
-    problemArea.appendChild(newContent);
+    verseContainer.textContent = '';
+    verseContainer.appendChild(newContent);
 }
 
 btnWrong.addEventListener('click', () => {
@@ -1231,4 +1259,166 @@ btnReset.addEventListener('click', () => {
     }
 });
 
+// Theme Logic
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (btnTheme) btnTheme.textContent = '☀️';
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        if (btnTheme) btnTheme.textContent = '🌙';
+    }
+}
 
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (currentTheme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        btnTheme.textContent = '🌙';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        btnTheme.textContent = '☀️';
+    }
+}
+
+if (btnTheme) {
+    btnTheme.addEventListener('click', toggleTheme);
+    initTheme();
+}
+
+
+
+// --- Settings Popups Logic ---
+const btnSettingBlank = document.getElementById('btnSettingBlank');
+const btnSettingWhole = document.getElementById('btnSettingWhole');
+const blankSettingsModal = document.getElementById('blankSettingsModal');
+const wholeSettingsModal = document.getElementById('wholeSettingsModal');
+const closeBlankSettings = document.getElementById('closeBlankSettings');
+const closeWholeSettings = document.getElementById('closeWholeSettings');
+const blankRatioGrid = document.getElementById('blankRatioGrid');
+const wholeLevelGrid = document.getElementById('wholeLevelGrid');
+
+// Active State Updaters
+function updateBlankGridActive() {
+    const currentRatio = Math.round(blankNum * 10);
+    const btns = blankRatioGrid.querySelectorAll('.btn-option');
+    btns.forEach(btn => {
+        if (parseInt(btn.dataset.ratio) === currentRatio) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+}
+
+function updateWholeGridActive() {
+    const btns = wholeLevelGrid.querySelectorAll('.btn-option');
+    btns.forEach(btn => {
+        if (parseInt(btn.dataset.words) === wholeLevelNum) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+}
+
+// Handlers
+if (btnSettingBlank) {
+    btnSettingBlank.addEventListener('click', (e) => {
+        console.log("Blank Setting Clicked");
+        e.stopPropagation();
+        try {
+            updateBlankGridActive();
+            blankSettingsModal.style.display = 'block';
+            console.log("Blank Modal Display Set to Block");
+        } catch (err) {
+            console.error("Error opening blank modal:", err);
+        }
+    });
+} else {
+    console.error("btnSettingBlank not found");
+}
+
+if (closeBlankSettings) {
+    closeBlankSettings.addEventListener('click', () => blankSettingsModal.style.display = 'none');
+}
+
+if (btnSettingWhole) {
+    btnSettingWhole.addEventListener('click', (e) => {
+        console.log("Whole Setting Clicked");
+        e.stopPropagation();
+        try {
+            updateWholeGridActive();
+            wholeSettingsModal.style.display = 'block';
+            console.log("Whole Modal Display Set to Block");
+        } catch (err) {
+            console.error("Error opening whole modal:", err);
+        }
+    });
+} else {
+    console.error("btnSettingWhole not found");
+}
+if (closeWholeSettings) {
+    closeWholeSettings.addEventListener('click', () => wholeSettingsModal.style.display = 'none');
+}
+
+// Close on outside click
+window.addEventListener('click', (e) => {
+    if (e.target === blankSettingsModal) blankSettingsModal.style.display = 'none';
+    if (e.target === wholeSettingsModal) wholeSettingsModal.style.display = 'none';
+});
+
+// Grid Selection Handlers
+if (blankRatioGrid) {
+    blankRatioGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-option')) {
+            const ratio = parseInt(e.target.dataset.ratio);
+            blankNum = ratio / 10;
+            blankSettingsModal.style.display = 'none';
+            if (currentMode === 1) {
+                // Determine if we need to reshuffle? displayProblem picks new random if we don't fix seed.
+                // Actually displayProblem picks NEW problem line? No.
+                // displayProblem:
+                // problemNum = Math.floor(Math.random()...) -> Yes it picks NEW line.
+                // If user just wants to adjust difficulty of SAME line?
+                // renderProblem is pure render. createProblem creates mask.
+                // If I call displayProblem(), it jumps to another verse.
+                // User might find this annoying.
+                // Ideally: recalculate mask for CURRENT line.
+                // Line 503: const line = currentScripture[problemNum];
+                // So I can reuse problemNum.
+                // But displayProblem() picks new num.
+                // Refactor displayProblem to accept optional index?
+                // Or just call createProblem again?
+                reloadCurrentProblem();
+            }
+        }
+    });
+}
+
+if (wholeLevelGrid) {
+    wholeLevelGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-option')) {
+            const words = parseInt(e.target.dataset.words);
+            wholeLevelNum = words;
+            wholeSettingsModal.style.display = 'none';
+            if (currentMode === 4) {
+                reloadCurrentProblem();
+            }
+        }
+    });
+}
+
+function reloadCurrentProblem() {
+    if (currentDayIndex === -1 || currentScripture.length === 0) return;
+    // regenerate using SAME problemNum
+    const line = currentScripture[problemNum];
+    let [refView, verseText, answers, ref] = createProblem(line, currentMode);
+    currentProblem = verseText;
+    currentAnswers = answers;
+    currentReference = ref;
+    attempts = 0;
+    problemCompleted = false;
+    hintCount = 0;
+    renderProblem(refView, verseText);
+    answerInput.value = "";
+    answerInput.focus();
+    updateStatus(); // score doesn't change
+}

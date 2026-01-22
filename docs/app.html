@@ -5,65 +5,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>말씀 암송 (Bible Memory)</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <h1>말씀 암송</h1>
-            <div class="controls-top">
-                <label for="fileInput" class="btn-file">
-                    📂 파일 열기
-                    <input type="file" id="fileInput" accept=".txt" multiple>
-                </label>
-                <button id="btnAddDay" class="btn-file">📅 일차 추가</button>
-                <button id="btnOpenAddVerse" class="btn-file">➕ 장절 추가</button>
-                <button id="btnOpenDeleteVerse" class="btn-file delete">➖ 장절 삭제</button>
-                <button id="btnDelete" class="btn-file delete">🗑️ 일차 삭제</button>
-                <select id="daySelect">
-                    <option value="" disabled selected>일차 선택</option>
-                </select>
-                <select id="levelSelect">
-                    <option value="all" selected>전체 과정</option>
-                    <option value="1">1과정</option>
-                    <option value="2">2과정</option>
-                    <option value="3">3과정</option>
-                    <option value="4">4과정</option>
-                </select>
+    <!-- Full Screen Container -->
+    <div class="app-layout">
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+            <div class="nav-left">
+                <div class="select-group">
+                    <select id="levelSelect" class="nav-select">
+                        <option value="all" selected>전체 과정</option>
+                        <option value="1">1과정</option>
+                        <option value="2">2과정</option>
+                        <option value="3">3과정</option>
+                        <option value="4">4과정</option>
+                    </select>
+                    <span class="divider">|</span>
+                    <select id="daySelect" class="nav-select">
+                        <option value="" disabled selected>일차 선택</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="nav-right">
+                <label for="fileInput" class="btn-pill btn-sm">📂 열기<input type="file" id="fileInput" accept=".txt"
+                        multiple style="display:none"></label>
+                <button id="btnAddDay" class="btn-pill btn-sm">📅 추가</button>
+                <button id="btnOpenAddVerse" class="btn-pill btn-sm">➕ 구절</button>
+                <button id="btnOpenDeleteVerse" class="btn-pill btn-sm delete">➖ 삭제</button>
+                <button id="btnDelete" class="btn-pill btn-sm delete">🗑️</button>
+                <div class="font-controls ml-2">
+                    <button id="btnTheme" class="btn-icon">🌙</button>
+                    <button id="btnFontUp" class="btn-icon">A+</button>
+                    <button id="btnFontDown" class="btn-icon">A-</button>
+                </div>
             </div>
         </header>
 
-        <main>
-            <div id="problemArea" class="problem-area">
-                <p class="placeholder">파일을 열거나 붙여넣기로 시작하세요.</p>
-            </div>
+        <!-- Mode Toggle Bar (Centered) -->
+        <div class="mode-bar">
+            <div class="mode-group">
+                <div class="mode-item-group">
+                    <button class="btn-mode active" data-mode="1">빈칸 모드</button>
+                    <button class="btn-settings" id="btnSettingBlank">⚙️</button>
+                </div>
 
-            <div class="input-area">
-                <input type="text" id="answerInput" placeholder="정답을 입력하세요..." autocomplete="off">
-            </div>
+                <button class="btn-mode" data-mode="2">구절 모드</button>
+                <button class="btn-mode" data-mode="3">장절 모드</button>
 
-            <div class="status-bar">
-                <span id="statusText">남은 구절: 0 | 틀린 갯수: 0 | 점수: 0</span>
+                <div class="mode-item-group">
+                    <button class="btn-mode" data-mode="4">전체 모드</button>
+                    <button class="btn-settings" id="btnSettingWhole">⚙️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area (Scrollable) -->
+        <main class="main-container">
+            <div id="problemArea" class="problem-card">
+                <p class="placeholder">상단 메뉴에서 과정과 일차를 선택한 후 모드를 눌러 시작하세요.</p>
             </div>
         </main>
 
-        <footer>
-            <div class="mode-controls">
-                <button class="btn-mode" data-mode="1">빈칸</button>
-                <button class="btn-mode" data-mode="2">구절</button>
-                <button class="btn-mode" data-mode="3">장절</button>
-                <button class="btn-mode" data-mode="4">전체</button>
+        <!-- Input Area (Fixed) -->
+        <div class="input-sect-container"
+            style="display: flex; justify-content: center; width: 100%; padding-bottom: 20px;">
+            <div class="input-container">
+                <input type="text" id="answerInput" placeholder="정답 입력..." autocomplete="off">
             </div>
-            <div class="action-controls">
-                <button id="btnReset" class="btn-action reset">초기화</button>
-                <button id="btnHint" class="btn-action hint">💡 힌트</button>
-                <button id="btnSkip" class="btn-action skip">스킵</button>
-                <button id="btnWrong" class="btn-action wrong">틀린 구절</button>
+        </div>
+
+        <!-- Bottom Status Bar -->
+        <footer class="bottom-bar">
+            <div class="status-left">
+                <span id="statusText">남은 구절: 0 | 틀린 갯수: 0 | 점수: 0</span>
             </div>
-            <div class="font-controls">
-                <button id="btnFontDown" class="btn-font">A-</button>
-                <button id="btnFontUp" class="btn-font">A+</button>
+            <div class="actions-right">
+                <button id="btnSkip" class="btn-text">스킵</button>
+                <button id="btnHint" class="btn-text">힌트</button>
+                <button id="btnWrong" class="btn-text">틀린 구절</button>
+                <button id="btnReset" class="btn-text danger">초기화</button>
             </div>
         </footer>
     </div>
@@ -109,10 +132,19 @@
                     </select>
                 </div>
 
-                <div class="input-row">
-                    <input type="text" id="inputRef" placeholder="장절 (예: 요 3:16)">
-                    <input type="text" id="inputVerse" placeholder="말씀 본문">
-                    <button id="btnAddVerseToDay" class="btn-add">추가</button>
+                <div class="input-group">
+                    <label for="inputRef">장절:</label>
+                    <input type="text" id="inputRef" placeholder="예: 요 3:16">
+                </div>
+
+                <div class="input-group">
+                    <label for="inputVerse">말씀 본문:</label>
+                    <textarea id="inputVerse" placeholder="말씀 본문을 입력하세요" rows="5"></textarea>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 10px;">
+                    <button id="btnAddVerseToDay" class="btn-add"
+                        style="width: 100%; justify-content: center;">추가하기</button>
                 </div>
             </div>
         </div>
@@ -141,7 +173,51 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Blank Settings Modal -->
+    <div id="blankSettingsModal" class="modal">
+        <div class="modal-content setting-modal-content">
+            <span class="close" id="closeBlankSettings">&times;</span>
+            <h2>빈칸 비율 설정</h2>
+            <div class="setting-grid" id="blankRatioGrid">
+                <button class="btn-option" data-ratio="0">0%</button>
+                <button class="btn-option" data-ratio="10">10%</button>
+                <button class="btn-option" data-ratio="20">20%</button>
+                <button class="btn-option" data-ratio="30">30%</button>
+                <button class="btn-option" data-ratio="40">40%</button>
+                <button class="btn-option" data-ratio="50">50%</button>
+                <button class="btn-option" data-ratio="60">60%</button>
+                <button class="btn-option" data-ratio="70">70%</button>
+                <button class="btn-option" data-ratio="80">80%</button>
+                <button class="btn-option" data-ratio="90">90%</button>
+                <button class="btn-option" data-ratio="100">100%</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Whole Settings Modal -->
+    <div id="wholeSettingsModal" class="modal">
+        <div class="modal-content setting-modal-content">
+            <span class="close" id="closeWholeSettings">&times;</span>
+            <h2>어절 수 설정</h2>
+            <div class="setting-grid" id="wholeLevelGrid">
+                <button class="btn-option" data-words="1">1어절</button>
+                <button class="btn-option" data-words="2">2어절</button>
+                <button class="btn-option" data-words="3">3어절</button>
+                <button class="btn-option" data-words="4">4어절</button>
+                <button class="btn-option" data-words="5">5어절</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <script src="script.js?v=7"></script>
+    </script>
+    </script>
+    </script>
+    </script>
 </body>
 
 </html>
