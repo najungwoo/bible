@@ -1476,7 +1476,13 @@ function speakCurrentVerse() {
         reference = "";
     }
 
-    const textToSpeak = (reference ? reference + ". " : "") + verse;
+    let spokenReference = reference;
+    if (spokenReference) {
+        spokenReference = spokenReference.replace(/:/g, '장 ');
+        spokenReference = spokenReference.replace(/-/g, '에서 ');
+        spokenReference += '절';
+    }
+    const textToSpeak = (spokenReference ? spokenReference + ". " : "") + verse;
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = 'ko-KR';
