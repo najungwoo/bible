@@ -41,6 +41,7 @@
                 </div>
                 <div class="font-controls">
                     <button id="btnFullscreen" class="btn-icon">⛶</button>
+                    <button id="btnBackground" class="btn-icon" title="배경 테마">🎨</button>
                     <button id="btnTheme" class="btn-icon">🌙</button>
                     <button id="btnFontSettings" class="btn-icon" style="font-weight: 400;">Aa</button>
                     <button id="btnFontUp" class="btn-icon">A+</button>
@@ -257,6 +258,31 @@
                     <button id="btnResetFont" class="btn-text danger">초기화</button>
                     <button id="btnCloseFontSettings" class="btn-save">닫기</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Settings Modal -->
+    <div id="backgroundModal" class="modal">
+        <div class="modal-content font-modal-content">
+            <span class="close" id="closeBackgroundSettings">&times;</span>
+            <h2>배경 테마 설정</h2>
+
+            <div class="theme-grid-container">
+                <h3>심플 (Simple)</h3>
+                <div class="theme-grid" id="themeSimpleGrid">
+                    <!-- Injected by JS -->
+                </div>
+
+                <h3>그라디언트 (Gradient)</h3>
+                <div class="theme-grid" id="themeGradientGrid"></div>
+
+                <h3>자연 (Nature)</h3>
+                <div class="theme-grid" id="themeNatureGrid"></div>
+            </div>
+
+            <div class="modal-actions" style="justify-content: center; margin-top: 20px;">
+                <button id="btnCloseBackgroundSettings" class="btn-save">닫기</button>
             </div>
         </div>
     </div>

@@ -1452,3 +1452,111 @@ if (btnTTS) {
 }
 
 
+
+// Background Theme Logic
+const bgThemes = {
+    simple: [
+        { id: 'simple-default', class: 'bg-simple', color: '#f8f9fa' }
+    ],
+    gradient: [
+        { id: 'grad-pastel', class: 'bg-gradient-pastel', color: 'linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%)' },
+        { id: 'grad-sky', class: 'bg-gradient-sky', color: 'linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)' },
+        { id: 'grad-soda', class: 'bg-gradient-soda', color: 'linear-gradient(120deg,rgb(137, 247, 254) 0%,rgb(102, 166, 255) 100%)' },
+        { id: 'grad-sunset', class: 'bg-gradient-sunset', color: 'linear-gradient(to top, #fcc5e4 0%, #fda34b 100%)' }
+    ],
+    nature: [
+        { id: 'nat-forest', class: 'bg-nature-forest', color: '#2d6a4f' },
+        { id: 'nat-sea', class: 'bg-nature-sea', color: '#0077b6' },
+        { id: 'nat-sky', class: 'bg-nature-sky', color: '#48cae4' },
+        { id: 'nat-stars', class: 'bg-nature-stars', color: '#03045e' }
+    ]
+};
+
+const btnBackground = document.getElementById('btnBackground');
+const backgroundModal = document.getElementById('backgroundModal');
+const closeBackgroundSettings = document.getElementById('closeBackgroundSettings');
+const btnCloseBackgroundSettings = document.getElementById('btnCloseBackgroundSettings');
+
+function initBackgrounds() {
+    renderThemeGrid('themeSimpleGrid', bgThemes.simple);
+    renderThemeGrid('themeGradientGrid', bgThemes.gradient);
+    renderThemeGrid('themeNatureGrid', bgThemes.nature);
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('bible-bg-theme');
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+}
+
+function renderThemeGrid(gridId, themes) {
+    const container = document.getElementById(gridId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    themes.forEach(theme => {
+        const btn = document.createElement('div');
+        btn.className = 'theme-option';
+        btn.dataset.themeClass = theme.class;
+        btn.style.background = theme.color;
+
+        btn.title = theme.id;
+
+        btn.addEventListener('click', () => {
+            // Highlight selection
+            document.querySelectorAll('.theme-option').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyTheme(theme.class);
+        });
+
+        container.appendChild(btn);
+    });
+}
+
+function applyTheme(themeClass) {
+    // Remove all bg classes
+    const allClasses = [
+        'bg-simple',
+        'bg-gradient-pastel', 'bg-gradient-sky', 'bg-gradient-soda', 'bg-gradient-sunset',
+        'bg-nature-forest', 'bg-nature-sea', 'bg-nature-sky', 'bg-nature-stars'
+    ];
+    document.body.classList.remove(...allClasses);
+
+    // Add new class
+    document.body.classList.add(themeClass);
+    localStorage.setItem('bible-bg-theme', themeClass);
+
+    // Glassmorphism toggle
+    if (themeClass === 'bg-simple') {
+        document.body.classList.remove('glass-mode');
+    } else {
+        document.body.classList.add('glass-mode');
+    }
+}
+
+if (btnBackground) {
+    btnBackground.addEventListener('click', () => {
+        if (backgroundModal) backgroundModal.style.display = 'flex';
+    });
+}
+
+if (closeBackgroundSettings) {
+    closeBackgroundSettings.addEventListener('click', () => {
+        if (backgroundModal) backgroundModal.style.display = 'none';
+    });
+}
+
+if (btnCloseBackgroundSettings) {
+    btnCloseBackgroundSettings.addEventListener('click', () => {
+        if (backgroundModal) backgroundModal.style.display = 'none';
+    });
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === backgroundModal) {
+        backgroundModal.style.display = 'none';
+    }
+});
+
+// Initialize
+initBackgrounds();

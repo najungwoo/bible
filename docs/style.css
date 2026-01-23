@@ -719,6 +719,135 @@ select option {
     max-width: 500px;
 }
 
+/* ========================================
+   7. Background Themes
+   ======================================== */
+
+/* Theme Grid in Modal */
+.theme-grid-container h3 {
+    margin: 15px 0 10px 0;
+    font-size: 1rem;
+    color: var(--text-sub);
+}
+
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+}
+
+.theme-option {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.theme-option:hover {
+    transform: scale(1.05);
+}
+
+.theme-option.active {
+    border-color: var(--text-main);
+    transform: scale(1.1);
+}
+
+/* --- Theme Classes (Applied to Body) --- */
+
+/* Simple (Default handled by :root variables, just ensuring clean slate) */
+.bg-simple {
+    background-color: var(--bg-body);
+    background-image: none;
+}
+
+/* Gradients */
+.bg-gradient-pastel {
+    background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.bg-gradient-sky {
+    background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.bg-gradient-soda {
+    background: linear-gradient(120deg, rgb(137, 247, 254) 0%, rgb(102, 166, 255) 100%);
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.bg-gradient-sunset {
+    background: linear-gradient(to top, #fcc5e4 0%, #fda34b 15%, #ff7882 35%, #c8699e 52%, #7046aa 71%, #0c1db8 87%, #020f75 100%);
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* Nature (Patterns / Images) */
+.bg-nature-forest {
+    background: url('https://images.unsplash.com/photo-1448375240586-dfd8d395ea6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.bg-nature-sea {
+    background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.bg-nature-sky {
+    background: url('https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.bg-nature-stars {
+    background: url('https://images.unsplash.com/photo-1519681393798-38e43269d877?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Glassmorphism for Panels */
+.glass-mode .app-container {
+    background: transparent;
+}
+
+.glass-mode .top-bar,
+.glass-mode .bottom-bar,
+.glass-mode .mode-bar,
+.glass-mode .problem-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-mode .btn-mode {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.glass-mode .btn-mode.active {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"].glass-mode .top-bar,
+[data-theme="dark"].glass-mode .bottom-bar,
+[data-theme="dark"].glass-mode .mode-bar,
+[data-theme="dark"].glass-mode .problem-card {
+    background: rgba(30, 30, 30, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"].glass-mode .btn-mode {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"].glass-mode .btn-mode.active {
+    background: rgba(255, 255, 255, 0.9);
+}
+
 .font-settings-container {
     display: flex;
     flex-direction: column;
