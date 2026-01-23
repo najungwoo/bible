@@ -675,6 +675,7 @@ function submitAnswer() {
         replaceBlankWithAnswer(currentAnswers[0], true);
         currentAnswers.shift();
         answerInput.value = "";
+        answerInput.placeholder = "정답 입력..."; // Reset hint placeholder
         attempts = 0;
         hintCount = 0; // Reset hint count for next blank
         if (currentAnswers.length === 0) {
@@ -685,6 +686,7 @@ function submitAnswer() {
     } else {
         attempts++;
         answerInput.value = "";
+        answerInput.placeholder = "정답 입력..."; // Reset hint if wrong? Or keep hint? Usually reset input state.
         if (attempts >= 3) {
             handleWrongAnswer();
         } else {
@@ -713,8 +715,12 @@ function handleWrongAnswer() {
     failNum++;
     score -= 5;
     updateStatus();
+    failNum++;
+    score -= 5;
+    updateStatus();
     attempts = 0;
     hintCount = 0; // Reset hint count for next blank
+    answerInput.placeholder = "정답 입력..."; // Reset hint placeholder
     if (currentAnswers.length === 0) {
         problemCompleted = true;
     }
