@@ -288,6 +288,19 @@ select option {
     font-weight: 700;
 }
 
+.voice-select {
+    padding: 4px;
+    margin-right: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-size: 0.8rem;
+    max-width: 120px;
+}
+
+/* ========================================
+
 /* ========================================
    3. Main Content (Card)
    ======================================== */

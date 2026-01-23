@@ -40,7 +40,8 @@ const btnWrong = document.getElementById('btnWrong');
 const btnFontUp = document.getElementById('btnFontUp');
 const btnFontDown = document.getElementById('btnFontDown');
 const btnTheme = document.getElementById('btnTheme');
-const btnTTS = document.getElementById('btnTTS'); // Moved to top
+const btnTTS = document.getElementById('btnTTS');
+const voiceSelect = document.getElementById('voiceSelect'); // New
 const modeBtns = document.querySelectorAll('.btn-mode');
 
 // Paste Modal Elements
@@ -1434,8 +1435,62 @@ function reloadCurrentProblem() {
 }
 
 // --- TTS Logic ---
-// btnTTS defined at Top
-// isSpeaking defined at Top
+
+function populateVoices() {
+    if (!voiceSelect) return;
+    const voices = window.speechSynthesis.getVoices();
+    // Filter Korean
+    const koVoices = voices.filter(v => v.lang.includes('ko'));
+
+    // Clear
+    voiceSelect.innerHTML = "";
+
+    if (koVoices.length === 0) {
+        voiceSelect.style.display = 'none';
+        return;
+    }
+
+    // Show select
+    voiceSelect.style.display = 'inline-block';
+
+    const savedVoiceURI = localStorage.getItem('bible-voice-uri');
+    let foundSaved = false;
+
+    koVoices.forEach((voice, index) => {
+        const option = document.createElement('option');
+        option.textContent = voice.name; // Display name
+        option.value = voice.voiceURI;   // Unique ID
+
+        if (savedVoiceURI === voice.voiceURI) {
+            option.selected = true;
+            foundSaved = true;
+        }
+
+        voiceSelect.appendChild(option);
+    });
+
+    // If no saved voice found, try to default to "Male" if available, else first
+    if (!foundSaved && !savedVoiceURI) {
+        // Only if user hasn't chosen one.
+        const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
+        if (maleVoice) {
+            voiceSelect.value = maleVoice.voiceURI;
+        }
+    }
+}
+
+if (voiceSelect) {
+    voiceSelect.addEventListener('change', () => {
+        localStorage.setItem('bible-voice-uri', voiceSelect.value);
+        // Maybe test speak "목소리 설정됨"
+    });
+}
+
+// Populate on load
+populateVoices();
+if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = populateVoices;
+}
 
 if (btnTTS) {
     btnTTS.addEventListener('click', () => {
@@ -1454,7 +1509,7 @@ function stopTTS() {
     isSpeaking = false;
     if (btnTTS) {
         btnTTS.classList.remove('active');
-        btnTTS.style.color = ""; // Reset inline style if any
+        btnTTS.style.color = "";
     }
 }
 
@@ -1514,14 +1569,30 @@ function speakCurrentVerse() {
     utterance.lang = 'ko-KR';
     utterance.rate = 1.0;
 
-    // Try to find a Male voice
-    const voices = window.speechSynthesis.getVoices();
-    const koVoices = voices.filter(v => v.lang.includes('ko'));
-    let targetVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
+    // --- Voice Selection Logic ---
+    const allVoices = window.speechSynthesis.getVoices();
+    const koVoices = allVoices.filter(v => v.lang.includes('ko'));
+
+    let targetVoice = null;
+
+    // 1. check User Selection
+    const savedURI = localStorage.getItem('bible-voice-uri');
+    if (savedURI) {
+        targetVoice = koVoices.find(v => v.voiceURI === savedURI);
+    }
+
+    // 2. If no saved or not found, try Male preference
+    if (!targetVoice) {
+        targetVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
+    }
+
+    // 3. Fallback
+    if (!targetVoice && koVoices.length > 0) {
+        targetVoice = koVoices[0];
+    }
+
     if (targetVoice) {
         utterance.voice = targetVoice;
-    } else if (koVoices.length > 0) {
-        utterance.voice = koVoices[0];
     }
 
     utterance.onend = () => {
@@ -1543,4 +1614,3 @@ function speakCurrentVerse() {
         btnTTS.classList.add('active');
     }
 }
-
