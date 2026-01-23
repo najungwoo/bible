@@ -226,26 +226,7 @@ select option {
     gap: 2px;
 }
 
-.btn-settings {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 6px;
-    border-radius: 50%;
-    color: var(--text-sub);
-    transition: all 0.2s;
-    line-height: 1;
-}
-
-.btn-settings:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--text-main);
-}
-
-[data-theme="dark"] .btn-settings:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
+/* .btn-settings styles removed */
 
 .btn-mode {
     background: transparent;

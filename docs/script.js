@@ -24,10 +24,9 @@ let failNum = 0;
 let wrongVerses = [];
 let hintCount = 0;
 let score = 0;
-let isSpeaking = false; // Moved to top
+let isSpeaking = false;
 console.log('hintCount initialized:', hintCount);
 
-// DOM Elements
 const fileInput = document.getElementById('fileInput');
 const daySelect = document.getElementById('daySelect');
 const levelSelect = document.getElementById('levelSelect');
@@ -46,27 +45,22 @@ const voiceSelect = document.getElementById('voiceSelect');
 const btnVoiceHelp = document.getElementById('btnVoiceHelp');
 const modeBtns = document.querySelectorAll('.btn-mode');
 
-// Voice Help Modal Elements
 const modalVoiceHelp = document.getElementById('voiceHelpModal');
 const btnCloseVoiceHelp = document.getElementById('btnCloseVoiceHelp');
 
-// Paste Modal Elements
 const btnDelete = document.getElementById('btnDelete');
 
-// Easy Input Elements
 const inputRef = document.getElementById('inputRef');
 const inputVerse = document.getElementById('inputVerse');
 const inputLevel = document.getElementById('inputLevel');
 
-// Delete Verse Elements
 const btnOpenDeleteVerse = document.getElementById('btnOpenDeleteVerse');
 const deleteVerseModal = document.getElementById('deleteVerseModal');
 const closeDeleteVerse = document.getElementById('closeDeleteVerse');
 const deleteDaySelect = document.getElementById('deleteDaySelect');
 const deleteVerseList = document.getElementById('deleteVerseList');
 
-let tempVerses = []; // Store verses temporarily before saving
-
+let tempVerses = [];
 // --- Helper Functions (Ported from Python) ---
 
 // 기호 제거 및 트림 (문자열 정규화)
@@ -92,13 +86,11 @@ function parseRefParts(ref) {
     }
 
     let book, chapVerse;
-    // Try splitting by last space
     let lastSpaceIdx = s.lastIndexOf(' ');
     if (lastSpaceIdx !== -1) {
         book = s.substring(0, lastSpaceIdx).trim();
         chapVerse = s.substring(lastSpaceIdx + 1).trim();
     } else {
-        // Fallback: find first digit
         let m = s.search(/\d/);
         if (m !== -1) {
             book = s.substring(0, m).trim();
@@ -142,7 +134,6 @@ function refMasked(ref, masked) {
     return `(_ _:${verseMask})`;
 }
 
-// Default Data is now loaded from data.js (const DEFAULT_DATA = ...)
 
 // 파일 로드 및 초기화 (File Input 변경 시 호출)
 function loadFiles(files) {
@@ -158,11 +149,9 @@ function loadFiles(files) {
             const text = e.target.result;
             const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
 
-            // Store data
             originalScriptures.push(lines);
             originalFilenames.push(file.name);
 
-            // Add to dropdown
             const option = document.createElement('option');
             option.value = originalScriptures.length - 1; // Index
             option.textContent = file.name.replace('.txt', '');
@@ -171,7 +160,6 @@ function loadFiles(files) {
             loadedCount++;
             if (loadedCount === files.length) {
                 saveDataToStorage();
-                // Auto select first file
                 if (originalScriptures.length > 0) {
                     daySelect.value = 0;
                     selectDay(0);
@@ -189,7 +177,6 @@ function saveDataToStorage() {
     localStorage.setItem('bible_data_version', DATA_VERSION);
 }
 
-// Data Version - Increment this to force update default data for users
 const DATA_VERSION = "1.6";
 
 // 로컬 스토리지에서 데이터 로드 (앱 시작 시 호출)
@@ -643,11 +630,28 @@ answerInput.addEventListener('keydown', (e) => {
     }
 });
 
+// Mode Button Logic
 modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+        const clickedMode = parseInt(btn.dataset.mode);
+
+        // If clicking the ALREADY active mode
+        if (currentMode === clickedMode) {
+            // Open settings if applicable
+            if (clickedMode === 1) { // Blank Mode
+                updateBlankGridActive();
+                blankSettingsModal.style.display = 'block';
+            } else if (clickedMode === 4) { // Whole Mode
+                updateWholeGridActive();
+                wholeSettingsModal.style.display = 'block';
+            }
+            return;
+        }
+
+        // Change Mode
         modeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        currentMode = parseInt(btn.dataset.mode);
+        currentMode = clickedMode;
         displayProblem();
     });
 });
@@ -1081,8 +1085,7 @@ if (btnTheme) {
 
 
 // --- Settings Popups Logic ---
-const btnSettingBlank = document.getElementById('btnSettingBlank');
-const btnSettingWhole = document.getElementById('btnSettingWhole');
+// btnSettingBlank and btnSettingWhole declarations removed
 const blankSettingsModal = document.getElementById('blankSettingsModal');
 const wholeSettingsModal = document.getElementById('wholeSettingsModal');
 const closeBlankSettings = document.getElementById('closeBlankSettings');
@@ -1109,41 +1112,13 @@ function updateWholeGridActive() {
 }
 
 // Handlers
-if (btnSettingBlank) {
-    btnSettingBlank.addEventListener('click', (e) => {
-        console.log("Blank Setting Clicked");
-        e.stopPropagation();
-        try {
-            updateBlankGridActive();
-            blankSettingsModal.style.display = 'block';
-            console.log("Blank Modal Display Set to Block");
-        } catch (err) {
-            console.error("Error opening blank modal:", err);
-        }
-    });
-} else {
-    console.error("btnSettingBlank not found");
-}
+// btnSettingBlank removed - logic moved to modeBtns click handler
 
 if (closeBlankSettings) {
     closeBlankSettings.addEventListener('click', () => blankSettingsModal.style.display = 'none');
 }
 
-if (btnSettingWhole) {
-    btnSettingWhole.addEventListener('click', (e) => {
-        console.log("Whole Setting Clicked");
-        e.stopPropagation();
-        try {
-            updateWholeGridActive();
-            wholeSettingsModal.style.display = 'block';
-            console.log("Whole Modal Display Set to Block");
-        } catch (err) {
-            console.error("Error opening whole modal:", err);
-        }
-    });
-} else {
-    console.error("btnSettingWhole not found");
-}
+// btnSettingWhole removed - logic moved to modeBtns click handler
 if (closeWholeSettings) {
     closeWholeSettings.addEventListener('click', () => wholeSettingsModal.style.display = 'none');
 }
@@ -1204,13 +1179,10 @@ function reloadCurrentProblem() {
 function populateVoices() {
     if (!voiceSelect) return;
     const voices = window.speechSynthesis.getVoices();
-    // Filter Korean
     const koVoices = voices.filter(v => v.lang.includes('ko'));
 
-    // Toggle Help Button (Show always)
     if (btnVoiceHelp) btnVoiceHelp.style.display = 'inline-block';
 
-    // Clear
     voiceSelect.innerHTML = "";
 
     if (koVoices.length === 0) {
@@ -1218,7 +1190,6 @@ function populateVoices() {
         return;
     }
 
-    // Show select
     voiceSelect.style.display = 'inline-block';
 
     const savedVoiceURI = localStorage.getItem('bible-voice-uri');
@@ -1226,8 +1197,8 @@ function populateVoices() {
 
     koVoices.forEach((voice, index) => {
         const option = document.createElement('option');
-        option.textContent = voice.name; // Display name
-        option.value = voice.voiceURI;   // Unique ID
+        option.textContent = voice.name;
+        option.value = voice.voiceURI;
 
         if (savedVoiceURI === voice.voiceURI) {
             option.selected = true;
@@ -1237,9 +1208,7 @@ function populateVoices() {
         voiceSelect.appendChild(option);
     });
 
-    // If no saved voice found, try to default to "Male" if available, else first
     if (!foundSaved && !savedVoiceURI) {
-        // Only if user hasn't chosen one.
         const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
         if (maleVoice) {
             voiceSelect.value = maleVoice.voiceURI;
@@ -1268,7 +1237,6 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Populate on load
 populateVoices();
 if (window.speechSynthesis.onvoiceschanged !== undefined) {
     window.speechSynthesis.onvoiceschanged = populateVoices;
@@ -1298,7 +1266,6 @@ function stopTTS() {
 function speakCurrentVerse() {
     if (!currentScripture || currentScripture.length === 0 || typeof problemNum === 'undefined') return;
 
-    // Parse raw line
     const line = currentScripture[problemNum];
     if (!line) return;
 
@@ -1315,7 +1282,6 @@ function speakCurrentVerse() {
 
     let spokenReference = reference;
     if (spokenReference) {
-        // Function to convert number to Sino-Korean text
         const numToText = (match, num, unit) => {
             const digits = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
             let n = parseInt(num);
@@ -1351,24 +1317,20 @@ function speakCurrentVerse() {
     utterance.lang = 'ko-KR';
     utterance.rate = 1.0;
 
-    // --- Voice Selection Logic ---
     const allVoices = window.speechSynthesis.getVoices();
     const koVoices = allVoices.filter(v => v.lang.includes('ko'));
 
     let targetVoice = null;
 
-    // 1. check User Selection
     const savedURI = localStorage.getItem('bible-voice-uri');
     if (savedURI) {
         targetVoice = koVoices.find(v => v.voiceURI === savedURI);
     }
 
-    // 2. If no saved or not found, try Male preference
     if (!targetVoice) {
         targetVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
     }
 
-    // 3. Fallback
     if (!targetVoice && koVoices.length > 0) {
         targetVoice = koVoices[0];
     }
