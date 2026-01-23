@@ -1147,6 +1147,167 @@ if (closeBlankSettings) {
     closeBlankSettings.addEventListener('click', () => blankSettingsModal.style.display = 'none');
 }
 
+// --- Font Settings Logic ---
+const btnFontSettings = document.getElementById('btnFontSettings');
+const fontSettingsModal = document.getElementById('fontSettingsModal');
+const closeFontSettings = document.getElementById('closeFontSettings');
+const btnLoadSystemFonts = document.getElementById('btnLoadSystemFonts');
+const fontList = document.getElementById('fontList');
+const fontSizeSlider = document.getElementById('fontSizeSlider');
+const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+const fontBoldCheckbox = document.getElementById('fontBoldCheckbox');
+const btnResetFont = document.getElementById('btnResetFont');
+const btnCloseFontSettings = document.getElementById('btnCloseFontSettings');
+
+// Default Fonts
+const defaultFonts = [
+    { name: '기본 (Noto Sans KR)', family: "'Noto Sans KR', sans-serif" },
+    { name: '나눔고딕 (Nanum Gothic)', family: "'Nanum Gothic', sans-serif" },
+    { name: '나눔명조 (Nanum Myeongjo)', family: "'Nanum Myeongjo', serif" },
+    { name: '고운돋움 (Gowun Dodum)', family: "'Gowun Dodum', sans-serif" },
+    { name: '고운바탕 (Gowun Batang)', family: "'Gowun Batang', serif" }
+];
+
+let systemFonts = [];
+let selectedFontFamily = defaultFonts[0].family;
+let isBold = true; // Default style reference
+
+// Initialize Font Settings
+function initFontSettings() {
+    renderFontList();
+
+    // Sync slider with current font size
+    fontSizeSlider.value = fontSize;
+    updateFontSizeDisplay(fontSize);
+
+    // Sync bold state (check style.css or current inline)
+    isBold = document.body.style.fontWeight !== '400';
+    fontBoldCheckbox.checked = isBold;
+}
+
+function renderFontList() {
+    fontList.innerHTML = '';
+
+    // Add Default Fonts
+    defaultFonts.forEach(font => {
+        createFontItem(font);
+    });
+
+    // Add System Fonts (if any)
+    if (systemFonts.length > 0) {
+        const divider = document.createElement('div');
+        divider.className = 'divider';
+        divider.style.margin = '10px 0';
+        divider.style.borderBottom = '1px solid var(--border)';
+        fontList.appendChild(divider);
+
+        systemFonts.forEach(font => {
+            createFontItem(font);
+        });
+    }
+}
+
+function createFontItem(font) {
+    const div = document.createElement('div');
+    div.className = 'font-item';
+    if (selectedFontFamily.includes(font.family) || (font.postscriptName && selectedFontFamily.includes(font.postscriptName))) {
+        div.classList.add('active');
+    }
+    div.textContent = font.name;
+    div.style.fontFamily = font.family;
+
+    div.addEventListener('click', () => {
+        selectedFontFamily = font.family;
+        document.body.style.fontFamily = selectedFontFamily;
+
+        // Update active class
+        const items = fontList.querySelectorAll('.font-item');
+        items.forEach(item => item.classList.remove('active'));
+        div.classList.add('active');
+    });
+
+    fontList.appendChild(div);
+}
+
+// Event Listeners
+if (btnFontSettings) {
+    btnFontSettings.addEventListener('click', () => {
+        initFontSettings();
+        fontSettingsModal.style.display = 'flex';
+    });
+}
+
+if (closeFontSettings) closeFontSettings.addEventListener('click', () => fontSettingsModal.style.display = 'none');
+if (btnCloseFontSettings) btnCloseFontSettings.addEventListener('click', () => fontSettingsModal.style.display = 'none');
+
+btnLoadSystemFonts.addEventListener('click', async () => {
+    try {
+        if (!window.queryLocalFonts) {
+            alert('이 브라우저는 시스템 폰트 불러오기를 지원하지 않습니다. (Chrome/Edge PC 버전 권장)');
+            return;
+        }
+
+        const permission = await navigator.permissions.query({ name: 'local-fonts' });
+        if (permission.state === 'denied') {
+            alert('폰트 접근 권한이 거부되었습니다.');
+            return;
+        }
+
+        const fonts = await window.queryLocalFonts();
+        // Filter Korean capable fonts (simple heuristic or just list all unique families)
+        const uniqueFamilies = [...new Set(fonts.map(f => f.family))];
+
+        systemFonts = uniqueFamilies.map(fam => ({ name: fam, family: `"${fam}"` })).sort((a, b) => a.name.localeCompare(b.name));
+
+        alert(`시스템 폰트 ${systemFonts.length}개를 불러왔습니다.`);
+        renderFontList();
+        btnLoadSystemFonts.style.display = 'none';
+
+    } catch (err) {
+        console.error(err);
+        alert('시스템 폰트를 불러오는 중 오류가 발생했습니다: ' + err.message);
+    }
+});
+
+// Font Size Slider
+fontSizeSlider.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    fontSize = val;
+    problemArea.style.fontSize = fontSize + 'px';
+    updateFontSizeDisplay(val);
+});
+
+function updateFontSizeDisplay(size) {
+    // approx rem calculation based on 16px base, roughly
+    const rem = (size / 16).toFixed(1);
+    fontSizeDisplay.textContent = `${size}px (${rem}rem)`;
+}
+
+// Bold Checkbox
+fontBoldCheckbox.addEventListener('change', (e) => {
+    isBold = e.target.checked;
+    if (isBold) {
+        document.body.style.fontWeight = '700';
+    } else {
+        document.body.style.fontWeight = '400';
+    }
+});
+
+// Reset
+btnResetFont.addEventListener('click', () => {
+    selectedFontFamily = defaultFonts[0].family;
+    document.body.style.fontFamily = ''; // Revert to CSS default
+    fontSize = 28; // Default size
+    isBold = true;
+
+    // Apply
+    document.body.style.fontFamily = '';
+    problemArea.style.fontSize = '28px';
+    document.body.style.fontWeight = ''; // Revert to CSS default (700)
+
+    initFontSettings();
+});
+
 // btnSettingWhole removed - logic moved to modeBtns click handler
 if (closeWholeSettings) {
     closeWholeSettings.addEventListener('click', () => wholeSettingsModal.style.display = 'none');

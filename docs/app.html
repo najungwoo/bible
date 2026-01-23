@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>말씀 암송 (Bible Memory)</title>
-    <link rel="stylesheet" href="style.css?v=38">
+    <link rel="stylesheet" href="style.css?v=39">
 </head>
 
 <body>
@@ -42,6 +42,7 @@
                 <div class="font-controls">
                     <button id="btnFullscreen" class="btn-icon">⛶</button>
                     <button id="btnTheme" class="btn-icon">🌙</button>
+                    <button id="btnFontSettings" class="btn-icon" style="font-weight: 400;">Aa</button>
                     <button id="btnFontUp" class="btn-icon">A+</button>
                     <button id="btnFontDown" class="btn-icon">A-</button>
                 </div>
@@ -215,8 +216,44 @@
             </div>
         </div>
     </div>
-    </div>
-    </div>
+
+    <!-- Font Settings Modal -->
+    <div id="fontSettingsModal" class="modal">
+        <div class="modal-content font-modal-content">
+            <span class="close" id="closeFontSettings">&times;</span>
+            <h2>글꼴 설정</h2>
+
+            <div class="font-settings-container">
+                <button id="btnLoadSystemFonts" class="btn-pill" style="width: 100%; margin-bottom: 20px;">
+                    📂 시스템 폰트 불러오기 (PC Only)
+                </button>
+
+                <div class="font-list-container">
+                    <div class="font-list" id="fontList">
+                        <!-- Font items will be injected here -->
+                    </div>
+                </div>
+
+                <div class="font-controls-area">
+                    <div class="control-row">
+                        <label>크기: <span id="fontSizeDisplay">1.8rem</span></label>
+                        <input type="range" id="fontSizeSlider" min="14" max="50" step="2" value="28">
+                    </div>
+                    <div class="control-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="fontBoldCheckbox" checked>
+                            <span class="checkmark"></span>
+                            진하게
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-actions" style="justify-content: center; margin-top: 20px;">
+                    <button id="btnResetFont" class="btn-text danger">초기화</button>
+                    <button id="btnCloseFontSettings" class="btn-save">닫기</button>
+                </div>
+            </div>
+        </div>
     </div>
     </div>
 
