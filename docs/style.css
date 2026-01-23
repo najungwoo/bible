@@ -829,7 +829,11 @@ select option {
 }
 
 .glass-mode .btn-mode.active {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
+    color: #212529;
+    /* Enforce dark text */
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="dark"].glass-mode .top-bar,
@@ -846,6 +850,9 @@ select option {
 
 [data-theme="dark"].glass-mode .btn-mode.active {
     background: rgba(255, 255, 255, 0.9);
+    color: #121212;
+    /* Enforce dark text on white glass */
+    font-weight: bold;
 }
 
 .font-settings-container {
