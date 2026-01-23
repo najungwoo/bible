@@ -513,6 +513,7 @@ function displayProblem() {
 
     renderProblem(refView, verseText);
     answerInput.value = "";
+    answerInput.placeholder = "정답 입력..."; // Reset hint placeholder
     answerInput.focus();
 }
 
