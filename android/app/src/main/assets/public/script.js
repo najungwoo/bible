@@ -41,8 +41,13 @@ const btnFontUp = document.getElementById('btnFontUp');
 const btnFontDown = document.getElementById('btnFontDown');
 const btnTheme = document.getElementById('btnTheme');
 const btnTTS = document.getElementById('btnTTS');
-const voiceSelect = document.getElementById('voiceSelect'); // New
+const voiceSelect = document.getElementById('voiceSelect');
+const btnVoiceHelp = document.getElementById('btnVoiceHelp');
 const modeBtns = document.querySelectorAll('.btn-mode');
+
+// Voice Help Modal Elements
+const modalVoiceHelp = document.getElementById('voiceHelpModal');
+const btnCloseVoiceHelp = document.getElementById('btnCloseVoiceHelp');
 
 // Paste Modal Elements
 // Paste Modal Elements (Removed)
@@ -1442,6 +1447,9 @@ function populateVoices() {
     // Filter Korean
     const koVoices = voices.filter(v => v.lang.includes('ko'));
 
+    // Toggle Help Button (Show always)
+    if (btnVoiceHelp) btnVoiceHelp.style.display = 'inline-block';
+
     // Clear
     voiceSelect.innerHTML = "";
 
@@ -1482,9 +1490,23 @@ function populateVoices() {
 if (voiceSelect) {
     voiceSelect.addEventListener('change', () => {
         localStorage.setItem('bible-voice-uri', voiceSelect.value);
-        // Maybe test speak "목소리 설정됨"
     });
 }
+if (btnVoiceHelp) {
+    btnVoiceHelp.addEventListener('click', () => {
+        if (modalVoiceHelp) modalVoiceHelp.style.display = 'flex';
+    });
+}
+if (btnCloseVoiceHelp) {
+    btnCloseVoiceHelp.addEventListener('click', () => {
+        if (modalVoiceHelp) modalVoiceHelp.style.display = 'none';
+    });
+}
+window.addEventListener('click', (e) => {
+    if (e.target === modalVoiceHelp) {
+        modalVoiceHelp.style.display = 'none';
+    }
+});
 
 // Populate on load
 populateVoices();
