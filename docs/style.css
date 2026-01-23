@@ -34,6 +34,7 @@
     --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
 
     --modal-overlay: rgba(0, 0, 0, 0.4);
+    --app-font: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
 }
 
 [data-theme="dark"] {
@@ -86,7 +87,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    font-family: var(--app-font);
     outline: none;
 }
 

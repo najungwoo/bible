@@ -1223,7 +1223,7 @@ function createFontItem(font) {
 
     div.addEventListener('click', () => {
         selectedFontFamily = font.family;
-        document.body.style.fontFamily = selectedFontFamily;
+        document.documentElement.style.setProperty('--app-font', selectedFontFamily);
 
         // Update active class
         const items = fontList.querySelectorAll('.font-item');
@@ -1301,7 +1301,7 @@ fontBoldCheckbox.addEventListener('change', (e) => {
 // Reset
 btnResetFont.addEventListener('click', () => {
     selectedFontFamily = defaultFonts[0].family;
-    document.body.style.fontFamily = ''; // Revert to CSS default
+    document.documentElement.style.setProperty('--app-font', selectedFontFamily);
     fontSize = 28; // Default size
     isBold = true;
 
