@@ -1488,6 +1488,10 @@ function speakCurrentVerse() {
     };
 
     utterance.onerror = (e) => {
+        if (e.error === 'interrupted' || e.error === 'canceled') {
+            // Normal interruption, ignore
+            return;
+        }
         console.error("TTS Error:", e);
         isSpeaking = false;
         if (btnTTS) btnTTS.classList.remove('active');
