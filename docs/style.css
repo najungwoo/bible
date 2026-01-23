@@ -666,7 +666,7 @@ select option {
     padding-left: 12px;
     border-left: 1px solid var(--border);
     display: flex;
-    gap: 8px;
+    gap: 15px;
 }
 
 @keyframes shake {

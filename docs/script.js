@@ -4,26 +4,26 @@ const WORD_TOKEN_RE = /[0-9A-Za-z가-힣]/;
 
 // State
 // --- State Variables (상태 변수들) ---
-let originalScriptures = []; // 전체 구절 데이타 (배열의 배열)
-let originalFilenames = [];
-let currentScripture = [];
-let currentDayIndex = -1;
-let currentMode = 1; // 1: Blank, 2: Verse, 3: Ref, 4: Whole
-let blankNum = 5; // 50%
-let wholeLevelNum = 1;
-let fontSize = 24;
+var originalScriptures = []; // 전체 구절 데이타 (배열의 배열)
+var originalFilenames = [];
+var currentScripture = [];
+var currentDayIndex = -1;
+var currentMode = 1; // 1: Blank, 2: Verse, 3: Ref, 4: Whole
+var blankNum = 5; // 50%
+var wholeLevelNum = 1;
+var fontSize = 24;
 
-let currentProblem = "";
-let currentAnswers = [];
-let currentReference = "";
-let problemNum = 0;
-let attempts = 0;
-let problemCompleted = false;
-let leftVerse = 0;
-let failNum = 0;
-let wrongVerses = [];
-let hintCount = 0;
-let score = 0;
+var currentProblem = "";
+var currentAnswers = [];
+var currentReference = "";
+var problemNum = 0;
+var attempts = 0;
+var problemCompleted = false;
+var leftVerse = 0;
+var failNum = 0;
+var wrongVerses = [];
+var hintCount = 0;
+var score = 0;
 // Audio state moved to audio.js
 console.log('hintCount initialized:', hintCount);
 
