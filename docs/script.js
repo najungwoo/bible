@@ -3,7 +3,8 @@ const PUNCT_RE = /[,\-]/g;
 const WORD_TOKEN_RE = /[0-9A-Za-z가-힣]/;
 
 // State
-let originalScriptures = []; // Array of arrays of strings
+// --- State Variables (상태 변수들) ---
+let originalScriptures = []; // 전체 구절 데이타 (배열의 배열)
 let originalFilenames = [];
 let currentScripture = [];
 let currentDayIndex = -1;
@@ -68,18 +69,22 @@ let tempVerses = []; // Store verses temporarily before saving
 
 // --- Helper Functions (Ported from Python) ---
 
+// 기호 제거 및 트림 (문자열 정규화)
 function normToken(s) {
     return s.replace(PUNCT_RE, '').trim();
 }
 
+// 단어 길이만큼 언더바(_)로 마스킹 (기호는 유지)
 function maskLenKeepPunct(tok) {
     return tok.replace(/[0-9A-Za-z가-힣]+/g, (m) => '_'.repeat(m.length));
 }
 
+// 단어를 하나의 언더바(_)로 마스킹 (기호는 유지)
 function maskOneKeepPunct(tok) {
     return tok.replace(/[0-9A-Za-z가-힣]+/g, '_');
 }
 
+// 성경 장절 파싱 (예: "(요 3:16)" -> ["요", "3", "16"])
 function parseRefParts(ref) {
     let s = ref.trim();
     if (s.startsWith('(') && s.endsWith(')')) {
@@ -113,6 +118,7 @@ function parseRefParts(ref) {
     return [book, chap, verse];
 }
 
+// 절 부분 파싱 (예: "1-2" 또는 "1,3" 등 처리)
 function splitVerseParts(verse) {
     if (verse.includes('-')) {
         let [a, b] = verse.split('-', 2);
@@ -126,6 +132,7 @@ function splitVerseParts(verse) {
     return ['_', [verse]];
 }
 
+// 장절 표시 포맷팅 (masked가 true이면 장절 숫자를 숨김)
 function refMasked(ref, masked) {
     let [book, chap, verse] = parseRefParts(ref);
     if (!masked) {
@@ -137,6 +144,7 @@ function refMasked(ref, masked) {
 
 // Default Data is now loaded from data.js (const DEFAULT_DATA = ...)
 
+// 파일 로드 및 초기화 (File Input 변경 시 호출)
 function loadFiles(files) {
     originalScriptures = [];
     originalFilenames = [];
@@ -174,6 +182,7 @@ function loadFiles(files) {
     });
 }
 
+// 데이터를 로컬 스토리지에 저장 (새로운 파일 로드 또는 데이터 변경 시)
 function saveDataToStorage() {
     localStorage.setItem('bible_scriptures', JSON.stringify(originalScriptures));
     localStorage.setItem('bible_filenames', JSON.stringify(originalFilenames));
@@ -183,6 +192,7 @@ function saveDataToStorage() {
 // Data Version - Increment this to force update default data for users
 const DATA_VERSION = "1.6";
 
+// 로컬 스토리지에서 데이터 로드 (앱 시작 시 호출)
 function loadDataFromStorage() {
     try {
         const storedVersion = localStorage.getItem('bible_data_version');
@@ -239,11 +249,13 @@ function loadDataFromStorage() {
 // Initialize
 loadDataFromStorage();
 
+// 특정 일차 선택 (Dropdown 변경 시)
 function selectDay(index) {
     currentDayIndex = index;
     dayReset();
 }
 
+// 선택된 일차와 레벨에 맞게 문제 데이터 초기화 및 첫 문제 표시
 function dayReset() {
     if (currentDayIndex !== -1) {
         const selectedLevel = levelSelect.value;
@@ -269,10 +281,12 @@ function dayReset() {
     displayProblem();
 }
 
+// 상태 텍스트 업데이트 (남은 구절, 틀린 갯수, 점수)
 function updateStatus() {
     statusText.textContent = `남은 구절: ${leftVerse} | 틀린 갯수: ${failNum} | 점수: ${score}`;
 }
 
+// 새로운 문제 표시 (랜덤 선택 및 화면 렌더링)
 function displayProblem() {
     if (typeof stopTTS === 'function') stopTTS();
     if (currentScripture.length === 0) {
@@ -300,6 +314,7 @@ function displayProblem() {
     answerInput.focus();
 }
 
+// 문제 화면 렌더링 (참조와 구절 텍스트 표시)
 function renderProblem(refText, verseText) {
     problemArea.innerHTML = '';
 
@@ -320,6 +335,7 @@ function renderProblem(refText, verseText) {
     problemArea.style.fontSize = fontSize + 'px';
 }
 
+// 문제 생성 로직 (현재 모드에 따라 빈칸 뚫기 등 처리)
 function createProblem(line, mode) {
     let cleanLine = line;
     const levelMatch = line.match(/^(\d+)\\/);
@@ -438,6 +454,7 @@ function createProblem(line, mode) {
 
 let autoAdvanceTimer = null;
 
+// 정답 제출 처리 (Enter 키 또는 입력 시)
 function submitAnswer() {
     const userAnswer = answerInput.value.trim();
 
@@ -478,6 +495,7 @@ function submitAnswer() {
     }
 }
 
+// 오답 3회 이상 시 처리 (정답 공개 및 오답 노트 추가)
 function handleWrongAnswer() {
     const wrongVerse = {
         reference: currentReference,
@@ -505,6 +523,7 @@ function handleWrongAnswer() {
     }
 }
 
+// 정답을 맞췄을 때 빈칸을 실제 텍스트로 교체 (색상 표시 포함)
 function replaceBlankWithAnswer(answer, correct) {
     // Target the verse container specifically
     const verseContainer = problemArea.querySelector('.verse-content');
@@ -584,6 +603,7 @@ function replaceBlankWithAnswer(answer, correct) {
     verseContainer.appendChild(newContent);
 }
 
+// 다음 문제로 이동 (현재 문제 제거 및 상태 업데이트)
 function nextProblem() {
     if (autoAdvanceTimer) {
         clearTimeout(autoAdvanceTimer);
@@ -663,6 +683,7 @@ btnHint.addEventListener('click', () => {
     applyHintToDisplay(hintPart, answer);
 });
 
+// 힌트 적용 로직 (현재 빈칸에 힌트 텍스트 표시)
 function applyHintToDisplay(hintPart, fullAnswer) {
     const verseContainer = problemArea.querySelector('.verse-content');
     if (!verseContainer) return;
