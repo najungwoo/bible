@@ -24,9 +24,7 @@ let failNum = 0;
 let wrongVerses = [];
 let hintCount = 0;
 let score = 0;
-let isSpeaking = false;
-let repeatMode = 1; // 1, 3, 5, -1 (Infinite)
-let repeatTimeout = null;
+// Audio state moved to audio.js
 console.log('hintCount initialized:', hintCount);
 
 const fileInput = document.getElementById('fileInput');
@@ -42,10 +40,8 @@ const btnWrong = document.getElementById('btnWrong');
 const btnFontUp = document.getElementById('btnFontUp');
 const btnFontDown = document.getElementById('btnFontDown');
 const btnTheme = document.getElementById('btnTheme');
-const btnTTS = document.getElementById('btnTTS');
-const btnRepeat = document.getElementById('btnRepeat');
-const voiceSelect = document.getElementById('voiceSelect');
-const btnVoiceHelp = document.getElementById('btnVoiceHelp');
+// Audio buttons moved to audio.js
+// Audio buttons moved to audio.js
 const modeBtns = document.querySelectorAll('.btn-mode');
 
 const modalVoiceHelp = document.getElementById('voiceHelpModal');
@@ -1455,144 +1451,4 @@ if (btnTTS) {
     });
 }
 
-function stopTTS() {
-    clearTimeout(repeatTimeout);
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-    }
-    isSpeaking = false;
-    if (btnTTS) {
-        btnTTS.classList.remove('active');
-        btnTTS.style.color = "";
-    }
-}
 
-function speakCurrentVerse(remaining) {
-    if (!currentScripture || currentScripture.length === 0 || typeof problemNum === 'undefined') return;
-
-    // Initial call (or explicit start)
-    if (remaining === undefined) {
-        stopTTS();
-        remaining = repeatMode;
-    }
-
-    const line = currentScripture[problemNum];
-    if (!line) return;
-
-    let cleanLine = line;
-    const levelMatch = line.match(/^(\d+)\\/);
-    if (levelMatch) {
-        cleanLine = line.substring(levelMatch[0].length);
-    }
-    let [reference, verse] = cleanLine.split('^');
-    if (!verse) {
-        verse = cleanLine;
-        reference = "";
-    }
-
-    let spokenReference = reference;
-    if (spokenReference) {
-        const numToText = (match, num, unit) => {
-            const digits = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
-            let n = parseInt(num);
-            if (n >= 1000) return num + unit;
-
-            let res = "";
-            if (n >= 100) {
-                res += (n >= 200 ? digits[Math.floor(n / 100)] : "") + '백';
-                n %= 100;
-            }
-            if (n >= 10) {
-                res += (n >= 20 ? digits[Math.floor(n / 10)] : "") + '십';
-                n %= 10;
-            }
-            if (n > 0 || res === "") {
-                res += digits[n];
-            }
-            return res + unit;
-        };
-
-        spokenReference = spokenReference.replace(/:/g, '장 ');
-        spokenReference = spokenReference.replace(/-/g, '에서 ');
-        spokenReference += '절';
-
-        // Convert numbers to Text (Sino-Korean)
-        spokenReference = spokenReference.replace(/(\d+)(장|절)/g, numToText);
-        spokenReference = spokenReference.replace(/(\d+)에서/g, (m, n) => numToText(m, n, "에서"));
-    }
-
-    const textToSpeak = (spokenReference ? spokenReference + ". " : "") + verse;
-
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = 'ko-KR';
-    utterance.rate = 1.0;
-
-    const allVoices = window.speechSynthesis.getVoices();
-    const koVoices = allVoices.filter(v => v.lang.includes('ko'));
-
-    let targetVoice = null;
-
-    const savedURI = localStorage.getItem('bible-voice-uri');
-    if (savedURI) {
-        targetVoice = koVoices.find(v => v.voiceURI === savedURI);
-    }
-
-    if (!targetVoice) {
-        targetVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
-    }
-
-    if (!targetVoice && koVoices.length > 0) {
-        targetVoice = koVoices[0];
-    }
-
-    if (targetVoice) {
-        utterance.voice = targetVoice;
-    }
-
-    utterance.onend = () => {
-        if (remaining === -1 || remaining > 1) {
-            const nextRemaining = (remaining === -1) ? -1 : remaining - 1;
-            repeatTimeout = setTimeout(() => {
-                speakCurrentVerse(nextRemaining);
-            }, 500);
-        } else {
-            isSpeaking = false;
-            if (btnTTS) btnTTS.classList.remove('active');
-        }
-    };
-
-    utterance.onerror = (e) => {
-        if (e.error === 'interrupted' || e.error === 'canceled') return;
-        console.error("TTS Error:", e);
-        isSpeaking = false;
-        if (btnTTS) btnTTS.classList.remove('active');
-    };
-
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-    isSpeaking = true;
-    if (btnTTS) {
-        btnTTS.classList.add('active');
-    }
-}
-
-// Repeat Button Listener
-if (btnRepeat) {
-    const modes = [1, 3, 5, -1];
-    const labels = ["🔁 1x", "🔁 3x", "🔁 5x", "🔁 ∞"];
-
-    btnRepeat.addEventListener('click', () => {
-        let idx = modes.indexOf(repeatMode);
-        idx = (idx + 1) % modes.length;
-        repeatMode = modes[idx];
-        btnRepeat.textContent = labels[idx];
-
-        if (repeatMode !== 1) {
-            btnRepeat.style.color = "var(--accent-blue, #339AF0)";
-            btnRepeat.style.fontWeight = "bold";
-        } else {
-            btnRepeat.style.color = "";
-            btnRepeat.style.fontWeight = "";
-        }
-    });
-}

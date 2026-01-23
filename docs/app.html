@@ -88,14 +88,18 @@
                 <span id="statusText">남은 구절: 0 | 틀린 갯수: 0 | 점수: 0</span>
             </div>
             <div class="actions-right">
-                <select id="voiceSelect" class="voice-select" style="display:none;"></select>
-                <button id="btnVoiceHelp" class="btn-icon-small" style="display:none;" title="음성 설정 도움말">❓</button>
-                <button id="btnRepeat" class="btn-text" style="min-width: 80px;">🔁 1x</button>
-                <button id="btnTTS" class="btn-text">듣기 🔊</button>
-                <button id="btnSkip" class="btn-text">스킵</button>
-                <button id="btnHint" class="btn-text">힌트</button>
-                <button id="btnWrong" class="btn-text">틀린 구절</button>
-                <button id="btnReset" class="btn-text danger">초기화</button>
+                <div class="control-group audio-controls">
+                    <select id="voiceSelect" class="voice-select" style="display:none;"></select>
+                    <button id="btnVoiceHelp" class="btn-icon-small" style="display:none;" title="음성 설정 도움말">❓</button>
+                    <button id="btnRepeat" class="btn-text" style="min-width: 80px;">🔁 1x</button>
+                    <button id="btnTTS" class="btn-text">듣기 🔊</button>
+                </div>
+                <div class="control-group game-controls">
+                    <button id="btnSkip" class="btn-text">스킵</button>
+                    <button id="btnHint" class="btn-text">힌트</button>
+                    <button id="btnWrong" class="btn-text">틀린 구절</button>
+                    <button id="btnReset" class="btn-text danger">초기화</button>
+                </div>
             </div>
         </footer>
     </div>
@@ -288,29 +292,8 @@
     </div>
 
     <script src="data.js?v=26"></script>
+    <script src="audio.js?v=1"></script>
     <script src="script.js?v=26"></script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
-    </script>
 </body>
 
 </html>

@@ -636,6 +636,39 @@ select option {
     font-weight: bold;
 }
 
+/* Control Groups in Footer */
+.actions-right {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.control-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 8px;
+}
+
+.audio-controls {
+    background-color: rgba(0, 0, 0, 0.03);
+    /* Subtle background */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .audio-controls {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-controls {
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+}
+
 @keyframes shake {
 
     0%,
