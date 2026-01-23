@@ -39,6 +39,7 @@ const btnWrong = document.getElementById('btnWrong');
 const btnFontUp = document.getElementById('btnFontUp');
 const btnFontDown = document.getElementById('btnFontDown');
 const btnTheme = document.getElementById('btnTheme');
+const btnTTS = document.getElementById('btnTTS'); // Moved to top
 const modeBtns = document.querySelectorAll('.btn-mode');
 
 // Paste Modal Elements
@@ -1432,7 +1433,7 @@ function reloadCurrentProblem() {
 }
 
 // --- TTS Logic ---
-const btnTTS = document.getElementById('btnTTS');
+// btnTTS defined at Top
 let isSpeaking = false;
 
 if (btnTTS) {
