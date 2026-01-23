@@ -23,6 +23,7 @@ let failNum = 0;
 let wrongVerses = [];
 let hintCount = 0;
 let score = 0;
+let isSpeaking = false; // Moved to top
 console.log('hintCount initialized:', hintCount);
 
 // DOM Elements
@@ -1434,7 +1435,7 @@ function reloadCurrentProblem() {
 
 // --- TTS Logic ---
 // btnTTS defined at Top
-let isSpeaking = false;
+// isSpeaking defined at Top
 
 if (btnTTS) {
     btnTTS.addEventListener('click', () => {
