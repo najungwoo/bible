@@ -1480,6 +1480,8 @@ function speakCurrentVerse() {
     if (spokenReference) {
         spokenReference = spokenReference.replace(/:/g, '장 ');
         spokenReference = spokenReference.replace(/-/g, '에서 ');
+        // Add '제' (Je) prefix to chapter number to force Sino-Korean reading (e.g., 제1장 = Je Il Jang)
+        spokenReference = spokenReference.replace(/(\d+)장/g, '제$1장');
         spokenReference += '절';
     }
     const textToSpeak = (spokenReference ? spokenReference + ". " : "") + verse;
