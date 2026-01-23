@@ -1479,93 +1479,10 @@ function speakCurrentVerse() {
     let spokenReference = reference;
     if (spokenReference) {
         // Function to convert number to Sino-Korean text
-        const numToSino = (n) => {
-            const digits = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
-            const units = ['', '십', '백', '천'];
-            let str = n.toString();
-            let result = '';
-            let len = str.length;
-
-            for (let i = 0; i < len; i++) {
-                let d = parseInt(str[i]);
-                if (d === 0) continue; // Skip zeros
-                // Don't say "Il-Sip" for 10, just "Sip". But "Il-Jang" (1 Chapter) needs "Il".
-                // For simplified logic: just map digits?
-                // No, TTS understands "일십" better as "10".
-                // But for standard reading: 
-                // 10 -> 십 (not 일십)
-                // 1 -> 일
-                // Actually, simple replace is safer: 
-                // Let's just pass the number to a simple converter or trust "제" prefix for Chapter?
-                // User said "Seoreun Yeodeol" (38 Native) appeared for "Verse" (Jeol).
-                // So we need to force Sino for Verse too. "제38절" might work?
-                // Or just convert to text: "삼십팔".
-
-                // Let's try "제" prefix for Verse too? "제38절".
-                // "제38장 제19절".
-                // User said "31 띄고 절" (31 space Jeol) -> "Sip space Jeol"?
-
-                // Let's rely on "제" (Ordinal) prefix for BOTH Chapter and Verse.
-                // It forces Sino-Korean reading usually.
-            }
-            return n; // Placeholder logic
-        };
-
-        spokenReference = spokenReference.replace(/:/g, '장 ');
-        spokenReference = spokenReference.replace(/-/g, '에서 ');
-
-        // Strategy: Add "제" prefix to both Chapter and Verse numbers
-        // Regex: Find Lookahead? Or just simpler replacement.
-        // 1. replace "Number장" -> "제Number장"
-        spokenReference = spokenReference.replace(/(\d+)장/g, '제$1장');
-
-        // 2. The verse part is at the end "Number절".
-        // But we just appended "절". Original was "Number".
-        // Let's fix the construction flow.
-
-        // Current logic:
-        // Ref: "Rom 1:19"
-        // 1. Replace ':' -> "장 " ==> "Rom 1장 19"
-        // 2. Append '절' -> "Rom 1장 19절"
-
-        // New Logic: 
-        // 1. Replace ':' -> "장 제" (Chapter Je)
-        // 2. Replace ' ' (space) before verse? No.
-        // 3. Prefix the FIRST number with "제"? ("Rom 제1장")?
-        // 4. Prefix the VERSE number with "제"?
-
-        // Let's use explicit replace for numbers.
-        spokenReference = spokenReference.replace(/(\d+)(장|절)/g, '제$1$2');
-        // Initial parse
-        spokenReference = reference.replace(/:/g, '장 제'); // 1:19 -> 1장 제19
-        spokenReference = spokenReference.replace(/-/g, '절에서 제'); // 12-13 -> 12절에서 제13
-    }
-
-    // REWRITE:
-    if (spokenReference) {
-        // 1. Replace separators
-        // Colon: "1:20" -> "1장 20"
-        spokenReference = spokenReference.replace(/:/g, '장 ');
-        spokenReference = spokenReference.replace(/-/g, '에서 ');
-
-        // 2. Identify numbers that represent Chapter or Verse and prefix '제'
-        // Chapter: "Number장" -> "제Number장"
-        spokenReference = spokenReference.replace(/(\d+)장/g, '제$1장');
-
-        // Verse: The number(s) AFTER '장 '.
-        // "제1장 20" -> "제1장 제20"
-        // Also ranges: "제1장 12에서 13" -> "제1장 제12에서 제13"
-        // This is getting complex with regex.
-
-        // ALTERNATIVE: Use function to convert to Text "삼십팔".
-        // 1 -> 일, 2 -> 이 ... 10 -> 십.
-
         const numToText = (match, num, unit) => {
-            // Simple mapping for 1-99 is usually enough for Bible chapters/verses (Ps 119 is exception).
-            // Let's implement full converter.
             const digits = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
             let n = parseInt(num);
-            if (n >= 1000) return num + unit; // Fallback or implement larger
+            if (n >= 1000) return num + unit;
 
             let res = "";
             if (n >= 100) {
@@ -1579,7 +1496,6 @@ function speakCurrentVerse() {
             if (n > 0 || res === "") {
                 res += digits[n];
             }
-
             return res + unit;
         };
 
@@ -1587,10 +1503,11 @@ function speakCurrentVerse() {
         spokenReference = spokenReference.replace(/-/g, '에서 ');
         spokenReference += '절';
 
-        // Now convert ALL "Number장" and "Number절" patterns
+        // Convert numbers to Text (Sino-Korean)
         spokenReference = spokenReference.replace(/(\d+)(장|절)/g, numToText);
         spokenReference = spokenReference.replace(/(\d+)에서/g, (m, n) => numToText(m, n, "에서"));
     }
+
     const textToSpeak = (spokenReference ? spokenReference + ". " : "") + verse;
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -1600,10 +1517,7 @@ function speakCurrentVerse() {
     // Try to find a Male voice
     const voices = window.speechSynthesis.getVoices();
     const koVoices = voices.filter(v => v.lang.includes('ko'));
-
-    // Prioritize voices with "Male", "남자", or specific male voice names
     let targetVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
-
     if (targetVoice) {
         utterance.voice = targetVoice;
     } else if (koVoices.length > 0) {
@@ -1616,10 +1530,7 @@ function speakCurrentVerse() {
     };
 
     utterance.onerror = (e) => {
-        if (e.error === 'interrupted' || e.error === 'canceled') {
-            // Normal interruption, ignore
-            return;
-        }
+        if (e.error === 'interrupted' || e.error === 'canceled') return;
         console.error("TTS Error:", e);
         isSpeaking = false;
         if (btnTTS) btnTTS.classList.remove('active');
@@ -1632,3 +1543,4 @@ function speakCurrentVerse() {
         btnTTS.classList.add('active');
     }
 }
+
