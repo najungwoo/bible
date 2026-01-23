@@ -647,10 +647,10 @@ modeBtns.forEach(btn => {
         // Always check to open settings for specific modes
         if (clickedMode === 1) { // Blank Mode
             updateBlankGridActive();
-            blankSettingsModal.style.display = 'block';
+            blankSettingsModal.style.display = 'flex';
         } else if (clickedMode === 4) { // Whole Mode
             updateWholeGridActive();
-            wholeSettingsModal.style.display = 'block';
+            wholeSettingsModal.style.display = 'flex';
         }
     });
 });
@@ -787,7 +787,7 @@ const btnSaveDay = document.getElementById('btnSaveDay');
 const newDayTitle = document.getElementById('newDayTitle');
 
 btnAddDay.addEventListener('click', () => {
-    addDayModal.style.display = "block";
+    addDayModal.style.display = "flex";
     newDayTitle.value = "";
     newDayTitle.focus();
 });
@@ -840,7 +840,7 @@ btnOpenAddVerse.addEventListener('click', () => {
         targetDaySelect.value = currentDayIndex;
     }
 
-    addVerseModal.style.display = "block";
+    addVerseModal.style.display = "flex";
     inputRef.value = "";
     inputVerse.value = "";
     inputRef.focus();
@@ -905,7 +905,7 @@ btnOpenDeleteVerse.addEventListener('click', () => {
         deleteVerseList.innerHTML = '';
     }
 
-    deleteVerseModal.style.display = "block";
+    deleteVerseModal.style.display = "flex";
 });
 
 closeDeleteVerse.addEventListener('click', () => {

@@ -461,7 +461,7 @@ select option {
 
 .modal-content {
     background-color: #FFFFFF;
-    margin: 10vh auto;
+    margin: 0;
     padding: 40px;
     width: 90%;
     max-width: 450px;
