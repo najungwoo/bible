@@ -38,6 +38,7 @@ const btnSkip = document.getElementById('btnSkip');
 const btnWrong = document.getElementById('btnWrong');
 const btnFontUp = document.getElementById('btnFontUp');
 const btnFontDown = document.getElementById('btnFontDown');
+const btnTheme = document.getElementById('btnTheme');
 const modeBtns = document.querySelectorAll('.btn-mode');
 
 // Paste Modal Elements
@@ -325,6 +326,28 @@ const DEFAULT_DATA = {
         "(벧후 3:16)^또 그 모든 편지에도 이런 일에 관하여 말하였으되 그 중에 알기 어려운 것이 더러 있으니 무식한 자들과 굳세지 못한 자들이 다른 성경과 같이 그것도 억지로 풀다가 스스로 멸망에 이르느니라",
         "(벧전 1:23)^너희가 거듭난 것이 썩어질 씨로 된 것이 아니요 썩지 아니할 씨로 된 것이니 하나님의 살아 있고 항상 있는 말씀으로 되었느니라",
         "(마가4:4)^예수께서 대답하여 가라사대 기록되었으되 사람이 떡으로만 살것이 아니요 하나님의 입으로 나오는 모든 말씀으로 살 것이라 하였느니라 하시니"
+    ],
+    "인생.txt": [
+        "1\\(전 3:20-21)^다 흙으로 말미암았으므로 다 흙으로 돌아가나니 다 한 곳으로 가거니와 인생의 혼은 위로 올라가고 짐승의 혼은 아래 곧 땅으로 내려가는 줄을 누가 알랴",
+        "1\\(시 39:4-6)^여호와여 나의 종말과 연한의 어떠함을 알게 하사 나로 나의 연약함을 알게 하소서 주께서 나의 날을 손 넓이 만큼 되게 하시매 나의 일생이 주의 앞에는 없는 것 같사오니 사람마다 그 든든히 선 때도 진실로 허사 뿐이니이다 진실로 각 사람은 그림자 같이 다니고 헛된 일에 분요하며 재물을 쌓으나 누가 취할는지 알지 못하나이다",
+        "1\\(잠 27:1)^너는 내일 일을 자랑하지 말라 하루 동안에 무슨 일이 날는지 네가 알 수 없음이니라",
+        "1\\(약 4:14)^내일 일을 너희가 알지 못하는도다 너희 생명이 무엇이뇨 너희는 잠간 보이다가 없어지는 안개니라",
+        "1\\(시 144:3-4)^여호와여 사람이 무엇이관대 주께서 저를 알아주시며 인생이 무엇이관대 주께서 저를 생각하시나이까 사람은 헛것 같고 그의 날은 지나가는 그림자 같으니이다",
+        "1\\(시 89:47)^나의 때가 얼마나 단촉한지 기억하소서 주께서 모든 인생을 어찌 그리 허무하게 창조하셨는지요",
+        "1\\(시 90:10)^우리의 년수가 칠십이요 강건하면 팔십이라도 그 년수의 자랑은 수고와 슬픔 뿐이요 신속히 가니 우리가 날아가나이다",
+        "1\\(욥 7:6)^나의 날은 베틀의 북보다 빠르니 소망 없이 보내는구나",
+        "1\\(전 1:18)^지혜가 많으면 번뇌도 많으니 지식을 더하는 자는 근심을 더하느니라",
+        "1\\(전 2:22-23)^사람이 해 아래서 수고하는 모든 수고와 마음에 애쓰는 것으로 소득이 무엇이랴 일평생에 근심하며 수고하는 것이 슬픔뿐이라 그 마음이 밤에도 쉬지 못하나니 이것도 헛되도다",
+        "1\\(전 3:1-2)^천하에 범사가 기한이 있고 모든 목적이 이룰 때가 있나니 날 때가 있고 죽을 때가 있으며 심을 때가 있고 심은 것을 뽑을 때가 있으며",
+        "1\\(전 5:10-11)^은을 사랑하는 자는 은으로 만족함이 없고 풍부를 사랑하는 자는 소득으로 만족함이 없나니 이것도 헛되도다 재산이 더하면 먹는 자도 더하나니 그 소유주가 눈으로 보는 외에 무엇이 유익하랴",
+        "1\\(전 5:15-17)^저가 모태에서 벌거벗고 나왔은즉 그 나온대로 돌아가고 수고하여 얻은 것을 아무 것도 손에 가지고 가지 못하리니 이것도 폐단이라 어떻게 왔든지 그대로 가리니 바람을 잡으려는 수고가 저에게 무엇이 유익하랴 일평생을 어두운데서 먹으며 번뇌와 병과 분노가 저에게 있느니라",
+        "1\\(전 7:4)^지혜자의 마음은 초상집에 있으되 우매자의 마음은 연락하는 집에 있느니라",
+        "1\\(전 9:12)^대저 사람은 자기의 시기를 알지 못하나니 물고기가 재앙의 그물에 걸리고 새가 올무에 걸림 같이 인생도 재앙의 날이 홀연히 임하면 거기 걸리느니라",
+        "1\\(전 12:1)^너는 청년의 때 곧 곤고한 날이 이르기 전, 나는 아무 낙이 없다고 할 해가 가깝기 전에 너의 창조자를 기억하라",
+        "1\\(잠 14:12-13)^어떤 길은 사람의 보기에 바르나 필경은 사망의 길이니라 웃을 때에도 마음에 슬픔이 있고 즐거움의 끝에도 근심이 있느니라",
+        "1\\(애 3:33)^주께서 인생으로 고생하며 근심하게 하심이 본심이 아니시로다",
+        "1\\(요 14:6)^예수께서 가라사대 내가 곧 길이요 진리요 생명이니 나로 말미암지 않고는 아버지께로 올 자가 없느니라",
+        "1\\(마 16:26)^사람이 만일 온 천하를 얻고도 제 목숨을 잃으면 무엇이 유익하리요 사람이 무엇을 주고 제 목숨을 바꾸겠느냐"
     ]
 };
 
@@ -372,7 +395,7 @@ function saveDataToStorage() {
 }
 
 // Data Version - Increment this to force update default data for users
-const DATA_VERSION = "1.5";
+const DATA_VERSION = "1.6";
 
 function loadDataFromStorage() {
     try {
@@ -479,22 +502,39 @@ function displayProblem() {
     problemNum = Math.floor(Math.random() * currentScripture.length);
     const line = currentScripture[problemNum];
 
-    let [text, answers, ref] = createProblem(line, currentMode);
+    let [refView, verseText, answers, ref] = createProblem(line, currentMode);
 
-    currentProblem = text;
+    currentProblem = verseText; // Store just verse text for logic if needed? No, logic uses currentAnswers
     currentAnswers = answers;
     currentReference = ref;
     attempts = 0;
     problemCompleted = false;
     hintCount = 0;  // Reset hint counter for new problem
 
-    renderProblem(currentProblem);
+    renderProblem(refView, verseText);
     answerInput.value = "";
+    answerInput.placeholder = "정답 입력..."; // Reset hint placeholder
     answerInput.focus();
 }
 
-function renderProblem(text) {
-    problemArea.textContent = text;
+function renderProblem(refText, verseText) {
+    problemArea.innerHTML = '';
+
+    // Create Layout
+    const refDiv = document.createElement('div');
+    refDiv.className = 'reference-block';
+    refDiv.textContent = refText;
+
+    // Append
+    problemArea.appendChild(refDiv);
+
+    // Create Verse Content Wrapper
+    const verseDiv = document.createElement('div');
+    verseDiv.className = 'verse-content';
+    verseDiv.appendChild(document.createTextNode(verseText));
+    problemArea.appendChild(verseDiv);
+
+    // problemArea.textContent = text; // OLD
     problemArea.style.fontSize = fontSize + 'px';
 }
 
@@ -532,20 +572,20 @@ function createProblem(line, mode) {
         const problemWords = words.map((w, i) => blankIndices.includes(i) ? maskLenKeepPunct(w) : w);
 
         const refView = refMasked(reference, false);
-        return [refView + " " + problemWords.join(" "), answers, reference];
+        return [refView, problemWords.join(" "), answers, reference];
     }
     else if (mode === 2) { // Verse Mode
         const answers = words.filter(w => WORD_TOKEN_RE.test(w)).map(w => normToken(w));
         const problemWords = words.map(w => WORD_TOKEN_RE.test(w) ? maskOneKeepPunct(w) : w);
         const refView = refMasked(reference, false);
-        return [refView + " " + problemWords.join(" "), answers, reference];
+        return [refView, problemWords.join(" "), answers, reference];
     }
     else if (mode === 3) { // Reference Mode
         let [book, chap, versePart] = parseRefParts(reference);
         let [_, verseParts] = splitVerseParts(versePart);
         const refView = refMasked(reference, true);
         const answers = [book, chap, ...verseParts];
-        return [refView + " " + words.join(" "), answers, reference];
+        return [refView, words.join(" "), answers, reference];
     }
     else if (mode === 4) { // Whole Mode
         const n = Math.min(wholeLevelNum, words.length);
@@ -611,10 +651,10 @@ function createProblem(line, mode) {
             i++;
         }
 
-        return [refView + " " + problemWords.join(" "), answers, reference];
+        return [refView, problemWords.join(" "), answers, reference];
     }
 
-    return ["", [], ""];
+    return ["", "", [], ""];
 }
 
 let autoAdvanceTimer = null;
@@ -681,8 +721,11 @@ function handleWrongAnswer() {
 }
 
 function replaceBlankWithAnswer(answer, correct) {
-    // Get all child nodes to handle both text and hint spans
-    const children = Array.from(problemArea.childNodes);
+    // Target the verse container specifically
+    const verseContainer = problemArea.querySelector('.verse-content');
+    if (!verseContainer) return; // Safety check
+
+    const children = Array.from(verseContainer.childNodes);
     let foundBlank = false;
 
     // Build new content
@@ -747,19 +790,22 @@ function replaceBlankWithAnswer(answer, correct) {
             }
         }
 
-        // Add node - if it's a span (correct/wrong/hint), extract only text content
-        if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SPAN') {
-            // Only add text content, not the styled span
-            newContent.appendChild(document.createTextNode(node.textContent));
-        } else {
-            // For text nodes and other elements, clone as-is
-            newContent.appendChild(node.cloneNode(true));
-        }
+        // Add node - if it's a span (correct/wrong/hint), extract only text content? 
+        // NO! We want to keep previous answers (correct/wrong) as Spans!
+        // The original code flattened them. That might have been a bug or intentional?
+        // Original: "if span ... append textContent". This removes color from previous answers??
+        // Wait, if I answer 1st blank correctly, it becomes Green Span.
+        // If I answer 2nd blank, this loop runs.
+        // It hits 1st Green Span. It strips it to text? That means it loses green color?
+        // Let's FIX this logic to preserve styling of previous answers.
+
+        // Preserve structure
+        newContent.appendChild(node.cloneNode(true));
     }
 
-    // Clear and update problem area
-    problemArea.textContent = '';
-    problemArea.appendChild(newContent);
+    // Clear and update verse container only
+    verseContainer.textContent = '';
+    verseContainer.appendChild(newContent);
 }
 
 function nextProblem() {
@@ -845,8 +891,13 @@ btnHint.addEventListener('click', () => {
     applyHintToDisplay(hintPart, answer);
 });
 
+// function applyHintToDisplay(hintPart, fullAnswer) { ... }
+// Needs update to target .verse-content as well
 function applyHintToDisplay(hintPart, fullAnswer) {
-    const children = Array.from(problemArea.childNodes);
+    const verseContainer = problemArea.querySelector('.verse-content');
+    if (!verseContainer) return;
+
+    const children = Array.from(verseContainer.childNodes);
     let foundBlank = false;
     const newContent = document.createDocumentFragment();
 
@@ -858,7 +909,7 @@ function applyHintToDisplay(hintPart, fullAnswer) {
             if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hint-text')) {
                 const hintSpan = document.createElement('span');
                 hintSpan.className = 'hint-text';
-                hintSpan.style.color = '#F1C40F';
+                // hintSpan.style.color value removed to use CSS variables
 
                 const remainingUnderscores = '_'.repeat(Math.max(0, fullAnswer.length - hintPart.length));
                 hintSpan.textContent = hintPart + remainingUnderscores;
@@ -883,7 +934,7 @@ function applyHintToDisplay(hintPart, fullAnswer) {
 
                     const hintSpan = document.createElement('span');
                     hintSpan.className = 'hint-text';
-                    hintSpan.style.color = '#F1C40F';
+                    // hintSpan.style.color value removed to use CSS variables
 
                     const remainingUnderscores = '_'.repeat(Math.max(0, fullAnswer.length - hintPart.length));
                     hintSpan.textContent = hintPart + remainingUnderscores;
@@ -903,14 +954,14 @@ function applyHintToDisplay(hintPart, fullAnswer) {
 
         // Preserve existing nodes
         if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SPAN' && !node.classList.contains('hint-text')) {
-            newContent.appendChild(document.createTextNode(node.textContent));
+            newContent.appendChild(node.cloneNode(true)); // Preserve previous answers!
         } else {
             newContent.appendChild(node.cloneNode(true));
         }
     }
 
-    problemArea.textContent = '';
-    problemArea.appendChild(newContent);
+    verseContainer.textContent = '';
+    verseContainer.appendChild(newContent);
 }
 
 btnWrong.addEventListener('click', () => {
@@ -1209,4 +1260,166 @@ btnReset.addEventListener('click', () => {
     }
 });
 
+// Theme Logic
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (btnTheme) btnTheme.textContent = '☀️';
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        if (btnTheme) btnTheme.textContent = '🌙';
+    }
+}
 
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (currentTheme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        btnTheme.textContent = '🌙';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        btnTheme.textContent = '☀️';
+    }
+}
+
+if (btnTheme) {
+    btnTheme.addEventListener('click', toggleTheme);
+    initTheme();
+}
+
+
+
+// --- Settings Popups Logic ---
+const btnSettingBlank = document.getElementById('btnSettingBlank');
+const btnSettingWhole = document.getElementById('btnSettingWhole');
+const blankSettingsModal = document.getElementById('blankSettingsModal');
+const wholeSettingsModal = document.getElementById('wholeSettingsModal');
+const closeBlankSettings = document.getElementById('closeBlankSettings');
+const closeWholeSettings = document.getElementById('closeWholeSettings');
+const blankRatioGrid = document.getElementById('blankRatioGrid');
+const wholeLevelGrid = document.getElementById('wholeLevelGrid');
+
+// Active State Updaters
+function updateBlankGridActive() {
+    const currentRatio = Math.round(blankNum * 10);
+    const btns = blankRatioGrid.querySelectorAll('.btn-option');
+    btns.forEach(btn => {
+        if (parseInt(btn.dataset.ratio) === currentRatio) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+}
+
+function updateWholeGridActive() {
+    const btns = wholeLevelGrid.querySelectorAll('.btn-option');
+    btns.forEach(btn => {
+        if (parseInt(btn.dataset.words) === wholeLevelNum) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+}
+
+// Handlers
+if (btnSettingBlank) {
+    btnSettingBlank.addEventListener('click', (e) => {
+        console.log("Blank Setting Clicked");
+        e.stopPropagation();
+        try {
+            updateBlankGridActive();
+            blankSettingsModal.style.display = 'block';
+            console.log("Blank Modal Display Set to Block");
+        } catch (err) {
+            console.error("Error opening blank modal:", err);
+        }
+    });
+} else {
+    console.error("btnSettingBlank not found");
+}
+
+if (closeBlankSettings) {
+    closeBlankSettings.addEventListener('click', () => blankSettingsModal.style.display = 'none');
+}
+
+if (btnSettingWhole) {
+    btnSettingWhole.addEventListener('click', (e) => {
+        console.log("Whole Setting Clicked");
+        e.stopPropagation();
+        try {
+            updateWholeGridActive();
+            wholeSettingsModal.style.display = 'block';
+            console.log("Whole Modal Display Set to Block");
+        } catch (err) {
+            console.error("Error opening whole modal:", err);
+        }
+    });
+} else {
+    console.error("btnSettingWhole not found");
+}
+if (closeWholeSettings) {
+    closeWholeSettings.addEventListener('click', () => wholeSettingsModal.style.display = 'none');
+}
+
+// Close on outside click
+window.addEventListener('click', (e) => {
+    if (e.target === blankSettingsModal) blankSettingsModal.style.display = 'none';
+    if (e.target === wholeSettingsModal) wholeSettingsModal.style.display = 'none';
+});
+
+// Grid Selection Handlers
+if (blankRatioGrid) {
+    blankRatioGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-option')) {
+            const ratio = parseInt(e.target.dataset.ratio);
+            blankNum = ratio / 10;
+            blankSettingsModal.style.display = 'none';
+            if (currentMode === 1) {
+                // Determine if we need to reshuffle? displayProblem picks new random if we don't fix seed.
+                // Actually displayProblem picks NEW problem line? No.
+                // displayProblem:
+                // problemNum = Math.floor(Math.random()...) -> Yes it picks NEW line.
+                // If user just wants to adjust difficulty of SAME line?
+                // renderProblem is pure render. createProblem creates mask.
+                // If I call displayProblem(), it jumps to another verse.
+                // User might find this annoying.
+                // Ideally: recalculate mask for CURRENT line.
+                // Line 503: const line = currentScripture[problemNum];
+                // So I can reuse problemNum.
+                // But displayProblem() picks new num.
+                // Refactor displayProblem to accept optional index?
+                // Or just call createProblem again?
+                reloadCurrentProblem();
+            }
+        }
+    });
+}
+
+if (wholeLevelGrid) {
+    wholeLevelGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-option')) {
+            const words = parseInt(e.target.dataset.words);
+            wholeLevelNum = words;
+            wholeSettingsModal.style.display = 'none';
+            if (currentMode === 4) {
+                reloadCurrentProblem();
+            }
+        }
+    });
+}
+
+function reloadCurrentProblem() {
+    if (currentDayIndex === -1 || currentScripture.length === 0) return;
+    // regenerate using SAME problemNum
+    const line = currentScripture[problemNum];
+    let [refView, verseText, answers, ref] = createProblem(line, currentMode);
+    currentProblem = verseText;
+    currentAnswers = answers;
+    currentReference = ref;
+    attempts = 0;
+    problemCompleted = false;
+    hintCount = 0;
+    renderProblem(refView, verseText);
+    answerInput.value = "";
+    answerInput.focus();
+    updateStatus(); // score doesn't change
+}

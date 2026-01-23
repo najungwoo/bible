@@ -1,781 +1,647 @@
-/* 1. 구글 웹 폰트 (Noto Sans KR) 불러오기 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
 :root {
-    --bg-color: #1a1a1a;
-    --text-color: #e0e0e0;
-    --primary-color: #3498db;
-    --secondary-color: #2c3e50;
-    --accent-color: #e74c3c;
-    --success-color: #2ecc71;
-    --warning-color: #f1c40f;
-    --card-bg: #2d2d2d;
-    --input-bg: #3d3d3d;
+    /* Achromatic / Clean Blue Theme */
+    --bg-app: #FFFFFF;
+    /* Pure White App Background (or very light gray) */
+    --bg-surface: #FFFFFF;
+    --text-main: #212529;
+    --text-sub: #868E96;
+    --border: #E9ECEF;
+    --border-hover: #CED4DA;
+
+    --primary: #212529;
+    /* Black for Primary Actions (Modes) */
+    --primary-text: #FFFFFF;
+
+    --accent-blue: #339AF0;
+    /* For Links / Highlights */
+    --accent-blue-soft: #D0EBFF;
+
+    --bg-card: #FFFFFF;
+    /* If body is gray, card is white. Let's make body white too or soft gray? */
+    /* Samuel style: Body white, or soft gray with white card? 
+       Let's go for Body #F8F9FA, Card #FFFFFF */
+    --bg-body: #F9FAFB;
+
+    --success: #2B8A3E;
+    --fail: #C92A2A;
+    --warning: #F39C12;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+
+    --modal-overlay: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] {
+    --bg-body: #121212;
+    --bg-card: #1E1E1E;
+    --bg-app: #121212;
+    --bg-surface: #1E1E1E;
+
+    --text-main: #E0E0E0;
+    --text-sub: #A0A0A0;
+
+    --border: #333333;
+    --border-hover: #495057;
+
+    --primary: #E0E0E0;
+    /* High contrast mode buttons in dark */
+    --primary-text: #121212;
+
+    --accent-blue: #339AF0;
+    --accent-blue-soft: #182A3A;
+
+    --success: #69DB7C;
+    --fail: #FF8787;
+    --warning: #FCC419;
+
+    --shadow-sm: none;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    /* 폰트 적용 순서 변경: Noto Sans KR 우선 적용 */
-    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    outline: none;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: var(--bg-body);
+    color: var(--text-main);
     height: 100vh;
-    display: flex;
-    flex-direction: column;
+    overflow: hidden;
+    /* App-like feel */
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    width: 100%;
+/* ========================================
+   App Layout
+   ======================================== */
+.app-layout {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
 }
 
 /* ========================================
-   Header & Controls
+   1. Top Nav
    ======================================== */
-
-header {
+.top-nav {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid #444;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    flex-shrink: 0;
 }
 
-h1 {
-    font-size: 1.2rem;
-    text-align: center;
-    color: var(--primary-color);
-}
-
-.controls-top {
+.nav-left,
+.nav-right {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
+    align-items: center;
+    gap: 12px;
 }
 
-select {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    border: 1px solid #555;
-    padding: 8px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    max-width: 150px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-select:hover {
-    border-color: #888;
-    background-color: #34495e;
-}
-
-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-/* ========================================
-   Main Content
-   ======================================== */
-
-main {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.problem-area {
-    flex-grow: 1;
-    display: block;
-    font-size: 1.5rem;
-    padding: 20px;
-    text-align: center;
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    margin: 10px 0;
-    min-height: 200px;
-    line-height: 1.8;
-    word-break: keep-all;
-    overflow-wrap: break-word;
-    /* 긴 내용 스크롤 처리 */
-    overflow-y: auto;
-    transition: box-shadow 0.3s ease;
-}
-
-.problem-area:hover {
-    box-shadow: 0 0 15px rgba(52, 152, 219, 0.1);
-}
-
-/* 커스텀 스크롤바 (다크 모드) */
-.problem-area::-webkit-scrollbar,
-.verse-list-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.problem-area::-webkit-scrollbar-track,
-.verse-list-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.problem-area::-webkit-scrollbar-thumb,
-.verse-list-container::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
-}
-
-.problem-area::-webkit-scrollbar-thumb:hover,
-.verse-list-container::-webkit-scrollbar-thumb:hover {
-    background: #2980b9;
-}
-
-.placeholder {
-    color: #888;
-}
-
-.input-area {
-    margin: 10px 0;
-}
-
-.input-area input {
-    width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    border: 1px solid #555;
-    border-radius: 5px;
-}
-
-.input-area input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-.status-bar {
-    text-align: center;
-    padding: 10px;
-    font-size: 0.9rem;
-    color: #999;
-}
-
-.correct {
-    color: var(--success-color);
-    font-weight: bold;
-}
-
-.wrong {
-    color: var(--accent-color);
-    font-weight: bold;
-}
-
-.hint-text {
-    color: var(--warning-color);
-    font-weight: bold;
-}
-
-/* ========================================
-   Footer & Buttons
-   ======================================== */
-
-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #444;
-}
-
-.mode-controls,
-.action-controls,
-.font-controls {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-}
-
-button {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
+/* Dropdowns */
+.nav-select {
+    background: transparent;
     border: none;
-    padding: 10px;
-    border-radius: 5px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
     cursor: pointer;
-    font-size: 0.9rem;
-    flex-grow: 1;
-    transition: all 0.3s ease;
-    /* 버튼 텍스트 수직 중앙 정렬 보장 */
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+select option {
+    background-color: var(--bg-surface);
+    color: var(--text-main);
+}
+
+
+.nav-select:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.divider {
+    color: var(--border);
+    font-size: 0.8rem;
+    margin: 0 4px;
+}
+
+/* Buttons in Header */
+.btn-pill {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-pill:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.btn-pill.delete {
+    color: var(--fail);
+}
+
+.btn-pill.delete:hover {
+    border-color: var(--fail);
+    background: #FFF5F5;
+}
+
+.btn-icon {
+    background: transparent;
+    border: 1px solid var(--border);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-button:hover {
-    background-color: #34495e;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-button:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-button:focus:not(:focus-visible) {
-    outline: none;
-}
-
-.btn-mode.active {
-    background-color: var(--primary-color);
-    font-weight: bold;
-}
-
-.btn-mode.active:hover {
-    background-color: #2980b9;
-}
-
-.btn-action.reset {
-    background-color: #c0392b;
-}
-
-.btn-action.reset:hover {
-    background-color: #a93226;
-}
-
-.btn-action.skip {
-    background-color: #f39c12;
-    color: #2c3e50;
-}
-
-.btn-action.skip:hover {
-    background-color: #e67e22;
-}
-
-.btn-action.hint {
-    background-color: var(--warning-color);
-    color: #2c3e50;
-}
-
-.btn-action.hint:hover {
-    background-color: #f39c12;
-}
-
-.btn-action.wrong {
-    background-color: var(--secondary-color);
-}
-
-.btn-font {
-    flex-grow: 0;
-    width: 50px;
-}
-
-.btn-file {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    color: var(--text-sub);
 }
 
-.btn-file:hover {
-    background-color: #34495e;
-    transform: translateY(-1px);
-}
-
-.btn-file:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-.btn-file:focus:not(:focus-visible) {
-    outline: none;
-}
-
-.btn-file input[type="file"] {
-    display: none;
-}
-
-.btn-file.delete {
-    background-color: #c0392b;
-}
-
-.btn-file.delete:hover {
-    background-color: #a93226;
+.btn-icon:hover {
+    color: var(--text-main);
+    border-color: var(--text-main);
+    background: #FFFFFF;
 }
 
 /* ========================================
-   Modals
+   2. Mode Bar (Centered Pill)
    ======================================== */
+.mode-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 10px 0 30px 0;
+    flex-shrink: 0;
+}
 
+.mode-group {
+    background: #F1F3F5;
+    padding: 4px;
+    border-radius: 30px;
+    display: flex;
+    gap: 4px;
+}
+
+[data-theme="dark"] .mode-group {
+    background: var(--border);
+}
+
+.mode-item-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.btn-settings {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 6px;
+    border-radius: 50%;
+    color: var(--text-sub);
+    transition: all 0.2s;
+    line-height: 1;
+}
+
+.btn-settings:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .btn-settings:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-mode {
+    background: transparent;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 24px;
+    font-size: 0.95rem;
+    color: var(--text-sub);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-mode:hover {
+    color: var(--text-main);
+}
+
+.btn-mode.active {
+    background: var(--text-main);
+    /* Black */
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* .help-btn removed */
+
+.btn-text {
+    background: transparent;
+    border: none;
+    color: var(--text-sub);
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-text:hover {
+    color: var(--text-main);
+    text-decoration: underline;
+}
+
+/* ========================================
+   3. Main Content (Card)
+   ======================================== */
+.main-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; Removed to prevent clipping when content overflows */
+    gap: 30px;
+    padding-bottom: 40px;
+    overflow-y: auto;
+}
+
+.problem-card {
+    background: var(--bg-card);
+    width: 100%;
+    max-width: 1100px;
+    min-height: 400px;
+    border-radius: 24px;
+    box-shadow: var(--shadow-sm);
+    padding: 100px 60px 60px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    font-size: 1.8rem;
+    line-height: 1.8;
+    word-break: keep-all;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.3s;
+    margin: 40px auto;
+    /* Fixed top/bottom position, centered horizontally */
+}
+
+/* Reference Block (Dynamic from JS) */
+.reference-block {
+    display: block;
+    margin-bottom: 30px;
+    font-weight: 700;
+    font-size: 1.2em;
+    color: var(--text-main);
+}
+
+/* Verse Text Content (Dynamic from JS) */
+.verse-content {
+    display: block;
+    width: 100%;
+    text-align: center;
+    /* keep center for now, or left? User complaint "location moves". Center causes movement if width changes. */
+    text-align: left;
+    /* Switching to LEFT to prevent jumping */
+    line-height: 2.0;
+    /* relaxed reading */
+}
+
+.problem-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.placeholder {
+    color: var(--text-sub);
+    font-size: 1.2rem;
+}
+
+/* Input */
+.input-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+#answerInput {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid var(--border);
+    background: transparent;
+    padding: 15px 0;
+    font-size: 1.2rem;
+    text-align: center;
+    color: var(--text-main);
+    transition: border-color 0.3s;
+}
+
+#answerInput:focus {
+    border-color: var(--text-main);
+    /* Active black underline */
+}
+
+#answerInput::placeholder {
+    color: #ADB5BD;
+    font-weight: 300;
+}
+
+/* ========================================
+   4. Bottom Bar
+   ======================================== */
+.bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-top: 1px solid transparent;
+    /* Or minimal border */
+    flex-shrink: 0;
+}
+
+.status-left {
+    color: var(--text-sub);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.actions-right {
+    display: flex;
+    gap: 20px;
+}
+
+.btn-text.danger {
+    color: var(--fail);
+}
+
+.btn-text.danger:hover {
+    color: #A61E4D;
+}
+
+/* ========================================
+   5. Modals (Preserved & Cleaned)
+   ======================================== */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 2000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--modal-overlay);
+    backdrop-filter: blur(4px);
+    /* Modern blur */
     align-items: center;
     justify-content: center;
 }
 
-.modal.show {
-    display: flex !important;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
 .modal-content {
-    background-color: var(--card-bg);
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
+    background-color: #FFFFFF;
+    margin: 10vh auto;
+    padding: 40px;
     width: 90%;
-    max-width: 500px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 450px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    transition: all 0.3s ease;
+    gap: 20px;
+    border: none;
 }
 
 .modal-content h2 {
-    color: var(--primary-color);
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    color: var(--text-main);
     text-align: center;
-    /* 제목 중앙 정렬 */
-    margin-top: 0;
     margin-bottom: 10px;
 }
 
 .close {
-    color: #aaa;
     position: absolute;
-    top: 15px;
+    top: 20px;
     right: 20px;
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--text-sub);
     cursor: pointer;
-    line-height: 1;
-    transition: all 0.3s ease;
-    z-index: 10;
 }
 
-.close:hover,
-.close:focus {
-    color: var(--accent-color);
-    text-decoration: none;
-    cursor: pointer;
-    transform: rotate(90deg);
-}
-
-/* Easy Input Styles */
+/* Modal Inputs */
 .easy-input-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-}
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    gap: 20px;
 }
 
 .input-group label {
+    display: block;
     font-size: 0.9rem;
-    color: #999;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
 }
 
 .input-group input,
-.input-group select {
+.input-group select,
+.input-group textarea {
     width: 100%;
-    padding: 8px 12px !important;
-    /* 크기 조정 */
-    border-radius: 5px;
-    border: 1px solid #555;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    font-size: 0.9rem !important;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: #F8F9FA;
+    transition: all 0.2s;
+    outline: none;
+    color: var(--text-main);
+}
+
+.input-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
 }
 
 .input-group input:focus,
-.input-group select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+.input-group select:focus,
+.input-group textarea:focus {
+    background: #FFFFFF;
+    border-color: var(--text-main);
+    box-shadow: 0 0 0 2px rgba(33, 37, 41, 0.1);
 }
 
-.input-row {
-    display: flex;
-    gap: 5px;
-}
-
-.input-row input {
-    padding: 8px 12px !important;
-    /* 크기 조정 */
-    border-radius: 5px;
-    border: 1px solid #555;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    font-size: 0.9rem !important;
-}
-
-#inputRef {
-    width: 30%;
-}
-
-#inputVerse {
-    flex-grow: 1;
-}
-
-#newDayTitle {
-    width: 100%;
-    padding: 8px 12px !important;
-    /* 크기 조정 */
-    border-radius: 5px;
-    border: 1px solid #555;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    font-size: 0.9rem !important;
-}
-
-.btn-add {
-    background-color: var(--success-color);
-    color: white;
-    width: auto;
-    padding: 6px 12px !important;
-    /* 크기 조정 */
-    font-size: 0.85rem !important;
-    min-height: 32px !important;
-    flex-grow: 0;
-    transition: all 0.3s ease;
-}
+/* Row styles removed as we switched to vertical stack */
 
 .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: 10px;
 }
 
-.btn-save {
-    background-color: var(--primary-color);
+.btn-save,
+.btn-add {
+    background: var(--text-main);
     color: white;
-    width: 100%;
-    padding: 10px 16px !important;
-    /* 크기 조정 */
-    font-size: 0.9rem !important;
-    min-height: 40px !important;
-    transition: all 0.3s ease;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.full-width-select {
-    width: 100%;
+.btn-save:hover {
+    background: #000;
 }
 
-/* ========================================
-   Verse List
-   ======================================== */
-
+/* Verse List */
 .verse-list-container {
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
-    border: 1px solid #444;
-    border-radius: 5px;
-    padding: 5px;
-    background-color: #222;
-}
-
-.verse-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
 }
 
 .verse-item {
+    background: white;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #444;
-    background-color: #2a2a2a;
-}
-
-.verse-item:last-child {
-    border-bottom: none;
-}
-
-.verse-info {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex: 1;
-    overflow: hidden;
 }
 
 .verse-level {
+    color: var(--accent-blue);
     font-weight: bold;
-    color: var(--primary-color);
-    min-width: 50px;
-    flex-shrink: 0;
-}
-
-.verse-ref {
-    font-weight: bold;
-    min-width: 60px;
-    flex-shrink: 0;
-}
-
-.verse-text {
-    color: #aaa;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-grow: 1;
-}
-
-.btn-delete-item {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 4px 8px !important;
-    /* 크기 조정 */
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 10px;
-    flex-shrink: 0;
-    font-size: 0.8rem !important;
-    min-height: 28px !important;
-    flex-grow: 0 !important;
-    transition: all 0.3s ease;
-}
-
-.btn-delete-item:hover {
-    background-color: #c0392b;
+    margin-right: 6px;
 }
 
 /* ========================================
-   Animations
+   6. Utilities / States
    ======================================== */
+.correct {
+    color: var(--success);
+    font-weight: bold;
+}
+
+.wrong {
+    color: var(--fail);
+    font-weight: bold;
+}
+
+.hint-text {
+    color: var(--warning);
+    font-weight: bold;
+}
 
 @keyframes shake {
-    0% {
-        transform: translate(1px, 1px) rotate(0deg);
-    }
 
-    10% {
-        transform: translate(-1px, -2px) rotate(-1deg);
-    }
-
-    20% {
-        transform: translate(-3px, 0px) rotate(1deg);
-    }
-
-    30% {
-        transform: translate(3px, 2px) rotate(0deg);
-    }
-
-    40% {
-        transform: translate(1px, -1px) rotate(1deg);
-    }
-
-    50% {
-        transform: translate(-1px, 2px) rotate(-1deg);
-    }
-
-    60% {
-        transform: translate(-3px, 1px) rotate(0deg);
-    }
-
-    70% {
-        transform: translate(3px, 1px) rotate(-1deg);
-    }
-
-    80% {
-        transform: translate(-1px, -1px) rotate(1deg);
-    }
-
-    90% {
-        transform: translate(1px, 2px) rotate(0deg);
-    }
-
+    0%,
     100% {
-        transform: translate(1px, -2px) rotate(-1deg);
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-4px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(4px);
     }
 }
 
 .shake {
-    animation: shake 0.5s;
-    animation-iteration-count: 1;
+    animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
 }
 
-/* ========================================
-   Responsive Design
-   ======================================== */
-
-/* Tablet & Large Mobile (Landscape) */
-@media (max-width: 768px) {
-    .container {
-        padding: 10px;
-        max-width: 100%;
-    }
-
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    .controls-top {
-        gap: 8px;
-    }
-
-    .btn-file,
-    select {
-        font-size: 0.9rem;
-        padding: 8px 10px;
-        flex-grow: 1;
-    }
-
-    .problem-area {
-        font-size: 1.4rem;
-        padding: 20px;
-    }
-
-    .mode-controls button,
-    .action-controls button {
-        padding: 12px;
-        font-size: 0.9rem;
-    }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-/* Mobile (Portrait) */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.2rem;
-        margin-bottom: 5px;
-    }
-
-    .controls-top {
-        gap: 5px;
-    }
-
-    .btn-file,
-    select {
-        font-size: 0.8rem;
-        padding: 6px;
-        width: 48%;
-        /* 모바일 터치 영역 개선 */
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #btnAddDay,
-    #btnOpenAddVerse,
-    #btnOpenDeleteVerse,
-    #btnDelete,
-    label[for="fileInput"] {
-        width: 100%;
-    }
-
-    .problem-area {
-        font-size: 1.2rem;
-        padding: 15px;
-        min-height: 150px;
-    }
-
-    .input-area input {
-        font-size: 1rem;
-        padding: 12px;
-    }
-
-    footer {
-        gap: 8px;
-    }
-
-    .mode-controls,
-    .action-controls {
-        flex-wrap: wrap;
-    }
-
-    .mode-controls button,
-    .action-controls button {
-        flex-grow: 1;
-        width: 48%;
-        padding: 10px;
-        font-size: 0.85rem;
-        /* 모바일 터치 영역 개선 */
-        min-height: 48px;
-    }
-
-    .font-controls {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .font-controls button {
-        width: 48%;
-        /* 모바일 터치 영역 개선 */
-        min-height: 48px;
-    }
+::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-/* Small Height Screens (Landscape Mobile) */
-@media (max-height: 500px) {
-    .container {
-        padding: 5px;
-    }
+::-webkit-scrollbar-thumb {
+    background: #DEE2E6;
+    border-radius: 4px;
+}
 
-    header {
-        padding: 5px 0;
-    }
+::-webkit-scrollbar-thumb:hover {
+    background: #ADB5BD;
+}
 
-    .problem-area {
-        min-height: 80px;
-        font-size: 1.1rem;
-        padding: 10px;
-    }
+/* Settings Modal */
+.setting-modal-content {
+    max-width: 400px;
+    text-align: center;
+}
 
-    footer {
-        padding-top: 5px;
-    }
+.setting-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
 
-    button {
-        padding: 6px;
-    }
+.btn-option {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-surface);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-option:hover {
+    border-color: var(--accent-blue);
+    background: var(--bg-body);
+}
+
+.btn-option.active {
+    background: var(--accent-blue);
+    color: #FFF;
+    border-color: var(--accent-blue);
 }
