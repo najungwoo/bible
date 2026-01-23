@@ -1081,6 +1081,31 @@ if (btnTheme) {
     initTheme();
 }
 
+// Fullscreen Logic
+const btnFullscreen = document.getElementById('btnFullscreen');
+if (btnFullscreen) {
+    btnFullscreen.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch((e) => {
+                console.error(`Error attempting to enable full-screen mode: ${e.message} (${e.name})`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    });
+
+    // Update icon on state change
+    document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement) {
+            btnFullscreen.textContent = '↙️';
+        } else {
+            btnFullscreen.textContent = '⛶';
+        }
+    });
+}
+
 
 
 // --- Settings Popups Logic ---
