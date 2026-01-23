@@ -631,28 +631,27 @@ answerInput.addEventListener('keydown', (e) => {
 });
 
 // Mode Button Logic
+// Mode Button Logic
 modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const clickedMode = parseInt(btn.dataset.mode);
 
-        // If clicking the ALREADY active mode
-        if (currentMode === clickedMode) {
-            // Open settings if applicable
-            if (clickedMode === 1) { // Blank Mode
-                updateBlankGridActive();
-                blankSettingsModal.style.display = 'block';
-            } else if (clickedMode === 4) { // Whole Mode
-                updateWholeGridActive();
-                wholeSettingsModal.style.display = 'block';
-            }
-            return;
+        // Always switch mode first if it's different
+        if (currentMode !== clickedMode) {
+            modeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMode = clickedMode;
+            displayProblem();
         }
 
-        // Change Mode
-        modeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentMode = clickedMode;
-        displayProblem();
+        // Always check to open settings for specific modes
+        if (clickedMode === 1) { // Blank Mode
+            updateBlankGridActive();
+            blankSettingsModal.style.display = 'block';
+        } else if (clickedMode === 4) { // Whole Mode
+            updateWholeGridActive();
+            wholeSettingsModal.style.display = 'block';
+        }
     });
 });
 
