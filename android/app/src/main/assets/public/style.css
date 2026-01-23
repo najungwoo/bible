@@ -283,6 +283,11 @@ select option {
     text-decoration: underline;
 }
 
+#btnTTS.active {
+    color: var(--accent-blue);
+    font-weight: 700;
+}
+
 /* ========================================
    3. Main Content (Card)
    ======================================== */

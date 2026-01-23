@@ -492,6 +492,7 @@ function updateStatus() {
 }
 
 function displayProblem() {
+    if (typeof stopTTS === 'function') stopTTS();
     if (currentScripture.length === 0) {
         problemArea.innerHTML = '<p class="placeholder">모든 구절을 완료했습니다!</p>';
         answerInput.disabled = true;
@@ -1428,4 +1429,72 @@ function reloadCurrentProblem() {
     answerInput.value = "";
     answerInput.focus();
     updateStatus(); // score doesn't change
+}
+
+// --- TTS Logic ---
+const btnTTS = document.getElementById('btnTTS');
+let isSpeaking = false;
+
+if (btnTTS) {
+    btnTTS.addEventListener('click', () => {
+        if (isSpeaking) {
+            stopTTS();
+        } else {
+            speakCurrentVerse();
+        }
+    });
+}
+
+function stopTTS() {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+    isSpeaking = false;
+    if (btnTTS) {
+        btnTTS.classList.remove('active');
+        btnTTS.style.color = ""; // Reset inline style if any
+    }
+}
+
+function speakCurrentVerse() {
+    if (!currentScripture || currentScripture.length === 0 || typeof problemNum === 'undefined') return;
+
+    // Parse raw line
+    const line = currentScripture[problemNum];
+    if (!line) return;
+
+    let cleanLine = line;
+    const levelMatch = line.match(/^(\d+)\\/);
+    if (levelMatch) {
+        cleanLine = line.substring(levelMatch[0].length);
+    }
+    let [reference, verse] = cleanLine.split('^');
+    if (!verse) {
+        verse = cleanLine;
+        reference = "";
+    }
+
+    const textToSpeak = (reference ? reference + ". " : "") + verse;
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = 'ko-KR';
+    utterance.rate = 1.0;
+
+    utterance.onend = () => {
+        isSpeaking = false;
+        if (btnTTS) btnTTS.classList.remove('active');
+    };
+
+    utterance.onerror = (e) => {
+        console.error("TTS Error:", e);
+        isSpeaking = false;
+        if (btnTTS) btnTTS.classList.remove('active');
+    };
+
+    stopTTS();
+    window.speechSynthesis.speak(utterance);
+    isSpeaking = true;
+    if (btnTTS) {
+        btnTTS.classList.add('active');
+    }
 }
