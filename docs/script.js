@@ -25,6 +25,8 @@ let wrongVerses = [];
 let hintCount = 0;
 let score = 0;
 let isSpeaking = false;
+let repeatMode = 1; // 1, 3, 5, -1 (Infinite)
+let repeatTimeout = null;
 console.log('hintCount initialized:', hintCount);
 
 const fileInput = document.getElementById('fileInput');
@@ -41,6 +43,7 @@ const btnFontUp = document.getElementById('btnFontUp');
 const btnFontDown = document.getElementById('btnFontDown');
 const btnTheme = document.getElementById('btnTheme');
 const btnTTS = document.getElementById('btnTTS');
+const btnRepeat = document.getElementById('btnRepeat');
 const voiceSelect = document.getElementById('voiceSelect');
 const btnVoiceHelp = document.getElementById('btnVoiceHelp');
 const modeBtns = document.querySelectorAll('.btn-mode');
@@ -1170,7 +1173,12 @@ const defaultFonts = [
     { name: '도현 (Do Hyeon)', family: "'Do Hyeon', sans-serif" },
     { name: '나눔손글씨 펜 (Nanum Pen)', family: "'Nanum Pen Script', cursive" },
     { name: '해바라기 (Sunflower)', family: "'Sunflower', sans-serif" },
-    { name: '동글 (Dongle)', family: "'Dongle', sans-serif" }
+    { name: '동글 (Dongle)', family: "'Dongle', sans-serif" },
+    { name: '검은고딕 (Black Han Sans)', family: "'Black Han Sans', sans-serif" },
+    { name: '개구 (Gaegu)', family: "'Gaegu', cursive" },
+    { name: '감자꽃 (Gamja Flower)', family: "'Gamja Flower', cursive" },
+    { name: '하이멜로디 (Hi Melody)', family: "'Hi Melody', cursive" },
+    { name: '본명조 (Noto Serif KR)', family: "'Noto Serif KR', serif" }
 ];
 
 let systemFonts = [];
@@ -1448,6 +1456,7 @@ if (btnTTS) {
 }
 
 function stopTTS() {
+    clearTimeout(repeatTimeout);
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
     }
@@ -1458,8 +1467,14 @@ function stopTTS() {
     }
 }
 
-function speakCurrentVerse() {
+function speakCurrentVerse(remaining) {
     if (!currentScripture || currentScripture.length === 0 || typeof problemNum === 'undefined') return;
+
+    // Initial call (or explicit start)
+    if (remaining === undefined) {
+        stopTTS();
+        remaining = repeatMode;
+    }
 
     const line = currentScripture[problemNum];
     if (!line) return;
@@ -1535,8 +1550,15 @@ function speakCurrentVerse() {
     }
 
     utterance.onend = () => {
-        isSpeaking = false;
-        if (btnTTS) btnTTS.classList.remove('active');
+        if (remaining === -1 || remaining > 1) {
+            const nextRemaining = (remaining === -1) ? -1 : remaining - 1;
+            repeatTimeout = setTimeout(() => {
+                speakCurrentVerse(nextRemaining);
+            }, 500);
+        } else {
+            isSpeaking = false;
+            if (btnTTS) btnTTS.classList.remove('active');
+        }
     };
 
     utterance.onerror = (e) => {
@@ -1546,10 +1568,31 @@ function speakCurrentVerse() {
         if (btnTTS) btnTTS.classList.remove('active');
     };
 
-    stopTTS();
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
     isSpeaking = true;
     if (btnTTS) {
         btnTTS.classList.add('active');
     }
+}
+
+// Repeat Button Listener
+if (btnRepeat) {
+    const modes = [1, 3, 5, -1];
+    const labels = ["🔁 1x", "🔁 3x", "🔁 5x", "🔁 ∞"];
+
+    btnRepeat.addEventListener('click', () => {
+        let idx = modes.indexOf(repeatMode);
+        idx = (idx + 1) % modes.length;
+        repeatMode = modes[idx];
+        btnRepeat.textContent = labels[idx];
+
+        if (repeatMode !== 1) {
+            btnRepeat.style.color = "var(--accent-blue, #339AF0)";
+            btnRepeat.style.fontWeight = "bold";
+        } else {
+            btnRepeat.style.color = "";
+            btnRepeat.style.fontWeight = "";
+        }
+    });
 }
