@@ -393,7 +393,8 @@ select option {
     display: block;
     margin-bottom: 30px;
     font-weight: 700;
-    font-size: 2.5rem;
+    font-size: 1.5em;
+    /* Changed from rem to em to scale with parent */
     color: var(--text-main);
 }
 
@@ -402,8 +403,8 @@ select option {
     display: block;
     width: 100%;
     text-align: center;
-    /* keep center for now, or left? User complaint "location moves". Center causes movement if width changes. */
-    text-align: left;
+    /* text-align: left; Removed based on user feedback */
+    line-height: 2.0;
     /* Switching to LEFT to prevent jumping */
     line-height: 2.0;
     /* relaxed reading */
