@@ -187,7 +187,7 @@ select option {
     cursor: pointer;
     font-size: 1rem;
     transition: all 0.2s;
-    color: var(--text-sub);
+    color: var(--text-main);
 }
 
 .btn-icon:hover {
