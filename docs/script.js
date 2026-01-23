@@ -769,14 +769,19 @@ btnWrong.addEventListener('click', () => {
     displayProblem();
 });
 
+// Font Size Logic
 btnFontUp.addEventListener('click', () => {
-    fontSize += 2;
-    problemArea.style.fontSize = fontSize + 'px';
+    if (fontSize < 50) { // Max limit
+        fontSize += 2;
+        problemArea.style.fontSize = fontSize + 'px';
+    }
 });
 
 btnFontDown.addEventListener('click', () => {
-    if (fontSize > 10) fontSize -= 2;
-    problemArea.style.fontSize = fontSize + 'px';
+    if (fontSize > 14) { // Min limit
+        fontSize -= 2;
+        problemArea.style.fontSize = fontSize + 'px';
+    }
 });
 
 // --- Add Day Modal Logic ---
