@@ -1482,6 +1482,19 @@ function speakCurrentVerse() {
     utterance.lang = 'ko-KR';
     utterance.rate = 1.0;
 
+    // Try to find a Male voice
+    const voices = window.speechSynthesis.getVoices();
+    const koVoices = voices.filter(v => v.lang.includes('ko'));
+
+    // Prioritize voices with "Male", "남자", or specific male voice names
+    let targetVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
+
+    if (targetVoice) {
+        utterance.voice = targetVoice;
+    } else if (koVoices.length > 0) {
+        utterance.voice = koVoices[0];
+    }
+
     utterance.onend = () => {
         isSpeaking = false;
         if (btnTTS) btnTTS.classList.remove('active');
