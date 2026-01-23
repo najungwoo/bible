@@ -1165,7 +1165,12 @@ const defaultFonts = [
     { name: '나눔고딕 (Nanum Gothic)', family: "'Nanum Gothic', sans-serif" },
     { name: '나눔명조 (Nanum Myeongjo)', family: "'Nanum Myeongjo', serif" },
     { name: '고운돋움 (Gowun Dodum)', family: "'Gowun Dodum', sans-serif" },
-    { name: '고운바탕 (Gowun Batang)', family: "'Gowun Batang', serif" }
+    { name: '고운바탕 (Gowun Batang)', family: "'Gowun Batang', serif" },
+    { name: '주아 (Jua)', family: "'Jua', sans-serif" },
+    { name: '도현 (Do Hyeon)', family: "'Do Hyeon', sans-serif" },
+    { name: '나눔손글씨 펜 (Nanum Pen)', family: "'Nanum Pen Script', cursive" },
+    { name: '해바라기 (Sunflower)', family: "'Sunflower', sans-serif" },
+    { name: '동글 (Dongle)', family: "'Dongle', sans-serif" }
 ];
 
 let systemFonts = [];
