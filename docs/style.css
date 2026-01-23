@@ -125,10 +125,27 @@ body {
     flex-shrink: 0;
 }
 
-.nav-left,
-.nav-right {
+.nav-left {
     display: flex;
     align-items: center;
+    gap: 12px;
+}
+
+.nav-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.font-controls {
+    display: flex;
     gap: 12px;
 }
 
