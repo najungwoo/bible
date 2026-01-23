@@ -393,8 +393,7 @@ select option {
     display: block;
     margin-bottom: 30px;
     font-weight: 700;
-    font-size: 1.5em;
-    /* Changed from rem to em to scale with parent */
+    font-size: 1.2em;
     color: var(--text-main);
 }
 
