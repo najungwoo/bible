@@ -102,6 +102,8 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
     flex-shrink: 0;
 }
 
@@ -434,7 +436,7 @@ select option {
     justify-content: space-between;
     align-items: center;
     padding: 20px 0;
-    border-top: 1px solid transparent;
+    border-top: 1px solid var(--border);
     /* Or minimal border */
     flex-shrink: 0;
 }
