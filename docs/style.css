@@ -148,9 +148,9 @@ select option {
     background: var(--bg-surface);
     border: 1px solid var(--border);
     color: var(--text-main);
-    padding: 6px 16px;
+    padding: 8px 20px;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
@@ -178,14 +178,14 @@ select option {
 .btn-icon {
     background: transparent;
     border: 1px solid var(--border);
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 1rem;
     transition: all 0.2s;
     color: var(--text-sub);
 }
@@ -250,9 +250,9 @@ select option {
 .btn-mode {
     background: transparent;
     border: none;
-    padding: 8px 20px;
+    padding: 10px 24px;
     border-radius: 24px;
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--text-sub);
     font-weight: 500;
     cursor: pointer;
@@ -276,7 +276,7 @@ select option {
     background: transparent;
     border: none;
     color: var(--text-sub);
-    font-size: 0.9rem;
+    font-size: 1rem;
     cursor: pointer;
     font-weight: 500;
 }
@@ -306,7 +306,7 @@ select option {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     margin-right: 8px;
     padding: 0;
     vertical-align: middle;
@@ -566,7 +566,7 @@ select option {
     background: var(--text-main);
     color: white;
     border: none;
-    padding: 10px 24px;
+    padding: 12px 28px;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
