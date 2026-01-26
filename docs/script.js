@@ -1036,9 +1036,7 @@ btnSkip.addEventListener('click', () => {
 
 btnReset.addEventListener('click', () => {
     if (confirm("정말 초기화 하시겠습니까?")) {
-        // Reload data from storage or default
-        loadDataFromStorage();
-        // Reset view
+        // Reset view without reloading data (preserves selections)
         if (currentDayIndex !== -1) {
             dayReset();
         } else {
