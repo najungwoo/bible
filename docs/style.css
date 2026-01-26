@@ -766,49 +766,42 @@ select option {
 }
 
 /* Gradients */
-.bg-gradient-pastel {
-    background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
-    background-size: cover;
-    background-attachment: fixed;
+/* Solid Colors */
+.bg-solid-white {
+    background-color: #F8F9FA;
+    background-image: none;
 }
 
-.bg-gradient-sky {
-    background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
-    background-size: cover;
-    background-attachment: fixed;
+.bg-solid-cream {
+    background-color: #FDFBF7;
+    background-image: none;
 }
 
-.bg-gradient-soda {
-    background: linear-gradient(120deg, rgb(137, 247, 254) 0%, rgb(102, 166, 255) 100%);
-    background-size: cover;
-    background-attachment: fixed;
+.bg-solid-paper {
+    background-color: #F4ECD8;
+    background-image: none;
 }
 
-.bg-gradient-sunset {
-    background: linear-gradient(to top, #fcc5e4 0%, #fda34b 15%, #ff7882 35%, #c8699e 52%, #7046aa 71%, #0c1db8 87%, #020f75 100%);
-    background-size: cover;
-    background-attachment: fixed;
+/* Dark Colors */
+.bg-solid-dark-gray {
+    background-color: #343A40;
+    background-image: none;
 }
 
-/* Nature (Patterns / Images) */
-.bg-nature-forest {
-    background: url('https://images.unsplash.com/photo-1448375240586-dfd8d395ea6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
-    background-size: cover;
+.bg-solid-black {
+    background-color: #121212;
+    background-image: none;
 }
 
-.bg-nature-sea {
-    background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
-    background-size: cover;
+.bg-solid-navy {
+    background-color: #0F172A;
+    /* Slate 900 */
+    background-image: none;
 }
 
-.bg-nature-sky {
-    background: url('https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
-    background-size: cover;
-}
-
-.bg-nature-stars {
-    background: url('https://images.unsplash.com/photo-1519681393798-38e43269d877?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
-    background-size: cover;
+.bg-solid-forest {
+    background-color: #143601;
+    background-image: none;
 }
 
 /* Glassmorphism for Panels */
