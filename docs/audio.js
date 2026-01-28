@@ -83,12 +83,19 @@ function populateVoices() {
     const voices = window.speechSynthesis.getVoices();
     const koVoices = voices.filter(v => v.lang.includes('ko'));
 
+    // Always add Google Online Option first
+    const googleOption = document.createElement('option');
+    googleOption.textContent = "Google 번역 음성 (온라인 - 데이터 필요)";
+    googleOption.value = "google_online";
+    voiceSelect.appendChild(googleOption);
+
     if (koVoices.length === 0) {
         const option = document.createElement('option');
-        option.textContent = "한국어 음성 없음";
+        option.textContent = "─ 기기 기본 음성 없음 ─";
+        option.disabled = true;
         voiceSelect.appendChild(option);
         if (btnVoiceHelp) btnVoiceHelp.style.display = "inline-block";
-        return;
+        // Do not return here, so Google option is still available
     } else {
         if (btnVoiceHelp) btnVoiceHelp.style.display = "none";
     }
@@ -121,6 +128,10 @@ function stopTTS() {
     clearTimeout(repeatTimeout);
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
+    }
+    if (googleAudio) {
+        googleAudio.pause();
+        googleAudio = null;
     }
     isSpeaking = false;
     if (btnTTS) {
@@ -196,7 +207,11 @@ function speakCurrentVerse(remaining) {
 
     const savedURI = localStorage.getItem('bible-voice-uri');
     if (savedURI) {
-        targetVoice = koVoices.find(v => v.voiceURI === savedURI);
+        if (savedURI === 'google_online') {
+            targetVoice = 'google_online';
+        } else {
+            targetVoice = koVoices.find(v => v.voiceURI === savedURI);
+        }
     }
 
     if (!targetVoice) {
@@ -207,35 +222,97 @@ function speakCurrentVerse(remaining) {
         targetVoice = koVoices[0];
     }
 
-    if (targetVoice) {
-        utterance.voice = targetVoice;
-    }
+    // Default to Google Online if no other voice found (or if user wants it)
+    // logic: if targetVoice is string 'google_online', use it.
 
-    utterance.onend = () => {
-        if (remaining === -1 || remaining > 1) {
-            const nextRemaining = (remaining === -1) ? -1 : remaining - 1;
-            repeatTimeout = setTimeout(() => {
-                speakCurrentVerse(nextRemaining);
-            }, 500);
-        } else {
+    if (targetVoice === 'google_online') {
+        playGoogleTTS(textToSpeak, remaining);
+    } else {
+        if (targetVoice) {
+            utterance.voice = targetVoice;
+        }
+
+        utterance.onend = () => {
+            // Logic for repeat
+            handleRepeat(remaining);
+        };
+
+        utterance.onerror = (e) => {
+            if (e.error === 'interrupted' || e.error === 'canceled') return;
+            console.error("TTS Error:", e);
             isSpeaking = false;
             if (btnTTS) btnTTS.classList.remove('active');
-        }
-    };
+        };
 
-    utterance.onerror = (e) => {
-        if (e.error === 'interrupted' || e.error === 'canceled') return;
-        console.error("TTS Error:", e);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+        isSpeaking = true;
+        if (btnTTS) {
+            btnTTS.classList.add('active');
+        }
+    }
+}
+
+// Helper to handle repeat logic centrally
+function handleRepeat(remaining) {
+    if (remaining === -1 || remaining > 1) {
+        const nextRemaining = (remaining === -1) ? -1 : remaining - 1;
+        repeatTimeout = setTimeout(() => {
+            speakCurrentVerse(nextRemaining);
+        }, 500);
+    } else {
         isSpeaking = false;
         if (btnTTS) btnTTS.classList.remove('active');
+    }
+}
+
+let googleAudio = null;
+
+function playGoogleTTS(text, remaining) {
+    // 1. Split text into chunks (approx 100 chars) to avoid Google API limit
+    // Simple split by punctuation
+    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+
+    let index = 0;
+
+    const playNextChunk = () => {
+        if (index >= sentences.length) {
+            // Finished all chunks
+            handleRepeat(remaining);
+            return;
+        }
+
+        const chunk = sentences[index].trim();
+        if (!chunk) {
+            index++;
+            playNextChunk();
+            return;
+        }
+
+        // Use the hack URL
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunk)}&tl=ko&client=tw-ob`;
+
+        googleAudio = new Audio(url);
+        googleAudio.onended = () => {
+            index++;
+            playNextChunk();
+        };
+        googleAudio.onerror = (e) => {
+            console.error("Google TTS Playback Error", e);
+            index++;
+            playNextChunk();
+        };
+
+        googleAudio.play().catch(e => {
+            console.error("Audio Play failed (interaction needed?)", e);
+            isSpeaking = false;
+            if (btnTTS) btnTTS.classList.remove('active');
+        });
     };
 
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
     isSpeaking = true;
-    if (btnTTS) {
-        btnTTS.classList.add('active');
-    }
+    if (btnTTS) btnTTS.classList.add('active');
+    playNextChunk();
 }
 
 // Auto-initialize if DOM is ready, or wait
