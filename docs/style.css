@@ -313,9 +313,9 @@ select option {
 .voice-select {
     padding: 4px;
     margin-right: 8px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    background: var(--bg-main);
+    background: var(--bg-surface);
     color: var(--text-main);
     font-size: 0.8rem;
     max-width: 120px;
@@ -348,7 +348,7 @@ select option {
 .help-text hr {
     margin: 15px 0;
     border: 0;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--border);
 }
 
 /* ========================================
@@ -500,7 +500,7 @@ select option {
 }
 
 .modal-content {
-    background-color: #FFFFFF;
+    background-color: var(--bg-card);
     margin: 0;
     padding: 40px;
     width: 90%;
@@ -553,7 +553,7 @@ select option {
     border: 1px solid var(--border);
     border-radius: 12px;
     font-size: 1rem;
-    background: #F8F9FA;
+    background: var(--bg-body);
     transition: all 0.2s;
     outline: none;
     color: var(--text-main);
