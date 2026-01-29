@@ -1003,10 +1003,21 @@ input[type=range] {
 
 /* Tablet & Small Desktop (Max 1024px) */
 @media (max-width: 1024px) {
+    .app-layout {
+        padding: 0 16px;
+    }
+
+    .main-container {
+        gap: 20px;
+        padding-bottom: 20px;
+        /* Reduce bottom space */
+    }
+
     .problem-card {
-        padding: 60px 40px;
+        padding: 40px 30px;
         min-height: 300px;
-        width: 95%;
+        width: 100%;
+        margin: 20px 0;
     }
 }
 
