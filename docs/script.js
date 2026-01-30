@@ -498,9 +498,6 @@ function handleWrongAnswer() {
     failNum++;
     score -= 5;
     updateStatus();
-    failNum++;
-    score -= 5;
-    updateStatus();
     attempts = 0;
     hintCount = 0; // Reset hint count for next blank
     answerInput.placeholder = "정답 입력..."; // Reset hint placeholder
