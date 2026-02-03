@@ -16,7 +16,19 @@
         <header class="top-nav">
             <div class="nav-left">
                 <div class="select-group">
-                    <select id="levelSelect" class="nav-select">
+                    <!-- Custom Hover Dropdown -->
+                    <div class="dropdown" id="levelDropdown">
+                        <button class="dropbtn" id="levelDropBtn">전체 과정 ▾</button>
+                        <div class="dropdown-content" id="levelDropContent">
+                            <div class="dropdown-item active" data-value="all">전체 과정</div>
+                            <div class="dropdown-item" data-value="1">1과정</div>
+                            <div class="dropdown-item" data-value="2">2과정</div>
+                            <div class="dropdown-item" data-value="3">3과정</div>
+                            <div class="dropdown-item" data-value="4">4과정</div>
+                        </div>
+                    </div>
+
+                    <select id="levelSelect" class="nav-select" style="display:none">
                         <option value="all" selected>전체 과정</option>
                         <option value="1">1과정</option>
                         <option value="2">2과정</option>

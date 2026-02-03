@@ -1595,4 +1595,31 @@ function speakCurrentVerse() {
     if (btnTTS) {
         btnTTS.classList.add('active');
     }
-}
+
+    // --- Dropdown Logic ---
+    const levelDropdownItems = document.querySelectorAll('#levelDropContent .dropdown-item');
+    const levelDropBtn = document.getElementById('levelDropBtn');
+
+    levelDropdownItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            // Prevent default anchor behavior
+            e.preventDefault();
+
+            // 1. Update UI (Active State)
+            levelDropdownItems.forEach(d => d.classList.remove('active'));
+            item.classList.add('active');
+
+            // 2. Update Button Text
+            const text = item.textContent;
+            // Keep the arrow ▾
+            levelDropBtn.innerText = text + " ▾";
+
+            // 3. Update Hidden Select & Trigger Change
+            const value = item.getAttribute('data-value');
+            levelSelect.value = value;
+
+            // Trigger generic change event
+            levelSelect.dispatchEvent(new Event('change'));
+        });
+    });
+
