@@ -29,6 +29,8 @@ console.log('hintCount initialized:', hintCount);
 // DOM Elements
 const fileInput = document.getElementById('fileInput');
 const daySelect = document.getElementById('daySelect');
+const dayDropBtn = document.getElementById('dayDropBtn');
+const dayDropContent = document.getElementById('dayDropContent');
 const levelSelect = document.getElementById('levelSelect');
 const problemArea = document.getElementById('problemArea');
 const answerInput = document.getElementById('answerInput');
@@ -1627,8 +1629,9 @@ levelDropdownItems.forEach(item => {
     });
 });
 
-const dayDropBtn = document.getElementById('dayDropBtn');
-const dayDropContent = document.getElementById('dayDropContent');
+// Removed dayDropBtn/dayDropContent from here (moved to top)
+
+// Removed dayDropBtn/dayDropContent from here (moved to top)
 
 function updateDayDropdown() {
     dayDropContent.innerHTML = ''; // Clear existing
