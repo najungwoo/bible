@@ -654,6 +654,13 @@ select option {
     color: #888;
 }
 
+[data-theme="dark"] .input-group input:focus,
+[data-theme="dark"] .input-group select:focus,
+[data-theme="dark"] .input-group textarea:focus {
+    background: #3E3E3E;
+    border-color: #FFFFFF;
+}
+
 .input-group textarea {
     resize: vertical;
     min-height: 100px;
