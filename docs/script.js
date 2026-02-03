@@ -370,67 +370,27 @@ function createProblem(line, mode) {
     }
     else if (mode === 4) { // Whole Mode
         const n = Math.min(wholeLevelNum, words.length);
-        const randIndex = Math.floor(Math.random() * (words.length - n + 1));
-        const visibleWords = words.slice(randIndex, randIndex + n);
 
-        const problemWords = [];
-        let i = 0;
-        let firstOccurrence = true;
+        // Always start visible words from the beginning (Index 0)
+        const visibleWords = words.slice(0, n);
+        const hiddenWords = words.slice(n);
 
-        while (i < words.length) {
-            // Check if current slice matches visibleWords
-            let match = true;
-            if (i + n > words.length) match = false;
-            else {
-                for (let j = 0; j < n; j++) {
-                    if (words[i + j] !== visibleWords[j]) {
-                        match = false;
-                        break;
-                    }
-                }
-            }
+        // Problem words: Visible words + Masked hidden words
+        const problemWords = [
+            ...visibleWords,
+            ...hiddenWords.map(w => WORD_TOKEN_RE.test(w) ? maskOneKeepPunct(w) : w)
+        ];
 
-            if (firstOccurrence && match) {
-                problemWords.push(...visibleWords);
-                firstOccurrence = false;
-                i += n;
-            } else {
-                problemWords.push(maskOneKeepPunct(words[i]));
-                i++;
-            }
-        }
+        // Reference is Visible (false for masked)
+        const refView = refMasked(reference, false);
 
-        const refView = refMasked(reference, true);
-        let [book, chap, versePart] = parseRefParts(reference);
-        let [_, verseParts] = splitVerseParts(versePart);
-        const answers = [book, chap, ...verseParts];
-
-        i = 0;
-        let skippedOnce = false;
-        while (i < words.length) {
-            let match = true;
-            if (i + n > words.length) match = false;
-            else {
-                for (let j = 0; j < n; j++) {
-                    if (words[i + j] !== visibleWords[j]) {
-                        match = false;
-                        break;
-                    }
-                }
-            }
-
-            if (!skippedOnce && match) {
-                skippedOnce = true;
-                i += n;
-                continue;
-            }
-
-            let w = words[i];
+        // Answers: Only the hidden words (Skip reference input)
+        const answers = [];
+        hiddenWords.forEach(w => {
             if (WORD_TOKEN_RE.test(w)) {
                 answers.push(normToken(w));
             }
-            i++;
-        }
+        });
 
         return [refView, problemWords.join(" "), answers, reference];
     }
