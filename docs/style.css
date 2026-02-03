@@ -1007,10 +1007,22 @@ input[type=range] {
         padding: 0 16px;
     }
 
+    .top-nav {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+        padding: 15px 0;
+    }
+
+    .nav-left,
+    .nav-right {
+        justify-content: space-between;
+        width: 100%;
+    }
+
     .main-container {
         gap: 20px;
         padding-bottom: 20px;
-        /* Reduce bottom space */
     }
 
     .problem-card {

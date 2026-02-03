@@ -688,8 +688,130 @@ select option {
     background: var(--bg-body);
 }
 
-.btn-option.active {
-    background: var(--accent-blue);
-    color: #FFF;
-    border-color: var(--accent-blue);
+
+/* ========================================
+   7. Responsive Design (Adaptive UI)
+   ======================================== */
+
+/* Tablet & Small Desktop (Max 1024px) */
+@media (max-width: 1024px) {
+    .app-layout {
+        padding: 0 16px;
+    }
+
+    .top-nav {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+        padding: 15px 0;
+    }
+
+    .nav-left,
+    .nav-right {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .main-container {
+        gap: 20px;
+        padding-bottom: 20px;
+    }
+
+    .problem-card {
+        padding: 40px 30px;
+        min-height: 300px;
+        width: 100%;
+        margin: 20px 0;
+    }
+}
+
+/* Mobile Devices (Max 768px) */
+@media (max-width: 768px) {
+    :root {
+        --font-size-base: 14px;
+    }
+
+    .app-layout {
+        padding: 0 10px;
+    }
+
+    .top-nav {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+        padding: 15px 0;
+    }
+
+    .nav-left,
+    .nav-right {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .problem-card {
+        margin: 20px auto;
+        padding: 40px 20px;
+        font-size: 1.4rem;
+        /* Smaller font on mobile */
+        min-height: 30vh;
+    }
+
+    .mode-bar {
+        padding: 5px 0 15px 0;
+        overflow-x: auto;
+        justify-content: flex-start;
+        /* Allow scroll if needed */
+    }
+
+    .mode-group {
+        flex-wrap: nowrap;
+        /* Prevent wrapping, allow scroll */
+    }
+
+    .btn-mode {
+        padding: 8px 16px;
+        /* Reduce padding */
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .bottom-bar {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding-bottom: 30px;
+        /* Safe area for mobile */
+    }
+
+    .actions-right {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    /* Adjust Modal for Mobile */
+    .modal-content {
+        width: 95%;
+        margin: 5vh auto;
+        padding: 20px;
+    }
+}
+
+/* Small Mobile (Max 480px) */
+@media (max-width: 480px) {
+    .problem-card {
+        font-size: 1.2rem;
+        padding: 30px 15px;
+    }
+
+    .btn-pill,
+    .btn-mode {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+
+    .actions-right {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }
