@@ -62,13 +62,16 @@
     --shadow-sm: none;
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
     --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+
+    --btn-primary-bg: #339AF0;
+    --btn-primary-text: #FFFFFF;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    font-family: var(--app-font);
     outline: none;
 }
 
@@ -606,10 +609,23 @@ select option {
     border: 1px solid var(--border);
     border-radius: 12px;
     font-size: 1rem;
-    background: #F8F9FA;
+    background: var(--bg-body);
     transition: all 0.2s;
     outline: none;
     color: var(--text-main);
+}
+
+[data-theme="dark"] .input-group input,
+[data-theme="dark"] .input-group select,
+[data-theme="dark"] .input-group textarea {
+    background: #2C2C2C;
+    /* Slightly lighter than card #1E1E1E */
+    border-color: #444;
+}
+
+[data-theme="dark"] .input-group input::placeholder,
+[data-theme="dark"] .input-group textarea::placeholder {
+    color: #888;
 }
 
 .input-group textarea {
@@ -637,17 +653,18 @@ select option {
 
 .btn-save,
 .btn-add {
-    background: var(--text-main);
-    color: white;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
     border: none;
-    padding: 10px 24px;
+    padding: 12px 28px;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
 }
 
-.btn-save:hover {
-    background: #000;
+.btn-save:hover,
+.btn-add:hover {
+    filter: brightness(1.1);
 }
 
 /* Verse List */
