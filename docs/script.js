@@ -676,10 +676,21 @@ btnHint.addEventListener('click', () => {
 
 // 힌트 적용 로직 (현재 빈칸에 힌트 텍스트 표시)
 function applyHintToDisplay(hintPart, fullAnswer) {
-    const verseContainer = problemArea.querySelector('.verse-content');
-    if (!verseContainer) return;
+    // 1. Try Reference Block
+    const refContainer = problemArea.querySelector('.reference-block');
+    if (refContainer) {
+        if (applyHintToContainer(refContainer, hintPart, fullAnswer)) return;
+    }
 
-    const children = Array.from(verseContainer.childNodes);
+    // 2. Try Verse Content
+    const verseContainer = problemArea.querySelector('.verse-content');
+    if (verseContainer) {
+        applyHintToContainer(verseContainer, hintPart, fullAnswer);
+    }
+}
+
+function applyHintToContainer(container, hintPart, fullAnswer) {
+    const children = Array.from(container.childNodes);
     let foundBlank = false;
     const newContent = document.createDocumentFragment();
 
@@ -740,8 +751,12 @@ function applyHintToDisplay(hintPart, fullAnswer) {
         }
     }
 
-    verseContainer.textContent = '';
-    verseContainer.appendChild(newContent);
+    if (foundBlank) {
+        container.textContent = '';
+        container.appendChild(newContent);
+        return true;
+    }
+    return false;
 }
 
 btnWrong.addEventListener('click', () => {
