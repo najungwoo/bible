@@ -61,6 +61,12 @@ const closeDeleteVerse = document.getElementById('closeDeleteVerse');
 const deleteDaySelect = document.getElementById('deleteDaySelect');
 const deleteVerseList = document.getElementById('deleteVerseList');
 
+const deleteDayModal = document.getElementById('deleteDayModal');
+const deleteDayMessage = document.getElementById('deleteDayMessage');
+const btnCancelDeleteDay = document.getElementById('btnCancelDeleteDay');
+const btnConfirmDeleteDay = document.getElementById('btnConfirmDeleteDay');
+const closeDeleteDay = document.getElementById('closeDeleteDay');
+
 let tempVerses = [];
 // --- Helper Functions (Ported from Python) ---
 
@@ -953,6 +959,9 @@ window.addEventListener('click', (e) => {
     if (e.target == deleteVerseModal) {
         deleteVerseModal.style.display = "none";
     }
+    if (e.target == deleteDayModal) {
+        deleteDayModal.style.display = "none";
+    }
 });
 
 
@@ -967,6 +976,7 @@ function updateDaySelect() {
 }
 
 // Delete Day Logic
+// Delete Day Logic
 btnDelete.addEventListener('click', () => {
     if (currentDayIndex === -1) {
         alert("삭제할 일차를 선택해주세요.");
@@ -974,20 +984,35 @@ btnDelete.addEventListener('click', () => {
     }
 
     const dayName = originalFilenames[currentDayIndex];
-    if (confirm(`정말 '${dayName}'을(를) 삭제하시겠습니까?`)) {
-        originalScriptures.splice(currentDayIndex, 1);
-        originalFilenames.splice(currentDayIndex, 1);
-        saveDataToStorage();
-
-        // Re-render dropdown
-        updateDaySelect();
-
-        // Reset view
-        currentDayIndex = -1;
-        daySelect.value = "";
-        dayReset();
-    }
+    deleteDayMessage.textContent = `정말 '${dayName.replace('.txt', '')}'을(를) 삭제하시겠습니까?`;
+    deleteDayModal.style.display = 'flex';
 });
+
+btnConfirmDeleteDay.addEventListener('click', () => {
+    if (currentDayIndex === -1) return;
+
+    originalScriptures.splice(currentDayIndex, 1);
+    originalFilenames.splice(currentDayIndex, 1);
+    saveDataToStorage();
+
+    // Re-render dropdown
+    updateDaySelect();
+
+    // Reset view
+    currentDayIndex = -1;
+    daySelect.value = "";
+    dayReset();
+
+    deleteDayModal.style.display = 'none';
+});
+
+btnCancelDeleteDay.addEventListener('click', () => {
+    deleteDayModal.style.display = 'none';
+});
+
+if (closeDeleteDay) {
+    closeDeleteDay.addEventListener('click', () => deleteDayModal.style.display = 'none');
+}
 
 
 
