@@ -865,6 +865,11 @@ select option {
     background: #F8F9FA;
 }
 
+[data-theme="dark"] .font-list-container {
+    background: #2C2C2C;
+    border-color: #444;
+}
+
 .font-item {
     padding: 10px;
     border-bottom: 1px solid var(--border);
@@ -877,14 +882,30 @@ select option {
     font-size: 1.1rem;
 }
 
+[data-theme="dark"] .font-item {
+    border-bottom-color: #444;
+    color: #E0E0E0;
+}
+
 .font-item:hover {
     background: #E9ECEF;
+}
+
+[data-theme="dark"] .font-item:hover {
+    background: #3E3E3E;
 }
 
 .font-item.active {
     background: var(--accent-blue-soft);
     font-weight: bold;
     color: var(--accent-blue);
+}
+
+[data-theme="dark"] .font-item.active {
+    background: #183C5C;
+    /* Darker blue background */
+    color: #4DABF7;
+    /* Lighter blue text */
 }
 
 .font-controls-area {
