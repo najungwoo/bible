@@ -683,12 +683,51 @@ select option {
 }
 
 .verse-item {
-    background: white;
+    background: var(--bg-surface);
     padding: 12px;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
+}
+
+[data-theme="dark"] .verse-item {
+    background: #2C2C2C;
+    border-color: #444;
+}
+
+.verse-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.verse-text {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-delete-item {
+    background-color: var(--fail);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: filter 0.2s;
+}
+
+.btn-delete-item:hover {
+    filter: brightness(0.9);
 }
 
 .verse-level {
