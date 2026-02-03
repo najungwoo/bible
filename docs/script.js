@@ -392,8 +392,8 @@ function createProblem(line, mode) {
             ...hiddenWords.map(w => WORD_TOKEN_RE.test(w) ? maskOneKeepPunct(w) : w)
         ];
 
-        // Reference is Visible (false for masked)
-        const refView = refMasked(reference, false);
+        // Reference is Visible (false for masked) -> NOW MASKED (true)
+        const refView = refMasked(reference, true);
 
         // Answers: Only the hidden words (Skip reference input)
         const answers = [];
