@@ -389,6 +389,7 @@ function loadFiles(files) {
                 if (originalScriptures.length > 0) {
                     daySelect.value = 0;
                     selectDay(0);
+                    updateDayDropdown();
                 }
             }
         };
@@ -434,6 +435,7 @@ function loadDataFromStorage() {
         if (originalScriptures.length > 0) {
             daySelect.value = 0;
             selectDay(0);
+            updateDayDropdown();
         }
     } catch (e) {
         console.error("Error loading data:", e);
@@ -454,6 +456,7 @@ function loadDataFromStorage() {
         if (originalScriptures.length > 0) {
             daySelect.value = 0;
             selectDay(0);
+            updateDayDropdown();
         }
     }
 }
@@ -1623,4 +1626,43 @@ levelDropdownItems.forEach(item => {
         levelSelect.dispatchEvent(new Event('change'));
     });
 });
+
+const dayDropBtn = document.getElementById('dayDropBtn');
+const dayDropContent = document.getElementById('dayDropContent');
+
+function updateDayDropdown() {
+    dayDropContent.innerHTML = ''; // Clear existing
+
+    // Use originalFilenames as source
+    originalFilenames.forEach((name, index) => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        // Remove .txt extension and trim
+        item.textContent = name.replace('.txt', '').trim();
+        item.dataset.value = index;
+
+        if (index === currentDayIndex) {
+            item.classList.add('active');
+            dayDropBtn.innerText = item.textContent + " ▾";
+        }
+
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // UI Update
+            const allItems = dayDropContent.querySelectorAll('.dropdown-item');
+            allItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            dayDropBtn.innerText = item.textContent + " ▾";
+
+            // Logic Update
+            daySelect.value = index;
+            selectDay(index);
+        });
+
+        dayDropContent.appendChild(item);
+    });
+}
+
 

@@ -36,7 +36,14 @@
                         <option value="4">4과정</option>
                     </select>
                     <span class="divider">|</span>
-                    <select id="daySelect" class="nav-select">
+                    <!-- Day Hover Dropdown -->
+                    <div class="dropdown" id="dayDropdown">
+                        <button class="dropbtn" id="dayDropBtn">일차 선택 ▾</button>
+                        <div class="dropdown-content" id="dayDropContent">
+                            <!-- Populated Dynamically -->
+                        </div>
+                    </div>
+                    <select id="daySelect" class="nav-select" style="display:none">
                         <option value="" disabled selected>일차 선택</option>
                     </select>
                 </div>
