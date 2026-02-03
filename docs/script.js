@@ -396,12 +396,18 @@ function createProblem(line, mode) {
         const refView = refMasked(reference, true);
 
         // Answers: Only the hidden words (Skip reference input)
-        const answers = [];
+        // [New Logic] In Whole Mode, we also want to answer the reference parts
+        let [book, chap, versePart] = parseRefParts(reference);
+        let [_, verseParts] = splitVerseParts(versePart);
+
+        const answers = [book, chap, ...verseParts]; // Start with reference parts
+
         hiddenWords.forEach(w => {
             if (WORD_TOKEN_RE.test(w)) {
                 answers.push(normToken(w));
             }
         });
+
 
         return [refView, problemWords.join(" "), answers, reference];
     }
@@ -478,12 +484,23 @@ function handleWrongAnswer() {
 }
 
 // 정답을 맞췄을 때 빈칸을 실제 텍스트로 교체 (색상 표시 포함)
+// 정답을 맞췄을 때 빈칸을 실제 텍스트로 교체 (색상 표시 포함)
 function replaceBlankWithAnswer(answer, correct) {
-    // Target the verse container specifically
-    const verseContainer = problemArea.querySelector('.verse-content');
-    if (!verseContainer) return; // Safety check
+    // 1. Try Reference Block Reference
+    const refContainer = problemArea.querySelector('.reference-block');
+    if (refContainer) {
+        if (replaceInContainer(refContainer, answer, correct)) return;
+    }
 
-    const children = Array.from(verseContainer.childNodes);
+    // 2. Try Verse Content
+    const verseContainer = problemArea.querySelector('.verse-content');
+    if (verseContainer) {
+        if (replaceInContainer(verseContainer, answer, correct)) return;
+    }
+}
+
+function replaceInContainer(container, answer, correct) {
+    const children = Array.from(container.childNodes);
     let foundBlank = false;
 
     // Build new content
@@ -552,9 +569,13 @@ function replaceBlankWithAnswer(answer, correct) {
         newContent.appendChild(node.cloneNode(true));
     }
 
-    // Clear and update verse container only
-    verseContainer.textContent = '';
-    verseContainer.appendChild(newContent);
+    if (foundBlank) {
+        // Clear and update container
+        container.textContent = '';
+        container.appendChild(newContent);
+        return true;
+    }
+    return false;
 }
 
 // 다음 문제로 이동 (현재 문제 제거 및 상태 업데이트)

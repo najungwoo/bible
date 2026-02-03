@@ -624,7 +624,12 @@ function createProblem(line, mode) {
         const refView = refMasked(reference, true);
 
         // Answers: Only the hidden words (Skip reference input)
-        const answers = [];
+        // [New Logic] In Whole Mode, we also want to answer the reference parts
+        let [book, chap, versePart] = parseRefParts(reference);
+        let [_, verseParts] = splitVerseParts(versePart);
+
+        const answers = [book, chap, ...verseParts]; // Start with reference parts
+
         hiddenWords.forEach(w => {
             if (WORD_TOKEN_RE.test(w)) {
                 answers.push(normToken(w));
@@ -707,11 +712,21 @@ function handleWrongAnswer() {
 }
 
 function replaceBlankWithAnswer(answer, correct) {
-    // Target the verse container specifically
-    const verseContainer = problemArea.querySelector('.verse-content');
-    if (!verseContainer) return; // Safety check
+    // 1. Try Reference Block Reference
+    const refContainer = problemArea.querySelector('.reference-block');
+    if (refContainer) {
+        if (replaceInContainer(refContainer, answer, correct)) return;
+    }
 
-    const children = Array.from(verseContainer.childNodes);
+    // 2. Try Verse Content
+    const verseContainer = problemArea.querySelector('.verse-content');
+    if (verseContainer) {
+        if (replaceInContainer(verseContainer, answer, correct)) return;
+    }
+}
+
+function replaceInContainer(container, answer, correct) {
+    const children = Array.from(container.childNodes);
     let foundBlank = false;
 
     // Build new content
@@ -776,22 +791,18 @@ function replaceBlankWithAnswer(answer, correct) {
             }
         }
 
-        // Add node - if it's a span (correct/wrong/hint), extract only text content? 
-        // NO! We want to keep previous answers (correct/wrong) as Spans!
-        // The original code flattened them. That might have been a bug or intentional?
-        // Original: "if span ... append textContent". This removes color from previous answers??
-        // Wait, if I answer 1st blank correctly, it becomes Green Span.
-        // If I answer 2nd blank, this loop runs.
-        // It hits 1st Green Span. It strips it to text? That means it loses green color?
-        // Let's FIX this logic to preserve styling of previous answers.
 
         // Preserve structure
         newContent.appendChild(node.cloneNode(true));
     }
 
-    // Clear and update verse container only
-    verseContainer.textContent = '';
-    verseContainer.appendChild(newContent);
+    if (foundBlank) {
+        // Clear and update container
+        container.textContent = '';
+        container.appendChild(newContent);
+        return true;
+    }
+    return false;
 }
 
 function nextProblem() {
