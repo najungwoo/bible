@@ -761,7 +761,7 @@ function applyHintToContainer(container, hintPart, fullAnswer) {
 
 btnWrong.addEventListener('click', () => {
     if (wrongVerses.length === 0) {
-        alert("틀린 구절이 없습니다.");
+        customAlert("틀린 구절이 없습니다.");
         return;
     }
     currentScripture = wrongVerses.map(w => w.full_text);
@@ -807,7 +807,7 @@ closeAddDay.addEventListener('click', () => {
 btnSaveDay.addEventListener('click', () => {
     const title = newDayTitle.value.trim();
     if (!title) {
-        alert("일차 제목을 입력해주세요.");
+        customAlert("일차 제목을 입력해주세요.");
         return;
     }
 
@@ -865,11 +865,11 @@ btnAddVerseToDay.addEventListener('click', () => {
     const level = inputLevel.value;
 
     if (isNaN(targetIndex)) {
-        alert("추가할 일차를 선택해주세요.");
+        customAlert("추가할 일차를 선택해주세요.");
         return;
     }
     if (!ref || !text) {
-        alert("장절과 내용을 모두 입력해주세요.");
+        customAlert("장절과 내용을 모두 입력해주세요.");
         return;
     }
 
@@ -880,7 +880,7 @@ btnAddVerseToDay.addEventListener('click', () => {
     originalScriptures[targetIndex].push(formatted);
     saveDataToStorage();
 
-    alert("추가되었습니다!");
+    customAlert("추가되었습니다!");
 
     inputRef.value = "";
     inputVerse.value = "";
@@ -969,19 +969,19 @@ function renderDeleteVerseList(dayIndex) {
 
 // Global function for delete button onclick
 window.deleteVerse = function (dayIndex, verseIndex) {
-    if (!confirm("정말 이 구절을 삭제하시겠습니까?")) return;
+    customConfirm("정말 이 구절을 삭제하시겠습니까?", () => {
+        // Remove verse
+        originalScriptures[dayIndex].splice(verseIndex, 1);
+        saveDataToStorage();
 
-    // Remove verse
-    originalScriptures[dayIndex].splice(verseIndex, 1);
-    saveDataToStorage();
+        // Re-render list
+        renderDeleteVerseList(dayIndex);
 
-    // Re-render list
-    renderDeleteVerseList(dayIndex);
-
-    // If we deleted from the currently viewed day, refresh the view
-    if (dayIndex === currentDayIndex) {
-        dayReset();
-    }
+        // If we deleted from the currently viewed day, refresh the view
+        if (dayIndex === currentDayIndex) {
+            dayReset();
+        }
+    });
 };
 
 // Update window click to close new modal
@@ -1015,7 +1015,7 @@ function updateDaySelect() {
 // Delete Day Logic
 btnDelete.addEventListener('click', () => {
     if (currentDayIndex === -1) {
-        alert("삭제할 일차를 선택해주세요.");
+        customAlert("삭제할 일차를 선택해주세요.");
         return;
     }
 
@@ -1058,7 +1058,7 @@ btnSkip.addEventListener('click', () => {
 });
 
 btnReset.addEventListener('click', () => {
-    if (confirm("정말 초기화 하시겠습니까?")) {
+    customConfirm("정말 초기화 하시겠습니까?", () => {
         // Reset view without reloading data (preserves selections)
         if (currentDayIndex !== -1) {
             dayReset();
@@ -1073,7 +1073,7 @@ btnReset.addEventListener('click', () => {
             problemArea.innerHTML = '<p class="placeholder">파일을 열거나 붙여넣기로 시작하세요.</p>';
             answerInput.disabled = true;
         }
-    }
+    });
 });
 
 // Theme Logic
@@ -1293,13 +1293,13 @@ if (btnCloseFontSettings) btnCloseFontSettings.addEventListener('click', () => f
 btnLoadSystemFonts.addEventListener('click', async () => {
     try {
         if (!window.queryLocalFonts) {
-            alert('이 브라우저는 시스템 폰트 불러오기를 지원하지 않습니다. (Chrome/Edge PC 버전 권장)');
+            customAlert('이 브라우저는 시스템 폰트 불러오기를 지원하지 않습니다. (Chrome/Edge PC 버전 권장)');
             return;
         }
 
         const permission = await navigator.permissions.query({ name: 'local-fonts' });
         if (permission.state === 'denied') {
-            alert('폰트 접근 권한이 거부되었습니다.');
+            customAlert('폰트 접근 권한이 거부되었습니다.');
             return;
         }
 
@@ -1309,13 +1309,13 @@ btnLoadSystemFonts.addEventListener('click', async () => {
 
         systemFonts = uniqueFamilies.map(fam => ({ name: fam, family: `"${fam}"` })).sort((a, b) => a.name.localeCompare(b.name));
 
-        alert(`시스템 폰트 ${systemFonts.length}개를 불러왔습니다.`);
+        customAlert(`시스템 폰트 ${systemFonts.length}개를 불러왔습니다.`);
         renderFontList();
         btnLoadSystemFonts.style.display = 'none';
 
     } catch (err) {
         console.error(err);
-        alert('시스템 폰트를 불러오는 중 오류가 발생했습니다: ' + err.message);
+        customAlert('시스템 폰트를 불러오는 중 오류가 발생했습니다: ' + err.message);
     }
 });
 
@@ -1680,3 +1680,60 @@ function updateDayDropdown() {
     });
 }
 
+// --- Generic Modal Logic ---
+const genericAlertModal = document.getElementById('genericAlertModal');
+const genericAlertMessage = document.getElementById('genericAlertMessage');
+const btnGenericAlertClose = document.getElementById('btnGenericAlertClose');
+
+const genericConfirmModal = document.getElementById('genericConfirmModal');
+const genericConfirmMessage = document.getElementById('genericConfirmMessage');
+const btnGenericConfirmCancel = document.getElementById('btnGenericConfirmCancel');
+const btnGenericConfirmOk = document.getElementById('btnGenericConfirmOk');
+
+let onConfirmCallback = null;
+
+function customAlert(msg) {
+    if (!genericAlertModal) {
+        alert(msg);
+        return;
+    }
+    genericAlertMessage.textContent = msg;
+    genericAlertModal.style.display = 'flex';
+}
+
+if (btnGenericAlertClose) {
+    btnGenericAlertClose.addEventListener('click', () => {
+        genericAlertModal.style.display = 'none';
+    });
+}
+
+function customConfirm(msg, callback) {
+    if (!genericConfirmModal) {
+        if (confirm(msg)) callback();
+        return;
+    }
+    genericConfirmMessage.textContent = msg;
+    onConfirmCallback = callback;
+    genericConfirmModal.style.display = 'flex';
+}
+
+if (btnGenericConfirmCancel) {
+    btnGenericConfirmCancel.addEventListener('click', () => {
+        genericConfirmModal.style.display = 'none';
+        onConfirmCallback = null;
+    });
+}
+
+if (btnGenericConfirmOk) {
+    btnGenericConfirmOk.addEventListener('click', () => {
+        if (onConfirmCallback) onConfirmCallback();
+        genericConfirmModal.style.display = 'none';
+        onConfirmCallback = null;
+    });
+}
+
+// Close generic modals on outside click
+window.addEventListener('click', (e) => {
+    if (e.target === genericAlertModal) genericAlertModal.style.display = 'none';
+    if (e.target === genericConfirmModal) genericConfirmModal.style.display = 'none';
+});
