@@ -298,16 +298,24 @@ function displayProblem() {
 
     let [refView, verseText, answers, ref] = createProblem(line, currentMode);
 
-    currentProblem = verseText; // Store just verse text for logic if needed? No, logic uses currentAnswers
+    currentProblem = verseText;
     currentAnswers = answers;
     currentReference = ref;
     attempts = 0;
-    problemCompleted = false;
-    hintCount = 0;  // Reset hint counter for new problem
+
+    // If no answers (e.g. 0% blank mode), mark as completed immediately so Enter key skips
+    if (currentAnswers.length === 0) {
+        problemCompleted = true;
+        answerInput.placeholder = "엔터(Enter)를 눌러 다음으로";
+    } else {
+        problemCompleted = false;
+        answerInput.placeholder = "정답 입력...";
+    }
+
+    hintCount = 0;
 
     renderProblem(refView, verseText);
     answerInput.value = "";
-    answerInput.placeholder = "정답 입력..."; // Reset hint placeholder
     answerInput.focus();
 }
 
