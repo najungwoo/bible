@@ -185,7 +185,7 @@ function saveDataToStorage() {
     localStorage.setItem('bible_data_version', DATA_VERSION);
 }
 
-const DATA_VERSION = "1.6";
+const DATA_VERSION = "1.7";
 
 // 로컬 스토리지에서 데이터 로드 (앱 시작 시 호출)
 function loadDataFromStorage() {
