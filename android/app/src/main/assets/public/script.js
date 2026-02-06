@@ -646,6 +646,9 @@ let autoAdvanceTimer = null;
 
 function submitAnswer() {
     const userAnswer = answerInput.value.trim();
+    if (currentMode === 4) {
+        ensureFullscreen();
+    }
 
     if (problemCompleted) {
         nextProblem();
@@ -819,6 +822,16 @@ function nextProblem() {
 
 
 
+
+// --- Helper for Fullscreen Persistence ---
+function ensureFullscreen() {
+    if (currentMode === 4 && !document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log("Fullscreen attempt failed: ", err);
+        });
+    }
+}
+
 // --- Event Listeners ---
 
 daySelect.addEventListener('change', (e) => {
@@ -849,6 +862,13 @@ modeBtns.forEach(btn => {
         modeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentMode = parseInt(btn.dataset.mode);
+
+        if (currentMode === 4) {
+            ensureFullscreen();
+        } else if (document.fullscreenElement) {
+            document.exitFullscreen().catch(err => console.log("Exit Fullscreen failed:", err));
+        }
+
         displayProblem();
     });
 });
@@ -856,6 +876,8 @@ modeBtns.forEach(btn => {
 
 btnHint.addEventListener('click', () => {
     if (!currentAnswers.length || problemCompleted) return;
+
+    ensureFullscreen();
 
     const answer = currentAnswers[0];
     let hintPart = '';
@@ -1252,6 +1274,7 @@ if (closeDeleteDay) {
 
 btnSkip.addEventListener('click', () => {
     if (currentScripture.length === 0) return;
+    ensureFullscreen();
     nextProblem();
 });
 
@@ -1517,6 +1540,7 @@ if (window.speechSynthesis.onvoiceschanged !== undefined) {
 
 if (btnTTS) {
     btnTTS.addEventListener('click', () => {
+        ensureFullscreen();
         if (isSpeaking) {
             stopTTS();
         } else {
