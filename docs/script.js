@@ -626,6 +626,13 @@ answerInput.addEventListener('keydown', (e) => {
     }
 });
 
+// Restore fullscreen when keyboard closes (blur)
+answerInput.addEventListener('blur', () => {
+    if (currentMode === 4) {
+        setTimeout(ensureFullscreen, 100); // Small delay to allow UI to settle
+    }
+});
+
 // Mode Button Logic
 // Mode Button Logic
 modeBtns.forEach(btn => {
