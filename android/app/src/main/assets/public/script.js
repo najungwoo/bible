@@ -199,7 +199,7 @@ function saveDataToStorage() {
 }
 
 // Data Version - Increment this to force update default data for users
-const DATA_VERSION = "1.8";
+const DATA_VERSION = "1.9";
 
 function loadDataFromStorage() {
     try {
