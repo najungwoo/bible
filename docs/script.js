@@ -337,7 +337,7 @@ function renderProblem(refText, verseText) {
     verseDiv.appendChild(document.createTextNode(verseText));
     problemArea.appendChild(verseDiv);
 
-    problemArea.style.fontSize = fontSize + 'px';
+    problemArea.style.setProperty('--app-font-size', fontSize + 'px');
 }
 
 // 문제 생성 로직 (현재 모드에 따라 빈칸 뚫기 등 처리)
@@ -791,14 +791,14 @@ btnWrong.addEventListener('click', () => {
 btnFontUp.addEventListener('click', () => {
     if (fontSize < 50) { // Max limit
         fontSize += 2;
-        problemArea.style.fontSize = fontSize + 'px';
+        problemArea.style.setProperty('--app-font-size', fontSize + 'px');
     }
 });
 
 btnFontDown.addEventListener('click', () => {
     if (fontSize > 14) { // Min limit
         fontSize -= 2;
-        problemArea.style.fontSize = fontSize + 'px';
+        problemArea.style.setProperty('--app-font-size', fontSize + 'px');
     }
 });
 

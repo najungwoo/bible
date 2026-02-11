@@ -474,6 +474,15 @@ select option {
     border: 1px solid var(--border);
     transition: box-shadow 0.3s;
     margin: 40px auto;
+    font-size: var(--app-font-size, 24px); /* Default 24px */
+}
+
+@media (max-width: 768px) {
+    .problem-card {
+        /* Cap the font size on mobile to prevent overflow */
+        /* Use min() to take the smaller of the user setting or the cap */
+        font-size: min(var(--app-font-size, 24px), 22px) !important;
+    }
 }
 
 /* Reference Block (Dynamic from JS) */
