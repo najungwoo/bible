@@ -105,7 +105,7 @@ function saveDataToStorage() {
     localStorage.setItem('bible_data_version', DATA_VERSION);
 }
 
-const DATA_VERSION = "1.9";
+const DATA_VERSION = "2.0";
 
 // 로컬 스토리지에서 데이터 로드 (앱 시작 시 호출)
 function loadDataFromStorage() {
@@ -118,6 +118,10 @@ function loadDataFromStorage() {
         if (storedVersion === DATA_VERSION && storedScriptures && storedFilenames) {
             originalScriptures = JSON.parse(storedScriptures);
             originalFilenames = JSON.parse(storedFilenames);
+
+            if (!originalScriptures || originalScriptures.length === 0) {
+                throw new Error("Stored data is empty");
+            }
         } else {
             // Load Default Data (Force Update)
             console.log("Updating data to version " + DATA_VERSION);
