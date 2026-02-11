@@ -24,7 +24,7 @@ var hintCount = 0;
 var score = 0;
 console.log('hintCount initialized:', hintCount);
 
-const fileInput = document.getElementById('fileInput');
+
 const daySelect = document.getElementById('daySelect');
 const dayDropBtn = document.getElementById('dayDropBtn');
 const dayDropContent = document.getElementById('dayDropContent');
@@ -46,41 +46,7 @@ let tempVerses = [];
 // Helper functions moved to utils.js
 
 
-// 파일 로드 및 초기화 (File Input 변경 시 호출)
-function loadFiles(files) {
-    originalScriptures = [];
-    originalFilenames = [];
-    daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
-
-    let loadedCount = 0;
-
-    Array.from(files).forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const text = e.target.result;
-            const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
-
-            originalScriptures.push(lines);
-            originalFilenames.push(file.name);
-
-            const option = document.createElement('option');
-            option.value = originalScriptures.length - 1; // Index
-            option.textContent = file.name.replace('.txt', '');
-            daySelect.appendChild(option);
-
-            loadedCount++;
-            if (loadedCount === files.length) {
-                saveDataToStorage();
-                if (originalScriptures.length > 0) {
-                    daySelect.value = 0;
-                    selectDay(0);
-                    updateDayDropdown();
-                }
-            }
-        };
-        reader.readAsText(file, 'UTF-8');
-    });
-}
+// File Load Logic removed
 
 // 데이터를 로컬 스토리지에 저장 (새로운 파일 로드 또는 데이터 변경 시)
 function saveDataToStorage() {
