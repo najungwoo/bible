@@ -91,8 +91,15 @@ function dayReset() {
         } else {
             const maxLevel = parseInt(selectedLevel, 10);
 
-            const levelRegex = new RegExp(`^[1-${maxLevel}]\\\\\\(`);
-            currentScripture = allVerses.filter(line => levelRegex.test(line));
+            // Filter verses where level <= maxLevel
+            currentScripture = allVerses.filter(line => {
+                const match = line.match(/^(\d+)\\/);
+                if (match) {
+                    const verseLevel = parseInt(match[1], 10);
+                    return verseLevel <= maxLevel;
+                }
+                return false;
+            });
         }
         leftVerse = currentScripture.length;
     } else {
@@ -441,11 +448,7 @@ levelSelect.addEventListener('change', () => {
     dayReset();
 });
 
-fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        loadFiles(e.target.files);
-    }
-});
+
 
 answerInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
