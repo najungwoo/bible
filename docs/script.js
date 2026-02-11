@@ -1338,7 +1338,7 @@ btnLoadSystemFonts.addEventListener('click', async () => {
 fontSizeSlider.addEventListener('input', (e) => {
     const val = parseInt(e.target.value);
     fontSize = val;
-    problemArea.style.fontSize = fontSize + 'px';
+    problemArea.style.setProperty('--app-font-size', fontSize + 'px');
     updateFontSizeDisplay(val);
 });
 
@@ -1367,7 +1367,7 @@ btnResetFont.addEventListener('click', () => {
 
     // Apply
     document.body.style.fontFamily = '';
-    problemArea.style.fontSize = '28px';
+    problemArea.style.setProperty('--app-font-size', '28px');
     document.body.style.fontWeight = ''; // Revert to CSS default (700)
 
     initFontSettings();
