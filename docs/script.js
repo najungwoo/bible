@@ -48,77 +48,31 @@ let tempVerses = [];
 
 // File Load Logic removed
 
-// 데이터를 로컬 스토리지에 저장 (새로운 파일 로드 또는 데이터 변경 시)
-function saveDataToStorage() {
-    localStorage.setItem('bible_scriptures', JSON.stringify(originalScriptures));
-    localStorage.setItem('bible_filenames', JSON.stringify(originalFilenames));
-    localStorage.setItem('bible_data_version', DATA_VERSION);
-}
+// 데이터 초기화 (앱 시작 시 호출)
+function initData() {
+    // 1. Load Data from DEFAULT_DATA (Source of Truth)
+    originalScriptures = Object.values(DEFAULT_DATA);
+    originalFilenames = Object.keys(DEFAULT_DATA);
 
-const DATA_VERSION = "2.0";
+    // 2. Legacy Data Cleanup (Remove old cached data)
+    localStorage.removeItem('bible_scriptures');
+    localStorage.removeItem('bible_filenames');
+    localStorage.removeItem('bible_data_version');
 
-// 로컬 스토리지에서 데이터 로드 (앱 시작 시 호출)
-function loadDataFromStorage() {
-    try {
-        const storedVersion = localStorage.getItem('bible_data_version');
-        const storedScriptures = localStorage.getItem('bible_scriptures');
-        const storedFilenames = localStorage.getItem('bible_filenames');
+    // 3. Populate Day Dropdown
+    updateDaySelect();
 
-        // Check if we need to force update (version mismatch or no data)
-        if (storedVersion === DATA_VERSION && storedScriptures && storedFilenames) {
-            originalScriptures = JSON.parse(storedScriptures);
-            originalFilenames = JSON.parse(storedFilenames);
-
-            if (!originalScriptures || originalScriptures.length === 0) {
-                throw new Error("Stored data is empty");
-            }
-        } else {
-            // Load Default Data (Force Update)
-            console.log("Updating data to version " + DATA_VERSION);
-            originalScriptures = Object.values(DEFAULT_DATA);
-            originalFilenames = Object.keys(DEFAULT_DATA);
-            saveDataToStorage();
-        }
-
-        daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
-        originalFilenames.forEach((name, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = name.replace('.txt', '');
-            daySelect.appendChild(option);
-        });
-
-        if (originalScriptures.length > 0) {
-            daySelect.value = 0;
-            selectDay(0);
-            updateDayDropdown();
-        }
-    } catch (e) {
-        console.error("Error loading data:", e);
-        // Fallback to default data on error
-        localStorage.clear();
-        originalScriptures = Object.values(DEFAULT_DATA);
-        originalFilenames = Object.keys(DEFAULT_DATA);
-        saveDataToStorage();
-
-        daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
-        originalFilenames.forEach((name, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = name.replace('.txt', '');
-            daySelect.appendChild(option);
-        });
-
-        if (originalScriptures.length > 0) {
-            daySelect.value = 0;
-            selectDay(0);
-            updateDayDropdown();
-        }
+    // 4. Select Initial Day (if exists)
+    if (originalScriptures.length > 0) {
+        daySelect.value = 0;
+        selectDay(0);
+        updateDayDropdown();
     }
 }
 
 // Initialize
-loadDataFromStorage();
+// Initialize
+initData();
 
 // 특정 일차 선택 (Dropdown 변경 시)
 function selectDay(index) {
