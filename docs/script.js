@@ -36,9 +36,6 @@ const btnReset = document.getElementById('btnReset');
 const btnHint = document.getElementById('btnHint');
 const btnSkip = document.getElementById('btnSkip');
 const btnWrong = document.getElementById('btnWrong');
-const btnFontUp = document.getElementById('btnFontUp');
-const btnFontDown = document.getElementById('btnFontDown');
-const btnTheme = document.getElementById('btnTheme');
 const modeBtns = document.querySelectorAll('.btn-mode');
 
 
