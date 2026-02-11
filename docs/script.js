@@ -40,23 +40,8 @@ const modeBtns = document.querySelectorAll('.btn-mode');
 
 
 
-const btnDelete = document.getElementById('btnDelete');
-
-const inputRef = document.getElementById('inputRef');
-const inputVerse = document.getElementById('inputVerse');
-const inputLevel = document.getElementById('inputLevel');
-
-const btnOpenDeleteVerse = document.getElementById('btnOpenDeleteVerse');
-const deleteVerseModal = document.getElementById('deleteVerseModal');
-const closeDeleteVerse = document.getElementById('closeDeleteVerse');
-const deleteDaySelect = document.getElementById('deleteDaySelect');
-const deleteVerseList = document.getElementById('deleteVerseList');
-
-const deleteDayModal = document.getElementById('deleteDayModal');
-const deleteDayMessage = document.getElementById('deleteDayMessage');
-const btnCancelDeleteDay = document.getElementById('btnCancelDeleteDay');
-const btnConfirmDeleteDay = document.getElementById('btnConfirmDeleteDay');
-const closeDeleteDay = document.getElementById('closeDeleteDay');
+const btnDelete = document.getElementById('btnDelete'); // Kept references if needed, but event listeners moved.
+// Editor logic moved to editor.js
 
 let tempVerses = [];
 // Helper functions moved to utils.js
@@ -416,7 +401,6 @@ function handleWrongAnswer() {
 }
 
 // 정답을 맞췄을 때 빈칸을 실제 텍스트로 교체 (색상 표시 포함)
-// 정답을 맞췄을 때 빈칸을 실제 텍스트로 교체 (색상 표시 포함)
 function replaceBlankWithAnswer(answer, correct) {
     // 1. Try Reference Block Reference
     const refContainer = problemArea.querySelector('.reference-block');
@@ -713,218 +697,18 @@ btnWrong.addEventListener('click', () => {
 
 // Font Size Logic moved to fonts.js
 
-// --- Add Day Modal Logic ---
-const btnAddDay = document.getElementById('btnAddDay');
-const addDayModal = document.getElementById('addDayModal');
-const closeAddDay = document.getElementById('closeAddDay');
-const btnSaveDay = document.getElementById('btnSaveDay');
-const newDayTitle = document.getElementById('newDayTitle');
+// Add Day Logic moved to editor.js
 
-btnAddDay.addEventListener('click', () => {
-    addDayModal.style.display = "flex";
-    newDayTitle.value = "";
-    newDayTitle.focus();
-});
-
-closeAddDay.addEventListener('click', () => {
-    addDayModal.style.display = "none";
-});
-
-btnSaveDay.addEventListener('click', () => {
-    const title = newDayTitle.value.trim();
-    if (!title) {
-        customAlert("일차 제목을 입력해주세요.");
-        return;
-    }
-
-    // Create new empty day
-    originalScriptures.push([]);
-    originalFilenames.push(title);
-    saveDataToStorage();
-
-    // Update dropdowns
-    updateDaySelect();
-
-    // Select the new day
-    daySelect.value = originalScriptures.length - 1;
-    selectDay(originalScriptures.length - 1);
-
-    addDayModal.style.display = "none";
-});
-
-// --- Add Verse Modal Logic ---
-const btnOpenAddVerse = document.getElementById('btnOpenAddVerse');
-const addVerseModal = document.getElementById('addVerseModal');
-const closeAddVerse = document.getElementById('closeAddVerse');
-const targetDaySelect = document.getElementById('targetDaySelect');
-const btnAddVerseToDay = document.getElementById('btnAddVerseToDay');
-
-btnOpenAddVerse.addEventListener('click', () => {
-    // Populate target day select
-    targetDaySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
-    originalFilenames.forEach((name, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = name.replace('.txt', '');
-        targetDaySelect.appendChild(option);
-    });
-
-    // Pre-select current day if valid
-    if (currentDayIndex !== -1) {
-        targetDaySelect.value = currentDayIndex;
-    }
-
-    addVerseModal.style.display = "flex";
-    inputRef.value = "";
-    inputVerse.value = "";
-    inputRef.focus();
-});
-
-closeAddVerse.addEventListener('click', () => {
-    addVerseModal.style.display = "none";
-});
-
-btnAddVerseToDay.addEventListener('click', () => {
-    const targetIndex = parseInt(targetDaySelect.value);
-    const ref = inputRef.value.trim();
-    const text = inputVerse.value.trim();
-    const level = inputLevel.value;
-
-    if (isNaN(targetIndex)) {
-        customAlert("추가할 일차를 선택해주세요.");
-        return;
-    }
-    if (!ref || !text) {
-        customAlert("장절과 내용을 모두 입력해주세요.");
-        return;
-    }
-
-    // Format: Level\(Ref)^Text
-    const formatted = `${level}\\(${ref})^${text}`;
-
-    // Add to selected day
-    originalScriptures[targetIndex].push(formatted);
-    saveDataToStorage();
-
-    customAlert("추가되었습니다!");
-
-    inputRef.value = "";
-    inputVerse.value = "";
-    inputRef.focus();
-
-    // If we added to the currently viewed day, refresh the view
-    if (targetIndex === currentDayIndex) {
-        dayReset();
-    }
-});
+// Add Verse Logic moved to editor.js
 
 
 // --- Delete Verse Modal Logic ---
 
-btnOpenDeleteVerse.addEventListener('click', () => {
-    // Populate day select
-    deleteDaySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
-    originalFilenames.forEach((name, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = name.replace('.txt', '');
-        deleteDaySelect.appendChild(option);
-    });
+// Delete Verse Logic moved to editor.js
 
-    // Pre-select current day if valid
-    if (currentDayIndex !== -1) {
-        deleteDaySelect.value = currentDayIndex;
-        renderDeleteVerseList(currentDayIndex);
-    } else {
-        deleteVerseList.innerHTML = '';
-    }
+// renderDeleteVerseList & deleteVerse moved to editor.js
 
-    deleteVerseModal.style.display = "flex";
-});
-
-closeDeleteVerse.addEventListener('click', () => {
-    deleteVerseModal.style.display = "none";
-});
-
-deleteDaySelect.addEventListener('change', (e) => {
-    const index = parseInt(e.target.value);
-    if (!isNaN(index)) {
-        renderDeleteVerseList(index);
-    }
-});
-
-function renderDeleteVerseList(dayIndex) {
-    deleteVerseList.innerHTML = '';
-    const verses = originalScriptures[dayIndex];
-
-    if (!verses || verses.length === 0) {
-        deleteVerseList.innerHTML = '<li>구절이 없습니다.</li>';
-        return;
-    }
-
-    verses.forEach((line, vIndex) => {
-        const li = document.createElement('li');
-        li.className = 'verse-item';
-
-        // Parse line to show friendly text
-        // Format: Level\(Ref)^Text
-        let displayLevel = "?";
-        let content = line;
-
-        const levelMatch = line.match(/^(\d+)\\/);
-        if (levelMatch) {
-            displayLevel = levelMatch[1];
-            if (displayLevel === "0") displayLevel = "전체";
-            content = line.substring(levelMatch[0].length);
-        }
-
-        let [ref, text] = content.split('^');
-        if (!text) text = content;
-
-        li.innerHTML = `
-            <div class="verse-info">
-                <span class="verse-level">[${displayLevel}과정]</span>
-                <span class="verse-ref">${ref}</span>
-                <span class="verse-text">${text.substring(0, 30)}...</span>
-            </div>
-            <button class="btn-delete-item" onclick="deleteVerse(${dayIndex}, ${vIndex})">삭제</button>
-        `;
-        deleteVerseList.appendChild(li);
-    });
-}
-
-// Global function for delete button onclick
-window.deleteVerse = function (dayIndex, verseIndex) {
-    customConfirm("정말 이 구절을 삭제하시겠습니까?", () => {
-        // Remove verse
-        originalScriptures[dayIndex].splice(verseIndex, 1);
-        saveDataToStorage();
-
-        // Re-render list
-        renderDeleteVerseList(dayIndex);
-
-        // If we deleted from the currently viewed day, refresh the view
-        if (dayIndex === currentDayIndex) {
-            dayReset();
-        }
-    });
-};
-
-// Update window click to close new modal
-window.addEventListener('click', (e) => {
-    if (e.target == addDayModal) {
-        addDayModal.style.display = "none";
-    }
-    if (e.target == addVerseModal) {
-        addVerseModal.style.display = "none";
-    }
-    if (e.target == deleteVerseModal) {
-        deleteVerseModal.style.display = "none";
-    }
-    if (e.target == deleteDayModal) {
-        deleteDayModal.style.display = "none";
-    }
-});
+// Editor modal close logic moved to editor.js
 
 
 function updateDaySelect() {
@@ -937,44 +721,7 @@ function updateDaySelect() {
     });
 }
 
-// Delete Day Logic
-// Delete Day Logic
-btnDelete.addEventListener('click', () => {
-    if (currentDayIndex === -1) {
-        customAlert("삭제할 일차를 선택해주세요.");
-        return;
-    }
-
-    const dayName = originalFilenames[currentDayIndex];
-    deleteDayMessage.textContent = `정말 '${dayName.replace('.txt', '')}'을(를) 삭제하시겠습니까?`;
-    deleteDayModal.style.display = 'flex';
-});
-
-btnConfirmDeleteDay.addEventListener('click', () => {
-    if (currentDayIndex === -1) return;
-
-    originalScriptures.splice(currentDayIndex, 1);
-    originalFilenames.splice(currentDayIndex, 1);
-    saveDataToStorage();
-
-    // Re-render dropdown
-    updateDaySelect();
-
-    // Reset view
-    currentDayIndex = -1;
-    daySelect.value = "";
-    dayReset();
-
-    deleteDayModal.style.display = 'none';
-});
-
-btnCancelDeleteDay.addEventListener('click', () => {
-    deleteDayModal.style.display = 'none';
-});
-
-if (closeDeleteDay) {
-    closeDeleteDay.addEventListener('click', () => deleteDayModal.style.display = 'none');
-}
+// Delete Day Logic moved to editor.js
 
 
 
