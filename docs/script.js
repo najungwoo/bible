@@ -24,7 +24,6 @@ var failNum = 0;
 var wrongVerses = [];
 var hintCount = 0;
 var score = 0;
-// Audio state moved to audio.js
 console.log('hintCount initialized:', hintCount);
 
 const fileInput = document.getElementById('fileInput');
@@ -42,12 +41,9 @@ const btnWrong = document.getElementById('btnWrong');
 const btnFontUp = document.getElementById('btnFontUp');
 const btnFontDown = document.getElementById('btnFontDown');
 const btnTheme = document.getElementById('btnTheme');
-// Audio buttons moved to audio.js
-// Audio buttons moved to audio.js
 const modeBtns = document.querySelectorAll('.btn-mode');
 
-const modalVoiceHelp = document.getElementById('voiceHelpModal');
-const btnCloseVoiceHelp = document.getElementById('btnCloseVoiceHelp');
+
 
 const btnDelete = document.getElementById('btnDelete');
 
