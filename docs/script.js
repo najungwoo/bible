@@ -40,8 +40,7 @@ const modeBtns = document.querySelectorAll('.btn-mode');
 
 
 
-const btnDelete = document.getElementById('btnDelete'); // Kept references if needed, but event listeners moved.
-// Editor logic moved to editor.js
+// Editor logic removed
 
 let tempVerses = [];
 // Helper functions moved to utils.js
@@ -695,22 +694,6 @@ btnWrong.addEventListener('click', () => {
     displayProblem();
 });
 
-// Font Size Logic moved to fonts.js
-
-// Add Day Logic moved to editor.js
-
-// Add Verse Logic moved to editor.js
-
-
-// --- Delete Verse Modal Logic ---
-
-// Delete Verse Logic moved to editor.js
-
-// renderDeleteVerseList & deleteVerse moved to editor.js
-
-// Editor modal close logic moved to editor.js
-
-
 function updateDaySelect() {
     daySelect.innerHTML = '<option value="" disabled selected>일차 선택</option>';
     originalFilenames.forEach((name, index) => {
@@ -720,10 +703,6 @@ function updateDaySelect() {
         daySelect.appendChild(option);
     });
 }
-
-// Delete Day Logic moved to editor.js
-
-
 
 btnSkip.addEventListener('click', () => {
     if (currentScripture.length === 0) return;
@@ -775,8 +754,6 @@ if (btnFullscreen) {
         }
     });
 }
-
-
 
 // --- Settings Popups Logic ---
 // btnSettingBlank and btnSettingWhole declarations removed
