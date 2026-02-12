@@ -13,7 +13,12 @@ var defaultFonts = [
     { name: '개구 (Gaegu)', family: "'Gaegu', cursive" },
     { name: '감자꽃 (Gamja Flower)', family: "'Gamja Flower', cursive" },
     { name: '하이멜로디 (Hi Melody)', family: "'Hi Melody', cursive" },
-    { name: '본명조 (Noto Serif KR)', family: "'Noto Serif KR', serif" }
+    { name: '본명조 (Noto Serif KR)', family: "'Noto Serif KR', serif" },
+    { name: '나눔손글씨 붓 (Nanum Brush)', family: "'Nanum Brush Script', cursive" },
+    { name: '연성 (Yeon Sung)', family: "'Yeon Sung', cursive" },
+    { name: '송명 (Song Myung)', family: "'Song Myung', serif" },
+    { name: '푸어스토리 (Poor Story)', family: "'Poor Story', cursive" },
+    { name: '함렛 (Hahmlet)', family: "'Hahmlet', serif" }
 ];
 
 var systemFonts = [];

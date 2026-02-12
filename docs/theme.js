@@ -14,7 +14,6 @@ function initTheme() {
 
 function toggleTheme() {
     // Check if we have a custom background active and clear it
-    // This allows the manual toggle to restore "Original" dark/light mode behavior
     const hasCustomBg = document.body.className.split(' ').some(c => c.startsWith('bg-'));
     if (hasCustomBg) {
         // Remove all bg- classes
@@ -96,7 +95,6 @@ function renderThemeGrid(gridId, themes) {
     themes.forEach(theme => {
         const btn = document.createElement('div');
         btn.className = 'theme-option';
-        // btn.dataset.themeClass = theme.class; // Not strictly needed if we use closure
         btn.style.background = theme.color;
         btn.title = theme.name;
 
