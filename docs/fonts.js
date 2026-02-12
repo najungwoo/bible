@@ -1,6 +1,7 @@
 var defaultFonts = [
     { name: '기본 (Noto Sans KR)', family: "'Noto Sans KR', sans-serif" },
     { name: '나눔고딕 (Nanum Gothic)', family: "'Nanum Gothic', sans-serif" },
+    { name: '고딕 A1 (Gothic A1)', family: "'Gothic A1', sans-serif" },
     { name: '나눔명조 (Nanum Myeongjo)', family: "'Nanum Myeongjo', serif" },
     { name: '고운돋움 (Gowun Dodum)', family: "'Gowun Dodum', sans-serif" },
     { name: '고운바탕 (Gowun Batang)', family: "'Gowun Batang', serif" },
@@ -19,7 +20,6 @@ var defaultFonts = [
     { name: '송명 (Song Myung)', family: "'Song Myung', serif" },
     { name: '푸어스토리 (Poor Story)', family: "'Poor Story', cursive" },
     { name: '함렛 (Hahmlet)', family: "'Hahmlet', serif" },
-    { name: '고딕 A1 (Gothic A1)', family: "'Gothic A1', sans-serif" },
     { name: '싱글데이 (Single Day)', family: "'Single Day', cursive" },
     { name: '스타일리시 (Stylish)', family: "'Stylish', sans-serif" },
     { name: '독도체 (Dokdo)', family: "'Dokdo', cursive" },
@@ -132,10 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnLoadSystemFonts) {
         btnLoadSystemFonts.addEventListener('click', async () => {
-            // Assuming customAlert is globally available from script.js (but script.js loads AFTER fonts.js?)
-            // Wait, if fonts.js loads BEFORE script.js, then customAlert is NOT yet defined when this listener is ATTACHED.
-            // BUT, the listener executes ON CLICK, which is much later, so customAlert WILL be defined by then.
-            // So this is safe.
 
             try {
                 if (!window.queryLocalFonts) {

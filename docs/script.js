@@ -1,5 +1,3 @@
-
-
 // State
 // --- State Variables (상태 변수들) ---
 var originalScriptures = []; // 전체 구절 데이타 (배열의 배열)
@@ -38,12 +36,7 @@ const btnSkip = document.getElementById('btnSkip');
 const btnWrong = document.getElementById('btnWrong');
 const modeBtns = document.querySelectorAll('.btn-mode')
 
-
-
 let tempVerses = [];
-
-
-
 
 
 // 데이터 초기화 (앱 시작 시 호출)

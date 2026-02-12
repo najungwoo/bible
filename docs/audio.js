@@ -1,4 +1,3 @@
-
 // State for Audio
 let isSpeaking = false;
 let repeatMode = 1; // 1, 3, 5, -1 (Infinite)
