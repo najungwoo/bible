@@ -18,7 +18,12 @@ var defaultFonts = [
     { name: '연성 (Yeon Sung)', family: "'Yeon Sung', cursive" },
     { name: '송명 (Song Myung)', family: "'Song Myung', serif" },
     { name: '푸어스토리 (Poor Story)', family: "'Poor Story', cursive" },
-    { name: '함렛 (Hahmlet)', family: "'Hahmlet', serif" }
+    { name: '함렛 (Hahmlet)', family: "'Hahmlet', serif" },
+    { name: '고딕 A1 (Gothic A1)', family: "'Gothic A1', sans-serif" },
+    { name: '싱글데이 (Single Day)', family: "'Single Day', cursive" },
+    { name: '스타일리시 (Stylish)', family: "'Stylish', sans-serif" },
+    { name: '독도체 (Dokdo)', family: "'Dokdo', cursive" },
+    { name: '기랑해랑 (Kirang Haerang)', family: "'Kirang Haerang', display" }
 ];
 
 var systemFonts = [];
