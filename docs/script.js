@@ -1,4 +1,4 @@
-// Constants & Regex moved to utils.js
+
 
 // State
 // --- State Variables (상태 변수들) ---
@@ -9,7 +9,7 @@ var currentDayIndex = -1;
 var currentMode = 1; // 1: Blank, 2: Verse, 3: Ref, 4: Whole
 var blankNum = 5; // 50%
 var wholeLevelNum = 1;
-// fontSize moved to fonts.js
+
 
 var currentProblem = "";
 var currentAnswers = [];
@@ -36,17 +36,15 @@ const btnReset = document.getElementById('btnReset');
 const btnHint = document.getElementById('btnHint');
 const btnSkip = document.getElementById('btnSkip');
 const btnWrong = document.getElementById('btnWrong');
-const modeBtns = document.querySelectorAll('.btn-mode');
+const modeBtns = document.querySelectorAll('.btn-mode')
 
 
-
-// Editor logic removed
 
 let tempVerses = [];
-// Helper functions moved to utils.js
 
 
-// File Load Logic removed
+
+
 
 // 데이터 초기화 (앱 시작 시 호출)
 function initData() {
@@ -70,8 +68,6 @@ function initData() {
     }
 }
 
-// Initialize
-// Initialize
 initData();
 
 // 특정 일차 선택 (Dropdown 변경 시)
@@ -651,7 +647,7 @@ btnReset.addEventListener('click', () => {
     });
 });
 
-// Theme Logic moved to theme.js
+
 
 // Fullscreen Logic
 const btnFullscreen = document.getElementById('btnFullscreen');
@@ -679,7 +675,7 @@ if (btnFullscreen) {
 }
 
 // --- Settings Popups Logic ---
-// btnSettingBlank and btnSettingWhole declarations removed
+
 const blankSettingsModal = document.getElementById('blankSettingsModal');
 const wholeSettingsModal = document.getElementById('wholeSettingsModal');
 const closeBlankSettings = document.getElementById('closeBlankSettings');
@@ -706,15 +702,15 @@ function updateWholeGridActive() {
 }
 
 // Handlers
-// btnSettingBlank removed - logic moved to modeBtns click handler
+
 
 if (closeBlankSettings) {
     closeBlankSettings.addEventListener('click', () => blankSettingsModal.style.display = 'none');
 }
 
-// Font Settings Logic moved to fonts.js
 
-// btnSettingWhole removed - logic moved to modeBtns click handler
+
+
 if (closeWholeSettings) {
     closeWholeSettings.addEventListener('click', () => wholeSettingsModal.style.display = 'none');
 }
@@ -770,7 +766,7 @@ function reloadCurrentProblem() {
     updateStatus(); // score doesn't change
 }
 
-// Background Theme Logic moved to theme.js
+
 // --- Dropdown Logic ---
 const levelDropdownItems = document.querySelectorAll('#levelDropContent .dropdown-item');
 const levelDropBtn = document.getElementById('levelDropBtn');
@@ -835,60 +831,4 @@ function updateDayDropdown() {
     });
 }
 
-// --- Generic Modal Logic ---
-const genericAlertModal = document.getElementById('genericAlertModal');
-const genericAlertMessage = document.getElementById('genericAlertMessage');
-const btnGenericAlertClose = document.getElementById('btnGenericAlertClose');
 
-const genericConfirmModal = document.getElementById('genericConfirmModal');
-const genericConfirmMessage = document.getElementById('genericConfirmMessage');
-const btnGenericConfirmCancel = document.getElementById('btnGenericConfirmCancel');
-const btnGenericConfirmOk = document.getElementById('btnGenericConfirmOk');
-
-let onConfirmCallback = null;
-
-function customAlert(msg) {
-    if (!genericAlertModal) {
-        alert(msg);
-        return;
-    }
-    genericAlertMessage.textContent = msg;
-    genericAlertModal.style.display = 'flex';
-}
-
-if (btnGenericAlertClose) {
-    btnGenericAlertClose.addEventListener('click', () => {
-        genericAlertModal.style.display = 'none';
-    });
-}
-
-function customConfirm(msg, callback) {
-    if (!genericConfirmModal) {
-        if (confirm(msg)) callback();
-        return;
-    }
-    genericConfirmMessage.textContent = msg;
-    onConfirmCallback = callback;
-    genericConfirmModal.style.display = 'flex';
-}
-
-if (btnGenericConfirmCancel) {
-    btnGenericConfirmCancel.addEventListener('click', () => {
-        genericConfirmModal.style.display = 'none';
-        onConfirmCallback = null;
-    });
-}
-
-if (btnGenericConfirmOk) {
-    btnGenericConfirmOk.addEventListener('click', () => {
-        if (onConfirmCallback) onConfirmCallback();
-        genericConfirmModal.style.display = 'none';
-        onConfirmCallback = null;
-    });
-}
-
-// Close generic modals on outside click
-window.addEventListener('click', (e) => {
-    if (e.target === genericAlertModal) genericAlertModal.style.display = 'none';
-    if (e.target === genericConfirmModal) genericConfirmModal.style.display = 'none';
-});

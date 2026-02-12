@@ -175,9 +175,14 @@ function speakCurrentVerse(remaining) {
             return res + unit;
         };
 
-        spokenReference = spokenReference.replace(/:/g, '장 ');
-        spokenReference = spokenReference.replace(/-/g, '에서 ');
-        spokenReference += '절';
+        // Use parseRefParts from utils.js
+        const [book, chap, verse] = parseRefParts(spokenReference);
+
+        // e.g. "요 3장 16에서 17절"
+        // Replace hyphen with '에서 ' for ranges (e.g. 16-17 -> 16에서 17)
+        let versePart = verse.replace(/-/g, '에서 ');
+
+        spokenReference = `${book} ${chap}장 ${versePart}절`;
 
         spokenReference = spokenReference.replace(/(\d+)(장|절)/g, numToText);
         spokenReference = spokenReference.replace(/(\d+)에서/g, (m, n) => numToText(m, n, "에서"));
