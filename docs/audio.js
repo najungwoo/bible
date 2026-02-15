@@ -78,6 +78,10 @@ function initAudio() {
 
 function populateVoices() {
     if (!voiceSelect) return;
+
+    // Ensure visibility
+    voiceSelect.style.display = 'inline-block';
+
     voiceSelect.innerHTML = "";
     const voices = window.speechSynthesis.getVoices();
     const koVoices = voices.filter(v => v.lang.includes('ko'));
