@@ -227,12 +227,10 @@ function createProblem(line, mode) {
         // Reference is Visible (false for masked) -> NOW MASKED (true)
         const refView = refMasked(reference, true);
 
-        // Answers: Only the hidden words (Skip reference input)
-        // [New Logic] In Whole Mode, we also want to answer the reference parts
         let [book, chap, versePart] = parseRefParts(reference);
         let [_, verseParts] = splitVerseParts(versePart);
 
-        const answers = [book, chap, ...verseParts]; // Start with reference parts
+        const answers = [book, chap, ...verseParts];
 
         hiddenWords.forEach(w => {
             if (WORD_TOKEN_RE.test(w)) {
@@ -385,7 +383,6 @@ function replaceInContainer(container, answer, correct) {
                     const nextText = children[i + 1].textContent;
                     if (nextText.match(/^_+/)) {
                         i++; // Skip the underscore node
-                        // Add any text after the underscores
                         const afterUnderscores = nextText.replace(/^_+/, '');
                         if (afterUnderscores) {
                             newContent.appendChild(document.createTextNode(afterUnderscores));
@@ -452,7 +449,6 @@ answerInput.addEventListener('blur', () => {
     }
 });
 
-// Mode Button Logic
 // Mode Button Logic
 modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {

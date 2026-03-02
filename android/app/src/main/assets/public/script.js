@@ -24,7 +24,6 @@ let wrongVerses = [];
 let hintCount = 0;
 let score = 0;
 let isSpeaking = false; // Moved to top
-console.log('hintCount initialized:', hintCount);
 
 // DOM Elements
 const fileInput = document.getElementById('fileInput');
@@ -51,16 +50,9 @@ const modeBtns = document.querySelectorAll('.btn-mode');
 const modalVoiceHelp = document.getElementById('voiceHelpModal');
 const btnCloseVoiceHelp = document.getElementById('btnCloseVoiceHelp');
 
-// Paste Modal Elements
-// Paste Modal Elements (Removed)
-// const btnPaste = document.getElementById('btnPaste');
 const btnDelete = document.getElementById('btnDelete');
-// const pasteModal = document.getElementById('pasteModal');
-// const closePasteModal = document.querySelector('.close');
-// const btnSavePaste = document.getElementById('btnSavePaste');
 
 // Easy Input Elements
-// const pasteTitle = document.getElementById('pasteTitle');
 const inputRef = document.getElementById('inputRef');
 const inputVerse = document.getElementById('inputVerse');
 const inputLevel = document.getElementById('inputLevel');
@@ -77,7 +69,6 @@ const deleteDayMessage = document.getElementById('deleteDayMessage');
 const btnCancelDeleteDay = document.getElementById('btnCancelDeleteDay');
 const btnConfirmDeleteDay = document.getElementById('btnConfirmDeleteDay');
 const closeDeleteDay = document.getElementById('closeDeleteDay');
-// const verseList = document.getElementById('verseList');
 
 let tempVerses = []; // Store verses temporarily before saving
 
@@ -272,12 +263,7 @@ function dayReset() {
         if (selectedLevel === "all") {
             currentScripture = [...allVerses];
         } else {
-            // Cumulative filtering: 1 to maxLevel
             const maxLevel = parseInt(selectedLevel, 10);
-            // Regex to match levels 1 to maxLevel followed by backslash and open paren
-            // Data format: "1\(..."
-            // We need to match digit + backslash + (
-            // In JS string, \\\\ becomes \\ in regex, which matches literal \
             const levelRegex = new RegExp(`^[1-${maxLevel}]\\\\\\(`);
             currentScripture = allVerses.filter(line => levelRegex.test(line));
         }
@@ -341,15 +327,12 @@ function renderProblem(refText, verseText) {
     verseDiv.appendChild(document.createTextNode(verseText));
     problemArea.appendChild(verseDiv);
 
-    // problemArea.textContent = text; // OLD
     problemArea.style.fontSize = fontSize + 'px';
 }
 
 function createProblem(line, mode) {
-    // Handle Level prefix: "1\(Ref)^Text"
-    // Remove level prefix if exists for display
+
     let cleanLine = line;
-    // Regex to match "Number\" at start
     const levelMatch = line.match(/^(\d+)\\/);
     if (levelMatch) {
         cleanLine = line.substring(levelMatch[0].length);
@@ -410,8 +393,6 @@ function createProblem(line, mode) {
         // Reference is Visible (false for masked) -> NOW MASKED (true)
         const refView = refMasked(reference, true);
 
-        // Answers: Only the hidden words (Skip reference input)
-        // [New Logic] In Whole Mode, we also want to answer the reference parts
         let [book, chap, versePart] = parseRefParts(reference);
         let [_, verseParts] = splitVerseParts(versePart);
 
@@ -1023,7 +1004,6 @@ function updateDaySelect() {
 }
 
 // Delete Day Logic
-// Delete Day Logic
 btnDelete.addEventListener('click', () => {
     if (currentDayIndex === -1) {
         alert("삭제할 일차를 선택해주세요.");
@@ -1204,20 +1184,6 @@ if (blankRatioGrid) {
             blankNum = ratio / 10;
             blankSettingsModal.style.display = 'none';
             if (currentMode === 1) {
-                // Determine if we need to reshuffle? displayProblem picks new random if we don't fix seed.
-                // Actually displayProblem picks NEW problem line? No.
-                // displayProblem:
-                // problemNum = Math.floor(Math.random()...) -> Yes it picks NEW line.
-                // If user just wants to adjust difficulty of SAME line?
-                // renderProblem is pure render. createProblem creates mask.
-                // If I call displayProblem(), it jumps to another verse.
-                // User might find this annoying.
-                // Ideally: recalculate mask for CURRENT line.
-                // Line 503: const line = currentScripture[problemNum];
-                // So I can reuse problemNum.
-                // But displayProblem() picks new num.
-                // Refactor displayProblem to accept optional index?
-                // Or just call createProblem again?
                 reloadCurrentProblem();
             }
         }
@@ -1479,8 +1445,6 @@ levelDropdownItems.forEach(item => {
         levelSelect.dispatchEvent(new Event('change'));
     });
 });
-
-// Removed dayDropBtn/dayDropContent from here (moved to top)
 
 // Removed dayDropBtn/dayDropContent from here (moved to top)
 
