@@ -66,11 +66,15 @@ function splitVerseParts(verse) {
 }
 
 // 장절 표시 포맷팅 (masked가 true이면 장절 숫자를 숨김)
-function refMasked(ref, masked) {
+function refMasked(ref, masked, showVerse = false) {
     let [book, chap, verse] = parseRefParts(ref);
     if (!masked) {
         return `(${book} ${chap}:${verse})`;
     }
-    let [verseMask, _] = splitVerseParts(verse);
-    return `(_ _:${verseMask})`;
+    if (showVerse) {
+        return `(_ _:${verse})`;
+    } else {
+        let [verseMask, _] = splitVerseParts(verse);
+        return `(_ _:${verseMask})`;
+    }
 }

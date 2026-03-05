@@ -207,8 +207,8 @@ function createProblem(line, mode) {
     else if (mode === 3) { // Reference Mode
         let [book, chap, versePart] = parseRefParts(reference);
         let [_, verseParts] = splitVerseParts(versePart);
-        const refView = refMasked(reference, true);
-        const answers = [book, chap, ...verseParts];
+        const refView = refMasked(reference, true, true);
+        const answers = [book, chap];
         return [refView, words.join(" "), answers, reference];
     }
     else if (mode === 4) { // Whole Mode
@@ -224,13 +224,13 @@ function createProblem(line, mode) {
             ...hiddenWords.map(w => WORD_TOKEN_RE.test(w) ? maskOneKeepPunct(w) : w)
         ];
 
-        // Reference is Visible (false for masked) -> NOW MASKED (true)
-        const refView = refMasked(reference, true);
+        // Reference is Visible (false for masked) -> NOW MASKED (true), showVerse (true)
+        const refView = refMasked(reference, true, true);
 
         let [book, chap, versePart] = parseRefParts(reference);
         let [_, verseParts] = splitVerseParts(versePart);
 
-        const answers = [book, chap, ...verseParts];
+        const answers = [book, chap];
 
         hiddenWords.forEach(w => {
             if (WORD_TOKEN_RE.test(w)) {
