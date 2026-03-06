@@ -19,6 +19,45 @@ function maskOneKeepPunct(tok) {
     return tok.replace(/[0-9A-Za-z가-힣]+/g, '_');
 }
 
+// 한글 초성 추출
+const CHOSUNG_LIST = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+function getChosung(text) {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        const code = text.charCodeAt(i);
+        // 한글 가(0xAC00) ~ 힣(0xD7A3)
+        if (code >= 0xAC00 && code <= 0xD7A3) {
+            result += CHOSUNG_LIST[Math.floor((code - 0xAC00) / 588)];
+        } else {
+            result += text.charAt(i); // 한글이 아니면(영어, 숫자 등) 그대로
+        }
+    }
+    return result;
+}
+
+// 단어를 초성으로 마스킹 (기호 유지)
+function maskWithChosung(tok) {
+    return tok.replace(/[0-9A-Za-z가-힣]+/g, (m) => getChosung(m));
+}
+
+// --- Mode 5 (Chosung Mode) Helper Functions ---
+function findChosungMatch(text, answer) {
+    const targetChosung = getChosung(answer);
+    const idx = text.indexOf(targetChosung);
+    if (idx !== -1) {
+        const match = [targetChosung];
+        match.index = idx;
+        return match;
+    }
+    return null;
+}
+
+// Helper for reference mode underscore mask remaining
+function getRemainingUnderscoresMask(answer, hintLength) {
+    const remaining = Math.max(0, answer.length - hintLength);
+    return '_'.repeat(remaining);
+}
+
 // 성경 장절 파싱 (예: "(요 3:16)" -> ["요", "3", "16"])
 function parseRefParts(ref) {
     let s = ref.trim();
@@ -77,4 +116,10 @@ function refMasked(ref, masked, showVerse = false) {
         let [verseMask, _] = splitVerseParts(verse);
         return `(_ _:${verseMask})`;
     }
+}
+// Mode 5 (Chosung Mode) Helper to get remaining mask after partial hint
+function getRemainingChosungMask(answer, hintLength) {
+    const fullChosung = getChosung(answer);
+    if (hintLength >= fullChosung.length) return "";
+    return fullChosung.substring(hintLength);
 }

@@ -241,6 +241,24 @@ function createProblem(line, mode) {
 
         return [refView, problemWords.join(" "), answers, reference];
     }
+    else if (mode === 5) { // Chosung Mode
+        // Problem words: All words masked with Chosung
+        const problemWords = words.map(w => WORD_TOKEN_RE.test(w) ? maskWithChosung(w) : w);
+        const refView = refMasked(reference, true, true);
+
+        let [book, chap, versePart] = parseRefParts(reference);
+        let [_, verseParts] = splitVerseParts(versePart);
+
+        const answers = [book, chap];
+
+        words.forEach(w => {
+            if (WORD_TOKEN_RE.test(w)) {
+                answers.push(normToken(w));
+            }
+        });
+
+        return [refView, problemWords.join(" "), answers, reference];
+    }
 
     return ["", "", [], ""];
 }
@@ -318,17 +336,17 @@ function replaceBlankWithAnswer(answer, correct) {
     // 1. Try Reference Block Reference
     const refContainer = problemArea.querySelector('.reference-block');
     if (refContainer) {
-        if (replaceInContainer(refContainer, answer, correct)) return;
+        if (replaceInContainer(refContainer, answer, correct, true)) return;
     }
 
     // 2. Try Verse Content
     const verseContainer = problemArea.querySelector('.verse-content');
     if (verseContainer) {
-        if (replaceInContainer(verseContainer, answer, correct)) return;
+        if (replaceInContainer(verseContainer, answer, correct, false)) return;
     }
 }
 
-function replaceInContainer(container, answer, correct) {
+function replaceInContainer(container, answer, correct, isReference) {
     const children = Array.from(container.childNodes);
     let foundBlank = false;
 
@@ -339,13 +357,19 @@ function replaceInContainer(container, answer, correct) {
         const node = children[i];
 
         if (!foundBlank) {
-            // Check if this is a text node with underscores
+            // Check if this is a text node
             if (node.nodeType === Node.TEXT_NODE) {
                 const text = node.textContent;
-                const match = text.match(/(_+)/);
+                let match = null;
+
+                if (currentMode === 5 && !isReference) {
+                    match = findChosungMatch(text, answer);
+                } else {
+                    match = text.match(/(_+)/);
+                }
 
                 if (match) {
-                    const blankIndex = text.indexOf(match[0]);
+                    const blankIndex = match.index !== undefined ? match.index : text.indexOf(match[0]);
                     const beforeBlank = text.substring(0, blankIndex);
                     const afterBlank = text.substring(blankIndex + match[0].length);
 
@@ -378,15 +402,35 @@ function replaceInContainer(container, answer, correct) {
                 newContent.appendChild(answerSpan);
                 foundBlank = true;
 
-                // Skip any underscores immediately after the hint
+                // Skip any target mask immediately after the hint (underscores or chosung)
                 if (i + 1 < children.length && children[i + 1].nodeType === Node.TEXT_NODE) {
                     const nextText = children[i + 1].textContent;
-                    if (nextText.match(/^_+/)) {
-                        i++; // Skip the underscore node
-                        const afterUnderscores = nextText.replace(/^_+/, '');
-                        if (afterUnderscores) {
-                            newContent.appendChild(document.createTextNode(afterUnderscores));
+                    let afterTarget = nextText;
+                    if (currentMode === 5 && !isReference) {
+                        const hintLength = node.textContent.length;
+                        const remainingMask = getRemainingChosungMask(answer, hintLength);
+                        if (nextText.startsWith(remainingMask)) {
+                            i++;
+                            afterTarget = nextText.substring(remainingMask.length);
                         }
+                    } else if (isReference || currentMode === 3) {
+                        const hintLength = node.textContent.length;
+                        const remainingMask = getRemainingUnderscoresMask(answer, hintLength);
+                        if (nextText.startsWith(remainingMask)) {
+                            i++;
+                            afterTarget = nextText.substring(remainingMask.length);
+                        } else if (nextText.match(/^_+/)) {
+                            i++;
+                            afterTarget = nextText.replace(/^_+/, '');
+                        }
+                    } else {
+                        if (nextText.match(/^_+/)) {
+                            i++; // Skip the underscore node (or modified node)
+                            afterTarget = nextText.replace(/^_+/, '');
+                        }
+                    }
+                    if (afterTarget) {
+                        newContent.appendChild(document.createTextNode(afterTarget));
                     }
                 }
                 continue;
@@ -466,7 +510,7 @@ modeBtns.forEach(btn => {
         if (clickedMode === 1) { // Blank Mode
             updateBlankGridActive();
             blankSettingsModal.style.display = 'flex';
-        } else if (clickedMode === 4) { // Whole Mode
+        } else if (clickedMode === 4) { // Whole Mode ONLY
             updateWholeGridActive();
             wholeSettingsModal.style.display = 'flex';
         }
@@ -480,9 +524,12 @@ btnHint.addEventListener('click', () => {
     const answer = currentAnswers[0];
     let hintPart = '';
 
+    // Determine hint portion based on how many hints have been used for this answer
     if (hintCount === 0) {
+        // First hint: reveal first character
         hintPart = answer.charAt(0);
     } else if (hintCount === 1) {
+        // Second hint: reveal half or full if short
         if (answer.length <= 2) {
             hintPart = answer;
         } else {
@@ -490,18 +537,32 @@ btnHint.addEventListener('click', () => {
             hintPart = answer.substring(0, half);
         }
     } else {
+        // Third or later hint: reveal full answer
         hintPart = answer;
     }
 
     hintCount++;
     score -= 2;
-    attempts++; // Deduct attempt (increase attempt count)
+    attempts++; // count as an attempt
     updateStatus();
 
     answerInput.placeholder = `힌트: ${hintPart}...`;
     answerInput.focus();
 
+    // Apply the hint visually
     applyHintToDisplay(hintPart, answer);
+
+    // In Reference mode (mode 3) we treat the hint as completing the current blank
+    // after the second hint (full answer) to move to the next part (e.g., chapter).
+    if (currentMode === 3 && hintCount >= 2) {
+        // Consider the current answer as revealed
+        currentAnswers.shift();
+        hintCount = 0; // reset for the next blank
+        // If no more blanks remain, mark problem as completed
+        if (currentAnswers.length === 0) {
+            problemCompleted = true;
+        }
+    }
 });
 
 // 힌트 적용 로직 (현재 빈칸에 힌트 텍스트 표시)
@@ -509,17 +570,17 @@ function applyHintToDisplay(hintPart, fullAnswer) {
     // 1. Try Reference Block
     const refContainer = problemArea.querySelector('.reference-block');
     if (refContainer) {
-        if (applyHintToContainer(refContainer, hintPart, fullAnswer)) return;
+        if (applyHintToContainer(refContainer, hintPart, fullAnswer, true)) return;
     }
 
     // 2. Try Verse Content
     const verseContainer = problemArea.querySelector('.verse-content');
     if (verseContainer) {
-        applyHintToContainer(verseContainer, hintPart, fullAnswer);
+        applyHintToContainer(verseContainer, hintPart, fullAnswer, false);
     }
 }
 
-function applyHintToContainer(container, hintPart, fullAnswer) {
+function applyHintToContainer(container, hintPart, fullAnswer, isReference) {
     const children = Array.from(container.childNodes);
     let foundBlank = false;
     const newContent = document.createDocumentFragment();
@@ -528,27 +589,33 @@ function applyHintToContainer(container, hintPart, fullAnswer) {
         const node = children[i];
 
         if (!foundBlank) {
-            // 1. Check for existing hint span to update
-            if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hint-text')) {
-                const hintSpan = document.createElement('span');
-                hintSpan.className = 'hint-text';
-
-                const remainingUnderscores = '_'.repeat(Math.max(0, fullAnswer.length - hintPart.length));
-                hintSpan.textContent = hintPart + remainingUnderscores;
-
-                newContent.appendChild(hintSpan);
-                foundBlank = true;
-                continue;
-            }
-
-            // 2. Check for text node with underscores
             if (node.nodeType === Node.TEXT_NODE) {
                 const text = node.textContent;
-                const match = text.match(/(_+)/);
+                let match = null;
+
+                if (currentMode === 5 && !isReference) {
+                    match = findChosungMatch(text, fullAnswer);
+                } else {
+                    match = text.match(/(_+)/);
+                }
 
                 if (match) {
-                    const blankIndex = text.indexOf(match[0]);
+                    const blankIndex = match.index !== undefined ? match.index : text.indexOf(match[0]);
                     const beforeBlank = text.substring(0, blankIndex);
+
+                    // The original mask (e.g. ____ or ㅌㅊㅇ)
+                    const originalMask = match[0];
+                    let remainingMask = "";
+                    if (currentMode === 5 && !isReference) {
+                        remainingMask = getRemainingChosungMask(fullAnswer, hintPart.length);
+                    } else if (isReference || currentMode === 3) {
+                        // Reference mode or Reference block: use underscore mask based on hint length
+                        remainingMask = getRemainingUnderscoresMask(fullAnswer, hintPart.length);
+                    } else {
+                        remainingMask = originalMask.substring(Math.min(hintPart.length, originalMask.length));
+                    }
+
+                    const afterBlankText = text.substring(blankIndex + originalMask.length);
 
                     if (beforeBlank) {
                         newContent.appendChild(document.createTextNode(beforeBlank));
@@ -556,20 +623,93 @@ function applyHintToContainer(container, hintPart, fullAnswer) {
 
                     const hintSpan = document.createElement('span');
                     hintSpan.className = 'hint-text';
-
-                    const remainingUnderscores = '_'.repeat(Math.max(0, fullAnswer.length - hintPart.length));
-                    hintSpan.textContent = hintPart + remainingUnderscores;
-
+                    hintSpan.textContent = hintPart;
                     newContent.appendChild(hintSpan);
 
-                    const afterBlank = text.substring(blankIndex + match[0].length);
-                    if (afterBlank) {
-                        newContent.appendChild(document.createTextNode(afterBlank));
+                    if (remainingMask) {
+                        newContent.appendChild(document.createTextNode(remainingMask));
+                    }
+
+                    if (afterBlankText) {
+                        newContent.appendChild(document.createTextNode(afterBlankText));
                     }
 
                     foundBlank = true;
                     continue;
                 }
+            } else if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hint-text')) {
+                // Update existing hint
+                const oldHintLength = node.textContent.length;
+                node.textContent = hintPart;
+                newContent.appendChild(node.cloneNode(true));
+                foundBlank = true;
+
+                // Update the remaining mask length
+                if (i + 1 < children.length && children[i + 1].nodeType === Node.TEXT_NODE) {
+                    const nextText = children[i + 1].textContent;
+                    let afterTarget = nextText;
+                    let remainingMask = "";
+                    if (currentMode === 5 && !isReference) {
+                        remainingMask = getRemainingChosungMask(fullAnswer, hintPart.length);
+                        const oldRemainingMask = getRemainingChosungMask(fullAnswer, oldHintLength);
+
+                        if (nextText.startsWith(oldRemainingMask)) {
+                            i++;
+                            afterTarget = nextText.substring(oldRemainingMask.length);
+                        } else if (nextText === oldRemainingMask) {
+                            i++;
+                            afterTarget = "";
+                        }
+
+                        if (remainingMask) {
+                            newContent.appendChild(document.createTextNode(remainingMask));
+                        }
+                        if (afterTarget) {
+                            newContent.appendChild(document.createTextNode(afterTarget));
+                        }
+                    } else if (isReference || currentMode === 3) {
+                        remainingMask = getRemainingUnderscoresMask(fullAnswer, hintPart.length);
+                        const oldRemainingMask = getRemainingUnderscoresMask(fullAnswer, oldHintLength);
+
+                        if (nextText.startsWith(oldRemainingMask)) {
+                            i++;
+                            afterTarget = nextText.substring(oldRemainingMask.length);
+                        } else if (nextText === oldRemainingMask) {
+                            i++;
+                            afterTarget = "";
+                        } else if (nextText.match(/^_+/)) {
+                            // fallback for underscores
+                            i++;
+                            afterTarget = nextText.replace(/^_+/, '');
+                        }
+
+                        if (remainingMask) {
+                            newContent.appendChild(document.createTextNode(remainingMask));
+                        }
+                        if (afterTarget) {
+                            newContent.appendChild(document.createTextNode(afterTarget));
+                        }
+                    } else {
+                        if (nextText.match(/^_+/)) {
+                            i++;
+                            const currentUnderscores = nextText.match(/^_+/)[0];
+                            const afterUnderscores = nextText.replace(/^_+/, '');
+                            const newUnderscoresLength = Math.max(0, currentUnderscores.length - (hintPart.length - oldHintLength));
+
+                            if (newUnderscoresLength > 0) {
+                                newContent.appendChild(document.createTextNode('_'.repeat(newUnderscoresLength)));
+                            }
+                            if (afterUnderscores) {
+                                newContent.appendChild(document.createTextNode(afterUnderscores));
+                            }
+                        } else {
+                            if (afterTarget) {
+                                newContent.appendChild(document.createTextNode(afterTarget));
+                            }
+                        }
+                    }
+                }
+                continue;
             }
         }
 
@@ -663,6 +803,14 @@ if (btnFullscreen) {
     });
 }
 
+function ensureFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {
+            // Silently fail if blocked by browser policy
+        });
+    }
+}
+
 // --- Settings Popups Logic ---
 
 const blankSettingsModal = document.getElementById('blankSettingsModal');
@@ -729,10 +877,12 @@ if (wholeLevelGrid) {
     wholeLevelGrid.addEventListener('click', (e) => {
         if (e.target.classList.contains('btn-option')) {
             const words = parseInt(e.target.dataset.words);
-            wholeLevelNum = words;
-            wholeSettingsModal.style.display = 'none';
-            if (currentMode === 4) {
-                reloadCurrentProblem();
+            if (words) {
+                wholeLevelNum = words;
+                wholeSettingsModal.style.display = 'none';
+                if (currentMode === 4 || currentMode === 5) {
+                    reloadCurrentProblem();
+                }
             }
         }
     });
