@@ -219,7 +219,7 @@ btnReset.addEventListener('click', () => {
 
 
 // Fullscreen Logic
-const btnFullscreen = document.getElementById('btnFullscreen');
+// Fullscreen Logic
 if (btnFullscreen) {
     btnFullscreen.addEventListener('click', () => {
         const docElm = document.documentElement;
@@ -270,12 +270,7 @@ function ensureFullscreen() {
 
 // --- Settings Popups Logic ---
 
-const blankSettingsModal = document.getElementById('blankSettingsModal');
-const wholeSettingsModal = document.getElementById('wholeSettingsModal');
-const closeBlankSettings = document.getElementById('closeBlankSettings');
-const closeWholeSettings = document.getElementById('closeWholeSettings');
-const blankRatioGrid = document.getElementById('blankRatioGrid');
-const wholeLevelGrid = document.getElementById('wholeLevelGrid');
+// --- Settings Popups Logic ---
 
 // Active State Updaters
 function updateBlankGridActive() {
@@ -364,8 +359,7 @@ function reloadCurrentProblem() {
 
 
 // --- Dropdown Logic ---
-const levelDropdownItems = document.querySelectorAll('#levelDropContent .dropdown-item');
-const levelDropBtn = document.getElementById('levelDropBtn');
+// --- Dropdown Logic ---
 
 levelDropdownItems.forEach(item => {
     item.addEventListener('click', (e) => {

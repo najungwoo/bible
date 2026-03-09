@@ -273,7 +273,7 @@ function createProblem(line, mode) {
     return ["", "", [], ""];
 }
 
-let autoAdvanceTimer = null;
+
 
 // 정답 제출 처리 (Enter 키 또는 입력 시)
 function submitAnswer() {
