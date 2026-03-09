@@ -164,6 +164,40 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// 화면이 작아지거나 키보드가 올라올 때 정답 입력할 위치(빈칸)를 화면 중앙으로 스크롤합니다.
+function scrollToActiveBlank() {
+    setTimeout(() => {
+        const walker = document.createTreeWalker(problemArea, NodeFilter.SHOW_ALL, null, false);
+        let node;
+        let rect = null;
+
+        while ((node = walker.nextNode())) {
+            if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hint-text')) {
+                rect = node.getBoundingClientRect();
+                break;
+            } else if (node.nodeType === Node.TEXT_NODE && node.textContent.includes('_')) {
+                const matchIndex = node.textContent.indexOf('_');
+                const range = document.createRange();
+                range.setStart(node, matchIndex);
+                range.setEnd(node, matchIndex + 1);
+                rect = range.getBoundingClientRect();
+                break;
+            }
+        }
+
+        if (rect) {
+            const mainContainer = document.querySelector('.main-container');
+            if (mainContainer && rect.top !== 0) {
+                const containerRect = mainContainer.getBoundingClientRect();
+                const scrollTop = mainContainer.scrollTop + (rect.top - containerRect.top) - (containerRect.height / 2) + (rect.height / 2);
+                mainContainer.scrollTo({ top: scrollTop, behavior: 'smooth' });
+            }
+        }
+    }, 150);
+}
+
+answerInput.addEventListener('focus', scrollToActiveBlank);
+
 // 문제 화면 렌더링 (참조와 구절 텍스트 표시)
 function renderProblem(refText, verseText) {
     problemArea.innerHTML = '';
@@ -183,6 +217,9 @@ function renderProblem(refText, verseText) {
     problemArea.appendChild(verseDiv);
 
     problemArea.style.setProperty('--app-font-size', fontSize + 'px');
+
+    // Auto-scroll to first blank
+    scrollToActiveBlank();
 }
 
 // 문제 생성 로직 (현재 모드에 따라 빈칸 뚫기 등 처리)
@@ -354,17 +391,23 @@ function handleWrongAnswer() {
 
 // 정답을 맞췄을 때 빈칸을 실제 텍스트로 교체 (색상 표시 포함)
 function replaceBlankWithAnswer(answer, correct) {
+    let replaced = false;
     // 1. Try Reference Block Reference
     const refContainer = problemArea.querySelector('.reference-block');
     if (refContainer) {
-        if (replaceInContainer(refContainer, answer, correct, true)) return;
+        if (replaceInContainer(refContainer, answer, correct, true)) replaced = true;
     }
 
     // 2. Try Verse Content
-    const verseContainer = problemArea.querySelector('.verse-content');
-    if (verseContainer) {
-        if (replaceInContainer(verseContainer, answer, correct, false)) return;
+    if (!replaced) {
+        const verseContainer = problemArea.querySelector('.verse-content');
+        if (verseContainer) {
+            if (replaceInContainer(verseContainer, answer, correct, false)) replaced = true;
+        }
     }
+
+    // Automatically scroll to the next blank
+    scrollToActiveBlank();
 }
 
 function replaceInContainer(container, answer, correct, isReference) {

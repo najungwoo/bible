@@ -484,6 +484,7 @@ select option {
     max-width: 1100px;
     min-height: 400px;
     height: auto;
+    flex-shrink: 0;
     /* Allow growth */
     border-radius: 24px;
     box-shadow: var(--shadow-sm);
@@ -1290,7 +1291,8 @@ input[type=range] {
     .problem-card {
         margin: 10px auto;
         padding: 30px 15px;
-        font-size: 1.2rem;
+        /* Cap the font size on mobile to prevent overflow */
+        font-size: min(var(--app-font-size, 24px), 22px) !important;
         min-height: 30vh;
     }
 
