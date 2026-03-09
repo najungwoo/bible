@@ -80,47 +80,32 @@ function applyHintToContainer(container, hintPart, fullAnswer, isReference) {
                 // Update the remaining mask length
                 if (i + 1 < children.length && children[i + 1].nodeType === Node.TEXT_NODE) {
                     const nextText = children[i + 1].textContent;
-                    let afterTarget = nextText;
-                    let remainingMask = "";
+
                     if (currentMode === 5 && !isReference) {
-                        remainingMask = getRemainingChosungMask(fullAnswer, hintPart.length);
+                        const remainingMask = getRemainingChosungMask(fullAnswer, hintPart.length);
                         const oldRemainingMask = getRemainingChosungMask(fullAnswer, oldHintLength);
 
-                        if (nextText.startsWith(oldRemainingMask)) {
+                        if (oldRemainingMask !== "" && nextText.startsWith(oldRemainingMask)) {
                             i++;
-                            afterTarget = nextText.substring(oldRemainingMask.length);
-                        } else if (nextText === oldRemainingMask) {
-                            i++;
-                            afterTarget = "";
-                        }
-
-                        if (remainingMask) {
-                            newContent.appendChild(document.createTextNode(remainingMask));
-                        }
-                        if (afterTarget) {
-                            newContent.appendChild(document.createTextNode(afterTarget));
+                            const afterTarget = nextText.substring(oldRemainingMask.length);
+                            if (remainingMask) newContent.appendChild(document.createTextNode(remainingMask));
+                            if (afterTarget) newContent.appendChild(document.createTextNode(afterTarget));
                         }
                     } else if (isReference || currentMode === 3) {
-                        remainingMask = getRemainingUnderscoresMask(fullAnswer, hintPart.length);
+                        const remainingMask = getRemainingUnderscoresMask(fullAnswer, hintPart.length);
                         const oldRemainingMask = getRemainingUnderscoresMask(fullAnswer, oldHintLength);
 
-                        if (nextText.startsWith(oldRemainingMask)) {
+                        if (oldRemainingMask !== "" && nextText.startsWith(oldRemainingMask)) {
                             i++;
-                            afterTarget = nextText.substring(oldRemainingMask.length);
-                        } else if (nextText === oldRemainingMask) {
-                            i++;
-                            afterTarget = "";
+                            const afterTarget = nextText.substring(oldRemainingMask.length);
+                            if (remainingMask) newContent.appendChild(document.createTextNode(remainingMask));
+                            if (afterTarget) newContent.appendChild(document.createTextNode(afterTarget));
                         } else if (nextText.match(/^_+/)) {
                             // fallback for underscores
                             i++;
-                            afterTarget = nextText.replace(/^_+/, '');
-                        }
-
-                        if (remainingMask) {
-                            newContent.appendChild(document.createTextNode(remainingMask));
-                        }
-                        if (afterTarget) {
-                            newContent.appendChild(document.createTextNode(afterTarget));
+                            const afterTarget = nextText.replace(/^_+/, '');
+                            if (remainingMask) newContent.appendChild(document.createTextNode(remainingMask));
+                            if (afterTarget) newContent.appendChild(document.createTextNode(afterTarget));
                         }
                     } else {
                         if (nextText.match(/^_+/)) {
@@ -134,10 +119,6 @@ function applyHintToContainer(container, hintPart, fullAnswer, isReference) {
                             }
                             if (afterUnderscores) {
                                 newContent.appendChild(document.createTextNode(afterUnderscores));
-                            }
-                        } else {
-                            if (afterTarget) {
-                                newContent.appendChild(document.createTextNode(afterTarget));
                             }
                         }
                     }
