@@ -155,6 +155,15 @@ function displayProblem() {
     answerInput.focus();
 }
 
+// Keep focus on the input field when clicking anywhere else
+// (except when clicking buttons, selects, or modal overlays)
+document.addEventListener('click', (e) => {
+    const isInteractive = e.target.closest('button, select, .dropdown, .modal-content, input[type="range"], input[type="checkbox"]');
+    if (!isInteractive && !problemCompleted && currentScripture.length > 0) {
+        answerInput.focus();
+    }
+});
+
 // 문제 화면 렌더링 (참조와 구절 텍스트 표시)
 function renderProblem(refText, verseText) {
     problemArea.innerHTML = '';
@@ -860,30 +869,47 @@ btnReset.addEventListener('click', () => {
 const btnFullscreen = document.getElementById('btnFullscreen');
 if (btnFullscreen) {
     btnFullscreen.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch((e) => {
-                console.error(`Error attempting to enable full-screen mode: ${e.message} (${e.name})`);
-            });
+        const docElm = document.documentElement;
+        const reqFullscreen = docElm.requestFullscreen || docElm.webkitRequestFullScreen || docElm.msRequestFullscreen;
+        const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+
+        if (!isFullscreen) {
+            if (reqFullscreen) {
+                reqFullscreen.call(docElm).catch((e) => {
+                    console.error(`Error attempting to enable full-screen mode: ${e.message} (${e.name})`);
+                });
+            }
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
+            if (exitFullscreen) {
+                exitFullscreen.call(document);
             }
         }
     });
 
     // Update icon on state change
-    document.addEventListener('fullscreenchange', () => {
-        if (document.fullscreenElement) {
+    const updateFullscreenIcon = () => {
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+        if (isFullscreen) {
             btnFullscreen.textContent = '↙️';
         } else {
             btnFullscreen.textContent = '⛶';
         }
-    });
+    };
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+    document.addEventListener('msfullscreenchange', updateFullscreenIcon);
 }
 
 function ensureFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {
+    const docElm = document.documentElement;
+    const reqFullscreen = docElm.requestFullscreen || docElm.webkitRequestFullScreen || docElm.msRequestFullscreen;
+    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+
+    if (!isFullscreen && reqFullscreen) {
+        reqFullscreen.call(docElm).catch(() => {
             // Silently fail if blocked by browser policy
         });
     }

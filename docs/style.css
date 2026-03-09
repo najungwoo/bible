@@ -492,16 +492,15 @@ select option {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Center vertically if small */
     text-align: center;
     font-size: 1.8rem;
     line-height: 1.8;
-    word-break: keep-all;
+    word-break: break-word;
+    overflow-wrap: break-word;
     border: 1px solid var(--border);
     transition: box-shadow 0.3s;
     margin: 40px auto;
     font-size: var(--app-font-size, 24px);
-    /* Default 24px */
 }
 
 @media (max-width: 768px) {
@@ -1207,7 +1206,7 @@ input[type=range] {
    7. Responsive Design (Adaptive UI)
    ======================================== */
 
-/* Tablet & Small Desktop (Max 1024px) */
+/* Table & Small Desktop (Max 1024px) */
 @media (max-width: 1024px) {
     .app-layout {
         padding: 0 16px;
@@ -1251,56 +1250,103 @@ input[type=range] {
 
     .top-nav {
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
+        /* Reduced gap */
         align-items: stretch;
-        padding: 15px 0;
+        padding: 10px 0;
     }
 
-    .nav-left,
-    .nav-right {
+    .nav-left {
+        flex-direction: row;
         justify-content: space-between;
         width: 100%;
     }
 
+    .nav-right {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .font-controls {
+        flex-wrap: wrap;
+        /* Allow wrapping */
+        justify-content: center;
+        gap: 4px;
+        /* Smaller gap */
+    }
+
+    .select-group {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .dropbtn {
+        padding: 6px 8px;
+        /* Smaller padding for dropbtn */
+        font-size: 0.85rem;
+    }
+
     .problem-card {
-        margin: 20px auto;
-        padding: 40px 20px;
-        font-size: 1.4rem;
-        /* Smaller font on mobile */
+        margin: 10px auto;
+        padding: 30px 15px;
+        font-size: 1.2rem;
         min-height: 30vh;
     }
 
     .mode-bar {
-        padding: 5px 0 15px 0;
-        overflow-x: auto;
-        justify-content: flex-start;
-        /* Allow scroll if needed */
+        padding: 5px 0 10px 0;
+        width: 100%;
     }
 
     .mode-group {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* Smooth scrolling */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .mode-group::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari */
+    }
+
+    .mode-grid {
+        display: flex;
         flex-wrap: nowrap;
-        /* Prevent wrapping, allow scroll */
+        gap: 4px;
     }
 
     .btn-mode {
-        padding: 8px 16px;
-        /* Reduce padding */
-        font-size: 0.9rem;
+        padding: 8px 14px;
+        font-size: 0.85rem;
         white-space: nowrap;
+        flex: 0 0 auto;
+        /* Prevent shrinking */
     }
 
     .bottom-bar {
         flex-direction: column;
-        gap: 15px;
-        text-align: center;
-        padding-bottom: 30px;
-        /* Safe area for mobile */
+        gap: 10px;
+        padding: 10px 0 20px 0;
     }
 
     .actions-right {
+        flex-direction: column;
+        /* Stack controls on mobile */
         width: 100%;
-        justify-content: space-between;
         gap: 10px;
+    }
+
+    .audio-controls,
+    .game-controls {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
     }
 
     /* Adjust Modal for Mobile */
@@ -1309,23 +1355,37 @@ input[type=range] {
         margin: 5vh auto;
         padding: 20px;
     }
+
+    .setting-grid {
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 columns on mobile instead of 4 */
+    }
 }
 
 /* Small Mobile (Max 480px) */
 @media (max-width: 480px) {
     .problem-card {
-        font-size: 1.2rem;
-        padding: 30px 15px;
+        font-size: 1.1rem;
+        padding: 20px 10px;
+    }
+
+    .btn-icon,
+    .btn-icon-text {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+        padding: 0 8px;
+        /* For icon-text */
     }
 
     .btn-pill,
     .btn-mode {
-        font-size: 0.85rem;
-        padding: 8px 12px;
+        font-size: 0.8rem;
+        padding: 6px 10px;
     }
 
-    .actions-right {
-        flex-wrap: wrap;
-        justify-content: center;
+    .setting-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 columns on very small screens */
     }
 }
