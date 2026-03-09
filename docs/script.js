@@ -493,7 +493,9 @@ levelSelect.addEventListener('change', () => {
 
 
 answerInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === ' ') {
+        // Prevent default spacebar behavior (scrolling or simply adding a space)
+        if (e.key === ' ') e.preventDefault();
         submitAnswer();
     }
 });
@@ -515,7 +517,11 @@ modeBtns.forEach(btn => {
             modeBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentMode = clickedMode;
-            displayProblem();
+            if (currentDayIndex !== -1) {
+                dayReset();
+            } else {
+                displayProblem();
+            }
         }
 
         // Always check to open settings for specific modes
