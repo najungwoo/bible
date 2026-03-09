@@ -74,7 +74,7 @@ function applyHintToContainer(container, hintPart, fullAnswer, isReference) {
                 // Update existing hint
                 const oldHintLength = node.textContent.length;
                 node.textContent = hintPart;
-                newContent.appendChild(node.cloneNode(true));
+                newContent.appendChild(node);
                 foundBlank = true;
 
                 // Update the remaining mask length
