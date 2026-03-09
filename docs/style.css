@@ -245,6 +245,7 @@ select option {
     cursor: pointer;
     font-size: 0.9rem;
     transition: background 0.2s;
+    white-space: pre-wrap;
 }
 
 .dropdown-item:hover {
