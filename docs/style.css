@@ -71,12 +71,14 @@
     --btn-primary-text: #FFFFFF;
 }
 
-[data-theme="dark"] .btn-icon {
+[data-theme="dark"] .btn-icon,
+[data-theme="dark"] .btn-icon-text {
     color: #FFFFFF;
     border-color: #555;
 }
 
-[data-theme="dark"] .btn-icon:hover {
+[data-theme="dark"] .btn-icon:hover,
+[data-theme="dark"] .btn-icon-text:hover {
     border-color: #FFFFFF;
 }
 
@@ -314,6 +316,29 @@ select option {
 }
 
 .btn-icon:hover {
+    color: #000000;
+    border-color: #000000;
+    background: #FFFFFF;
+}
+
+.btn-icon-text {
+    background: transparent;
+    border: 1px solid var(--border);
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    color: #000000;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.btn-icon-text:hover {
     color: #000000;
     border-color: #000000;
     background: #FFFFFF;

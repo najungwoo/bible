@@ -20,6 +20,7 @@ var failNum = 0;
 var wrongVerses = [];
 var hintCount = 0;
 var score = 0;
+var maxAttempts = 3; // Number of chances
 console.log('hintCount initialized:', hintCount);
 
 
@@ -35,6 +36,10 @@ const btnHint = document.getElementById('btnHint');
 const btnSkip = document.getElementById('btnSkip');
 const btnWrong = document.getElementById('btnWrong');
 const modeBtns = document.querySelectorAll('.btn-mode')
+const btnChancesSettings = document.getElementById('btnChancesSettings');
+const chancesSettingsModal = document.getElementById('chancesSettingsModal');
+const closeChancesSettings = document.getElementById('closeChancesSettings');
+const chancesCountText = document.getElementById('chancesCountText');
 
 let tempVerses = [];
 
@@ -53,7 +58,14 @@ function initData() {
     // 3. Populate Day Dropdown
     updateDaySelect();
 
-    // 4. Select Initial Day (if exists)
+    // 4. Load maxAttempts
+    const savedAttempts = localStorage.getItem('bible_max_attempts');
+    if (savedAttempts) {
+        maxAttempts = savedAttempts === 'infinite' ? 'infinite' : parseInt(savedAttempts, 10);
+    }
+    updateChancesText();
+
+    // 5. Select Initial Day (if exists)
     if (originalScriptures.length > 0) {
         daySelect.value = 0;
         selectDay(0);
@@ -294,7 +306,7 @@ function submitAnswer() {
         attempts++;
         answerInput.value = "";
         answerInput.placeholder = "정답 입력..."; // Reset hint if wrong? Or keep hint? Usually reset input state.
-        if (attempts >= 3) {
+        if (maxAttempts !== 'infinite' && attempts >= maxAttempts) {
             handleWrongAnswer();
         } else {
             score -= 1;
@@ -515,6 +527,66 @@ modeBtns.forEach(btn => {
             wholeSettingsModal.style.display = 'flex';
         }
     });
+});
+
+// --- Chances Settings Logic ---
+function updateChancesText() {
+    if (chancesCountText) {
+        chancesCountText.textContent = maxAttempts === 'infinite' ? '무제한' : `${maxAttempts}번`;
+    }
+}
+
+function updateChancesGridActive() {
+    const options = document.querySelectorAll('#chancesGrid .btn-option');
+    options.forEach(opt => {
+        if (opt.dataset.chances === String(maxAttempts)) {
+            opt.classList.add('active');
+        } else {
+            opt.classList.remove('active');
+        }
+    });
+}
+
+if (btnChancesSettings) {
+    btnChancesSettings.addEventListener('click', () => {
+        updateChancesGridActive();
+        if (chancesSettingsModal) {
+            chancesSettingsModal.style.display = 'flex';
+        }
+    });
+}
+
+if (closeChancesSettings) {
+    closeChancesSettings.addEventListener('click', () => {
+        if (chancesSettingsModal) {
+            chancesSettingsModal.style.display = 'none';
+        }
+    });
+}
+
+document.querySelectorAll('#chancesGrid .btn-option').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const value = e.target.dataset.chances;
+        maxAttempts = value === 'infinite' ? 'infinite' : parseInt(value, 10);
+        localStorage.setItem('bible_max_attempts', maxAttempts);
+        updateChancesText();
+
+        // Highlight selection
+        document.querySelectorAll('#chancesGrid .btn-option').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+
+        setTimeout(() => {
+            if (chancesSettingsModal) {
+                chancesSettingsModal.style.display = 'none';
+            }
+        }, 300);
+    });
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === chancesSettingsModal) {
+        chancesSettingsModal.style.display = 'none';
+    }
 });
 
 

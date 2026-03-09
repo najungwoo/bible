@@ -57,6 +57,8 @@
                     <button id="btnFullscreen" class="btn-icon">⛶</button>
                     <button id="btnBackground" class="btn-icon" title="배경 테마">🎨</button>
                     <button id="btnTheme" class="btn-icon">🌙</button>
+                    <button id="btnChancesSettings" class="btn-icon-text" title="정답 기회 설정">❤️ <span
+                            id="chancesCountText">3번</span></button>
                     <button id="btnFontSettings" class="btn-icon" style="font-weight: 400;">Aa</button>
                     <button id="btnFontUp" class="btn-icon">A+</button>
                     <button id="btnFontDown" class="btn-icon">A-</button>
@@ -148,6 +150,20 @@
                 <button class="btn-option" data-words="3">3어절</button>
                 <button class="btn-option" data-words="4">4어절</button>
                 <button class="btn-option" data-words="5">5어절</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chances Settings Modal -->
+    <div id="chancesSettingsModal" class="modal">
+        <div class="modal-content setting-modal-content">
+            <span class="close" id="closeChancesSettings">&times;</span>
+            <h2>정답 기회 설정</h2>
+            <div class="setting-grid" id="chancesGrid">
+                <button class="btn-option" data-chances="1">1번</button>
+                <button class="btn-option" data-chances="3">3번</button>
+                <button class="btn-option" data-chances="5">5번</button>
+                <button class="btn-option" data-chances="infinite">무제한</button>
             </div>
         </div>
     </div>
