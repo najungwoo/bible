@@ -228,6 +228,12 @@ if (btnFullscreen) {
                 reqFullscreen.call(docElm).catch((e) => {
                     console.error(`Error attempting to enable full-screen mode: ${e.message} (${e.name})`);
                 });
+            } else {
+                if (typeof customAlert === 'function') {
+                    customAlert("아이폰(iOS) 브라우저에서는 전체화면 버튼 기능이 지원되지 않습니다.\\n대신 하단의 [공유] ➔ [홈 화면에 추가]를 눌러 전체화면 앱처럼 사용해 보세요!");
+                } else {
+                    alert("아이폰(iOS) 브라우저에서는 전체화면 버튼 기능이 지원되지 않습니다.\\n대신 하단의 [공유] ➔ [홈 화면에 추가]를 눌러 전체화면 앱처럼 사용해 보세요!");
+                }
             }
         } else {
             if (exitFullscreen) {
