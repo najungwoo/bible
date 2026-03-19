@@ -1,9 +1,4 @@
-
-
-
-
 // --- Event Listeners ---
-
 daySelect.addEventListener('change', (e) => {
     const index = parseInt(e.target.value);
     if (!isNaN(index)) {
@@ -14,8 +9,6 @@ daySelect.addEventListener('change', (e) => {
 levelSelect.addEventListener('change', () => {
     dayReset();
 });
-
-
 
 answerInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -211,9 +204,6 @@ btnReset.addEventListener('click', () => {
     });
 });
 
-
-
-// Fullscreen Logic
 // Fullscreen Logic
 if (btnFullscreen) {
     btnFullscreen.addEventListener('click', () => {
@@ -271,8 +261,6 @@ function ensureFullscreen() {
 
 // --- Settings Popups Logic ---
 
-// --- Settings Popups Logic ---
-
 // Active State Updaters
 function updateBlankGridActive() {
     const currentRatio = Math.round(blankNum * 10);
@@ -293,13 +281,9 @@ function updateWholeGridActive() {
 
 // Handlers
 
-
 if (closeBlankSettings) {
     closeBlankSettings.addEventListener('click', () => blankSettingsModal.style.display = 'none');
 }
-
-
-
 
 if (closeWholeSettings) {
     closeWholeSettings.addEventListener('click', () => wholeSettingsModal.style.display = 'none');
@@ -358,8 +342,6 @@ function reloadCurrentProblem() {
     updateStatus(); // score doesn't change
 }
 
-
-// --- Dropdown Logic ---
 // --- Dropdown Logic ---
 
 levelDropdownItems.forEach(item => {
@@ -421,7 +403,6 @@ function updateDayDropdown() {
         dayDropContent.appendChild(item);
     });
 }
-
 
 // Initialize application
 initData();
