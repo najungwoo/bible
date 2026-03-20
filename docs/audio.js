@@ -2,19 +2,22 @@
 let isSpeaking = false;
 let repeatMode = 1; // 1, 3, 5, -1 (Infinite)
 let repeatTimeout = null;
+let ttsSpeed = 1.0;
 
 // UI Elements (Initialized in initAudio)
-let btnTTS, btnRepeat, voiceSelect, btnVoiceHelp;
+let btnTTS, btnRepeat, btnSpeed, voiceSelect, btnVoiceHelp;
 
 function initAudio() {
     btnTTS = document.getElementById('btnTTS');
     btnRepeat = document.getElementById('btnRepeat');
+    btnSpeed = document.getElementById('btnSpeed');
     voiceSelect = document.getElementById('voiceSelect');
     btnVoiceHelp = document.getElementById('btnVoiceHelp');
     const modalVoiceHelp = document.getElementById('voiceHelpModal');
     const btnCloseVoiceHelp = document.getElementById('btnCloseVoiceHelp');
 
     // Load saved settings
+    ttsSpeed = parseFloat(localStorage.getItem('bible-tts-speed')) || 1.0;
     populateVoices();
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
         window.speechSynthesis.onvoiceschanged = populateVoices;
@@ -73,6 +76,32 @@ function initAudio() {
                 btnRepeat.style.fontWeight = "";
             }
         });
+    }
+
+    if (btnSpeed) {
+        btnSpeed.innerHTML = `⏱️ ${ttsSpeed}x`;
+        const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+
+        btnSpeed.addEventListener('click', () => {
+            let idx = speeds.indexOf(ttsSpeed);
+            idx = (idx + 1) % speeds.length;
+            ttsSpeed = speeds[idx];
+            btnSpeed.innerHTML = `⏱️ ${ttsSpeed}x`;
+            localStorage.setItem('bible-tts-speed', ttsSpeed);
+
+            if (ttsSpeed !== 1.0) {
+                btnSpeed.style.color = "var(--accent-blue, #339AF0)";
+                btnSpeed.style.fontWeight = "bold";
+            } else {
+                btnSpeed.style.color = "";
+                btnSpeed.style.fontWeight = "";
+            }
+        });
+
+        if (ttsSpeed !== 1.0) {
+            btnSpeed.style.color = "var(--accent-blue, #339AF0)";
+            btnSpeed.style.fontWeight = "bold";
+        }
     }
 }
 
@@ -195,7 +224,7 @@ function speakCurrentVerse(remaining) {
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = 'ko-KR';
-    utterance.rate = 1.0;
+    utterance.rate = ttsSpeed;
 
     const allVoices = window.speechSynthesis.getVoices();
     const koVoices = allVoices.filter(v => v.lang.includes('ko'));
