@@ -343,7 +343,6 @@ function reloadCurrentProblem() {
 }
 
 // --- Dropdown Logic ---
-
 levelDropdownItems.forEach(item => {
     item.addEventListener('click', (e) => {
         // Prevent default anchor behavior
@@ -368,7 +367,6 @@ levelDropdownItems.forEach(item => {
 });
 
 // Removed dayDropBtn/dayDropContent from here (moved to top)
-
 function updateDayDropdown() {
     dayDropContent.innerHTML = ''; // Clear existing
 
