@@ -421,32 +421,36 @@ function replaceInContainer(container, answer, correct, isReference) {
                 // Skip any target mask immediately after the hint (underscores or chosung)
                 if (i + 1 < children.length && children[i + 1].nodeType === Node.TEXT_NODE) {
                     const nextText = children[i + 1].textContent;
+                    let consumed = false;
                     let afterTarget = nextText;
                     if (currentMode === 5 && !isReference) {
                         const hintLength = node.textContent.length;
                         const remainingMask = getRemainingChosungMask(answer, hintLength);
                         if (nextText.startsWith(remainingMask)) {
-                            i++;
+                            consumed = true;
                             afterTarget = nextText.substring(remainingMask.length);
                         }
                     } else if (isReference || currentMode === 3) {
                         const hintLength = node.textContent.length;
                         const remainingMask = getRemainingUnderscoresMask(answer, hintLength);
                         if (nextText.startsWith(remainingMask)) {
-                            i++;
+                            consumed = true;
                             afterTarget = nextText.substring(remainingMask.length);
                         } else if (nextText.match(/^_+/)) {
-                            i++;
+                            consumed = true;
                             afterTarget = nextText.replace(/^_+/, '');
                         }
                     } else {
                         if (nextText.match(/^_+/)) {
-                            i++; // Skip the underscore node (or modified node)
+                            consumed = true; // Skip the underscore node (or modified node)
                             afterTarget = nextText.replace(/^_+/, '');
                         }
                     }
-                    if (afterTarget) {
-                        newContent.appendChild(document.createTextNode(afterTarget));
+                    if (consumed) {
+                        i++;
+                        if (afterTarget) {
+                            newContent.appendChild(document.createTextNode(afterTarget));
+                        }
                     }
                 }
                 continue;
