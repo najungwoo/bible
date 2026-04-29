@@ -73,7 +73,13 @@ function updateStatus() {
 
 // 새로운 문제 표시 (랜덤 선택 및 화면 렌더링)
 function displayProblem() {
+    let wasSpeaking = false;
+    if (typeof isSpeaking !== 'undefined') {
+        wasSpeaking = isSpeaking;
+    }
+
     if (typeof stopTTS === 'function') stopTTS();
+    
     if (currentScripture.length === 0) {
         problemArea.innerHTML = '<p class="placeholder">모든 구절을 완료했습니다!</p>';
         answerInput.disabled = true;
@@ -105,6 +111,13 @@ function displayProblem() {
     renderProblem(refView, verseText);
     answerInput.value = "";
     answerInput.focus();
+
+    if (wasSpeaking && typeof speakCurrentVerse === 'function') {
+        // Automatically play the new verse if it was playing before
+        setTimeout(() => {
+            speakCurrentVerse();
+        }, 500);
+    }
 }
 
 // Keep focus on the input field when clicking anywhere else

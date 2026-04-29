@@ -3,6 +3,7 @@ let isSpeaking = false;
 let repeatMode = 1; // 1, 3, 5, -1 (Infinite)
 let repeatTimeout = null;
 let ttsSpeed = 1.0;
+let currentUtterance = null; // Track current utterance to prevent ghost events
 
 // UI Elements (Initialized in initAudio)
 let btnTTS, btnRepeat, btnSpeed, voiceSelect, btnVoiceHelp;
@@ -150,11 +151,20 @@ function populateVoices() {
 }
 
 function stopTTS() {
-    clearTimeout(repeatTimeout);
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-    }
     isSpeaking = false;
+    clearTimeout(repeatTimeout);
+    if (currentUtterance) {
+        currentUtterance.onend = null;
+        currentUtterance.onerror = null;
+    }
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.cancel();
+        // Send a dummy utterance to force flush the queue on Android WebViews
+        const dummy = new SpeechSynthesisUtterance('');
+        dummy.volume = 0;
+        window.speechSynthesis.speak(dummy);
+    }
     if (btnTTS) {
         btnTTS.classList.remove('active');
         btnTTS.style.color = "";
@@ -167,7 +177,7 @@ function speakCurrentVerse(remaining) {
 
     // Initial call
     if (remaining === undefined) {
-        stopTTS();
+        if (isSpeaking) stopTTS();
         remaining = repeatMode;
     }
 
@@ -223,6 +233,7 @@ function speakCurrentVerse(remaining) {
     const textToSpeak = (spokenReference ? spokenReference + ". " : "") + verse;
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    currentUtterance = utterance;
     utterance.lang = 'ko-KR';
     utterance.rate = ttsSpeed;
 
@@ -249,9 +260,11 @@ function speakCurrentVerse(remaining) {
     }
 
     utterance.onend = () => {
+        if (!isSpeaking) return; // Prevent continuing if stopped manually
         if (remaining === -1 || remaining > 1) {
             const nextRemaining = (remaining === -1) ? -1 : remaining - 1;
             repeatTimeout = setTimeout(() => {
+                if (!isSpeaking) return; // Double check before firing next
                 speakCurrentVerse(nextRemaining);
             }, 500);
         } else {
@@ -263,11 +276,11 @@ function speakCurrentVerse(remaining) {
     utterance.onerror = (e) => {
         if (e.error === 'interrupted' || e.error === 'canceled') return;
         console.error("TTS Error:", e);
+        if (!isSpeaking) return;
         isSpeaking = false;
         if (btnTTS) btnTTS.classList.remove('active');
     };
 
-    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
     isSpeaking = true;
     if (btnTTS) {
