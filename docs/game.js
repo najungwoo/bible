@@ -51,7 +51,8 @@ function dayReset() {
                     const verseLevel = parseInt(match[1], 10);
                     return verseLevel <= maxLevel;
                 }
-                return false;
+                // If no level prefix is provided, default to level 1
+                return 1 <= maxLevel;
             });
         }
         leftVerse = currentScripture.length;
