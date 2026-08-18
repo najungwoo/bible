@@ -4,9 +4,83 @@ let repeatMode = 1; // 1, 3, 5, -1 (Infinite)
 let repeatTimeout = null;
 let ttsSpeed = 1.0;
 let currentUtterance = null; // Track current utterance to prevent ghost events
+let ttsWarmedUp = false;     // 음성 엔진 예열 여부 (첫 재생 지연 방지)
+let startWatchdog = null;    // 재생이 시작되지 않을 때 자동 복구용 타이머
 
 // UI Elements (Initialized in initAudio)
 let btnTTS, btnRepeat, btnSpeed, voiceSelect, btnVoiceHelp;
+
+// 듣기 버튼 상태 표시 ('idle' | 'loading' | 'playing')
+function setTTSButtonState(state) {
+    if (!btnTTS) return;
+    if (state === 'playing') {
+        btnTTS.textContent = '정지 ⏹';
+        btnTTS.classList.add('active');
+    } else if (state === 'loading') {
+        btnTTS.textContent = '준비 중…';
+        btnTTS.classList.add('active');
+    } else {
+        btnTTS.textContent = '듣기 🔊';
+        btnTTS.classList.remove('active');
+        btnTTS.style.color = "";
+    }
+}
+
+// 음성 엔진 예열: 첫 터치 시 무음 발화를 한 번 보내 엔진을 미리 깨워둔다.
+// (안드로이드 TTS 서비스 바인딩 / iOS 사용자 제스처 요구사항 대응)
+function warmUpTTS() {
+    if (ttsWarmedUp || !('speechSynthesis' in window)) return;
+    ttsWarmedUp = true;
+    try {
+        const warm = new SpeechSynthesisUtterance(' ');
+        warm.volume = 0;
+        warm.lang = 'ko-KR';
+        window.speechSynthesis.speak(warm);
+    } catch (e) {
+        // 예열 실패는 무시 (실제 재생에는 영향 없음)
+    }
+}
+
+// 음성 목록이 준비된 뒤에 콜백 실행 (getVoices()는 비동기로 채워짐)
+function whenVoicesReady(callback) {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+        callback(voices);
+        return;
+    }
+
+    let done = false;
+    const finish = () => {
+        if (done) return;
+        done = true;
+        callback(window.speechSynthesis.getVoices());
+    };
+
+    window.speechSynthesis.addEventListener('voiceschanged', finish, { once: true });
+    setTimeout(finish, 1000); // 목록이 끝내 안 오면 기본 음성으로 진행
+}
+
+// 사용할 한국어 음성 선택 (네트워크 음성보다 기기 내장 음성을 우선)
+function pickKoreanVoice(voices) {
+    const koVoices = voices.filter(v => v.lang && v.lang.includes('ko'));
+    if (koVoices.length === 0) return null;
+
+    const savedURI = localStorage.getItem('bible-voice-uri');
+    if (savedURI) {
+        const saved = koVoices.find(v => v.voiceURI === savedURI);
+        if (saved) return saved;
+    }
+
+    // localService = 기기에 설치된 음성. 네트워크 음성은 첫 재생이 느리다.
+    const localVoices = koVoices.filter(v => v.localService);
+    const pool = localVoices.length > 0 ? localVoices : koVoices;
+
+    const maleVoice = pool.find(v =>
+        v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON')
+    );
+
+    return maleVoice || pool[0];
+}
 
 function initAudio() {
     btnTTS = document.getElementById('btnTTS');
@@ -23,6 +97,10 @@ function initAudio() {
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
         window.speechSynthesis.onvoiceschanged = populateVoices;
     }
+
+    // 첫 사용자 입력 시 음성 엔진 예열 (첫 듣기 재생이 늦게 나오는 문제 방지)
+    document.addEventListener('pointerdown', warmUpTTS, { once: true, capture: true });
+    document.addEventListener('keydown', warmUpTTS, { once: true, capture: true });
 
     // Event Listeners
     if (voiceSelect) {
@@ -143,9 +221,10 @@ function populateVoices() {
     });
 
     if (!foundSaved && !savedVoiceURI) {
-        const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
-        if (maleVoice) {
-            voiceSelect.value = maleVoice.voiceURI;
+        // 실제 재생에 쓰일 음성과 목록의 선택 상태를 일치시킨다
+        const defaultVoice = pickKoreanVoice(voices);
+        if (defaultVoice) {
+            voiceSelect.value = defaultVoice.voiceURI;
         }
     }
 }
@@ -153,25 +232,23 @@ function populateVoices() {
 function stopTTS() {
     isSpeaking = false;
     clearTimeout(repeatTimeout);
+    clearTimeout(startWatchdog);
     if (currentUtterance) {
+        currentUtterance.onstart = null;
         currentUtterance.onend = null;
         currentUtterance.onerror = null;
+        currentUtterance = null;
     }
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.pause();
+        // pause()를 쓰면 iOS/안드로이드 WebView에서 엔진이 일시정지 상태로 남아
+        // 다음 speak()이 큐에만 쌓이고 재생되지 않는다. cancel() 후 resume()으로 정리한다.
         window.speechSynthesis.cancel();
-        // Send a dummy utterance to force flush the queue on Android WebViews
-        const dummy = new SpeechSynthesisUtterance('');
-        dummy.volume = 0;
-        window.speechSynthesis.speak(dummy);
+        window.speechSynthesis.resume();
     }
-    if (btnTTS) {
-        btnTTS.classList.remove('active');
-        btnTTS.style.color = "";
-    }
+    setTTSButtonState('idle');
 }
 
-function speakCurrentVerse(remaining) {
+function speakCurrentVerse(remaining, isRetry) {
     // Access global variables from script.js
     if (!window.currentScripture || window.currentScripture.length === 0 || typeof window.problemNum === 'undefined') return;
 
@@ -181,8 +258,17 @@ function speakCurrentVerse(remaining) {
         remaining = repeatMode;
     }
 
+    // 버튼을 누른 즉시 반응을 보여준다 (엔진이 준비되는 동안 먹통처럼 보이지 않도록)
+    isSpeaking = true;
+    setTTSButtonState('loading');
+
     const line = window.currentScripture[window.problemNum];
-    if (!line) return;
+    if (!line) {
+        // 읽을 구절이 없으면 버튼이 '준비 중…'에서 멈추지 않도록 되돌린다
+        isSpeaking = false;
+        setTTSButtonState('idle');
+        return;
+    }
 
     let cleanLine = line;
     const levelMatch = line.match(/^(\d+)\\/);
@@ -232,60 +318,65 @@ function speakCurrentVerse(remaining) {
 
     const textToSpeak = (spokenReference ? spokenReference + ". " : "") + verse;
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    currentUtterance = utterance;
-    utterance.lang = 'ko-KR';
-    utterance.rate = ttsSpeed;
+    // 음성 목록이 아직 로드되지 않은 상태에서 speak()을 호출하면
+    // 엔진이 기본(네트워크) 음성을 고르면서 첫 재생이 크게 지연될 수 있다.
+    whenVoicesReady((voices) => {
+        if (!isSpeaking) return; // 준비되는 사이에 사용자가 정지를 눌렀다면 중단
 
-    const allVoices = window.speechSynthesis.getVoices();
-    const koVoices = allVoices.filter(v => v.lang.includes('ko'));
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        currentUtterance = utterance;
+        utterance.lang = 'ko-KR';
+        utterance.rate = ttsSpeed;
 
-    let targetVoice = null;
-
-    const savedURI = localStorage.getItem('bible-voice-uri');
-    if (savedURI) {
-        targetVoice = koVoices.find(v => v.voiceURI === savedURI);
-    }
-
-    if (!targetVoice) {
-        targetVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남자') || v.name.toUpperCase().includes('INJOON'));
-    }
-
-    if (!targetVoice && koVoices.length > 0) {
-        targetVoice = koVoices[0];
-    }
-
-    if (targetVoice) {
-        utterance.voice = targetVoice;
-    }
-
-    utterance.onend = () => {
-        if (!isSpeaking) return; // Prevent continuing if stopped manually
-        if (remaining === -1 || remaining > 1) {
-            const nextRemaining = (remaining === -1) ? -1 : remaining - 1;
-            repeatTimeout = setTimeout(() => {
-                if (!isSpeaking) return; // Double check before firing next
-                speakCurrentVerse(nextRemaining);
-            }, 500);
-        } else {
-            isSpeaking = false;
-            if (btnTTS) btnTTS.classList.remove('active');
+        const targetVoice = pickKoreanVoice(voices);
+        if (targetVoice) {
+            utterance.voice = targetVoice;
         }
-    };
 
-    utterance.onerror = (e) => {
-        if (e.error === 'interrupted' || e.error === 'canceled') return;
-        console.error("TTS Error:", e);
-        if (!isSpeaking) return;
-        isSpeaking = false;
-        if (btnTTS) btnTTS.classList.remove('active');
-    };
+        utterance.onstart = () => {
+            clearTimeout(startWatchdog);
+            if (isSpeaking) setTTSButtonState('playing');
+        };
 
-    window.speechSynthesis.speak(utterance);
-    isSpeaking = true;
-    if (btnTTS) {
-        btnTTS.classList.add('active');
-    }
+        utterance.onend = () => {
+            clearTimeout(startWatchdog);
+            if (!isSpeaking) return; // Prevent continuing if stopped manually
+            if (remaining === -1 || remaining > 1) {
+                const nextRemaining = (remaining === -1) ? -1 : remaining - 1;
+                repeatTimeout = setTimeout(() => {
+                    if (!isSpeaking) return; // Double check before firing next
+                    speakCurrentVerse(nextRemaining);
+                }, 500);
+            } else {
+                isSpeaking = false;
+                setTTSButtonState('idle');
+            }
+        };
+
+        utterance.onerror = (e) => {
+            clearTimeout(startWatchdog);
+            if (e.error === 'interrupted' || e.error === 'canceled') return;
+            console.error("TTS Error:", e);
+            if (!isSpeaking) return;
+            isSpeaking = false;
+            setTTSButtonState('idle');
+        };
+
+        // 일부 브라우저는 speak() 후에도 재생이 시작되지 않는 상태에 빠진다.
+        // 2초 안에 시작되지 않으면 큐를 비우고 한 번만 다시 시도한다.
+        clearTimeout(startWatchdog);
+        if (!isRetry) {
+            startWatchdog = setTimeout(() => {
+                if (!isSpeaking || window.speechSynthesis.speaking) return;
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.resume();
+                speakCurrentVerse(remaining, true);
+            }, 2000);
+        }
+
+        window.speechSynthesis.resume(); // 이전에 일시정지 상태로 남아 있는 경우 대비
+        window.speechSynthesis.speak(utterance);
+    });
 }
 
 // Auto-initialize if DOM is ready, or wait
