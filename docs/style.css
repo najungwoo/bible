@@ -1391,3 +1391,74 @@ input[type=range] {
         /* 2 columns on very small screens */
     }
 }
+
+/* ========================================
+   8. 모바일 키보드 모드
+   키보드가 올라오면 상단/하단 UI를 접어 말씀이 보이는 영역을 최대한 확보한다.
+   (body.keyboard-open 클래스는 script.js에서 visualViewport로 토글)
+   ======================================== */
+@media (max-width: 768px) {
+
+    /* 입력 중에는 필요 없는 요소를 숨긴다 (키보드를 내리면 즉시 복귀) */
+    body.keyboard-open .top-nav,
+    body.keyboard-open .mode-bar,
+    body.keyboard-open .status-left,
+    body.keyboard-open .voice-select,
+    body.keyboard-open #btnVoiceHelp,
+    body.keyboard-open #btnRepeat,
+    body.keyboard-open #btnSpeed,
+    body.keyboard-open #btnWrong,
+    body.keyboard-open #btnReset {
+        display: none !important;
+    }
+
+    /* 말씀 카드: 여백을 줄여 본문에 공간을 몰아준다 */
+    body.keyboard-open .main-container {
+        gap: 0;
+        padding-bottom: 0;
+    }
+
+    body.keyboard-open .problem-card {
+        margin: 0 auto;
+        padding: 14px 12px;
+        min-height: 0;
+    }
+
+    /* 입력창 */
+    body.keyboard-open .input-sect-container {
+        padding-bottom: 6px !important;
+    }
+
+    body.keyboard-open #answerInput {
+        padding: 10px 0;
+    }
+
+    /* 하단 바: 2줄(179px) → 1줄로 압축, 듣기/스킵/힌트만 남긴다 */
+    body.keyboard-open .bottom-bar {
+        flex-direction: row;
+        justify-content: center;
+        padding: 2px 0 6px 0;
+        gap: 0;
+    }
+
+    body.keyboard-open .actions-right {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        gap: 6px;
+    }
+
+    body.keyboard-open .audio-controls,
+    body.keyboard-open .game-controls {
+        width: auto;
+        gap: 6px;
+        padding: 0;
+    }
+
+    /* 남은 버튼은 터치하기 좋은 크기 유지 */
+    body.keyboard-open .bottom-bar .btn-text {
+        min-height: 44px;
+        padding: 0 14px;
+    }
+}

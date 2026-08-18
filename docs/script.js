@@ -402,5 +402,59 @@ function updateDayDropdown() {
     });
 }
 
+// --- 모바일 키보드 대응 ---
+// 키보드가 올라오면 상단 네비/모드바/하단 바를 접어 말씀 영역을 확보한다.
+// (실제 숨김 처리는 style.css의 body.keyboard-open 규칙)
+(function setupMobileKeyboardMode() {
+    const vv = window.visualViewport;
+    if (!vv) return; // 미지원 브라우저에서는 기존 동작 유지
+
+    // 주소창이 숨겨질 때의 높이 변화(약 60~100px)와 구분하기 위한 최소 임계값
+    const KEYBOARD_MIN_SHRINK = 120;
+    let baseHeight = vv.height;
+
+    const isMobileWidth = () => window.matchMedia('(max-width: 768px)').matches;
+
+    function update() {
+        if (!isMobileWidth()) {
+            document.body.classList.remove('keyboard-open');
+            baseHeight = vv.height;
+            return;
+        }
+
+        // 키보드가 닫힌 상태의 최대 높이를 기준으로 삼는다
+        if (vv.height > baseHeight) baseHeight = vv.height;
+
+        const isOpen = (baseHeight - vv.height) > KEYBOARD_MIN_SHRINK;
+        if (isOpen === document.body.classList.contains('keyboard-open')) return;
+
+        document.body.classList.toggle('keyboard-open', isOpen);
+
+        // 레이아웃이 바뀌었으니 지금 입력할 빈칸을 다시 화면 중앙으로
+        if (isOpen && typeof scrollToActiveBlank === 'function') {
+            scrollToActiveBlank();
+        }
+    }
+
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    window.addEventListener('resize', update); // 일부 브라우저는 visualViewport resize를 놓친다
+
+    // 입력창 포커스/블러 직후에도 한 번 더 확인 (키보드 애니메이션이 끝난 뒤 높이가 확정됨)
+    if (answerInput) {
+        answerInput.addEventListener('focus', () => setTimeout(update, 300));
+        answerInput.addEventListener('blur', () => setTimeout(update, 300));
+    }
+
+    // 화면 회전 시에는 기준 높이를 다시 잡는다
+    window.addEventListener('orientationchange', () => {
+        document.body.classList.remove('keyboard-open');
+        setTimeout(() => {
+            baseHeight = vv.height;
+            update();
+        }, 300);
+    });
+})();
+
 // Initialize application
 initData();
