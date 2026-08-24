@@ -1393,7 +1393,221 @@ input[type=range] {
 }
 
 /* ========================================
-   8. 모바일 키보드 모드
+   8. 암송 목록 패널 (열었다 닫는 사이드 탭)
+   ======================================== */
+.verse-panel-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--modal-overlay);
+    z-index: 1400;
+}
+
+.verse-panel-overlay.open {
+    display: block;
+}
+
+.verse-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    max-width: 88vw;
+    height: 100%;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s;
+}
+
+.verse-panel.open {
+    transform: translateX(0);
+    visibility: visible;
+}
+
+.verse-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.verse-panel-header h2 {
+    font-size: 1.15rem;
+    color: var(--text-main);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.verse-panel-sub {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    flex-shrink: 0;
+}
+
+.verse-panel-sub-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.verse-panel-mini {
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.verse-panel-switch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--text-main);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.verse-panel-switch input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-blue);
+    cursor: pointer;
+}
+
+.verse-panel-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.verse-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+}
+
+.verse-item:hover {
+    background: var(--accent-blue-soft);
+}
+
+.verse-check {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: var(--accent-blue);
+    cursor: pointer;
+}
+
+.verse-item-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.verse-item-ref {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.verse-item-text {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-sub);
+    word-break: keep-all;
+}
+
+/* 목록을 한눈에 보기 위해 본문을 2줄로 줄여서 표시 (기본값) */
+.verse-panel.compact .verse-item-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.verse-item-tag {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--border);
+    color: var(--text-sub);
+}
+
+/* 외움으로 표시한 구절 */
+.verse-item.mastered .verse-item-ref {
+    text-decoration: line-through;
+    color: var(--text-sub);
+}
+
+.verse-item.mastered .verse-item-text {
+    opacity: 0.5;
+}
+
+/* 이번 회차에 이미 푼 구절 */
+.verse-item.answered .verse-item-text {
+    opacity: 0.6;
+}
+
+/* 지금 풀고 있는 구절 */
+.verse-item.current {
+    background: var(--accent-blue-soft);
+    border-left: 3px solid var(--accent-blue);
+    padding-left: 15px;
+}
+
+.verse-panel-footer {
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.verse-panel-footer .btn-text {
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .verse-panel {
+        width: 92vw;
+        max-width: 92vw;
+    }
+
+    .verse-item {
+        padding: 14px 16px;
+    }
+}
+
+/* ========================================
+   9. 모바일 키보드 모드
    키보드가 올라오면 상단/하단 UI를 접어 말씀이 보이는 영역을 최대한 확보한다.
    (body.keyboard-open 클래스는 script.js에서 visualViewport로 토글)
    ======================================== */

@@ -11,7 +11,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="favicon.ico">
-    <link rel="stylesheet" href="style.css?v=47">
+    <link rel="stylesheet" href="style.css?v=49">
 </head>
 
 <body>
@@ -55,6 +55,7 @@
                 </div>
                 <button id="btnChancesSettings" class="btn-icon-text" title="정답 기회 설정">❤️ <span
                         id="chancesCountText">3번</span></button>
+                <button id="btnVerseList" class="btn-icon" title="암송 목록 보기" aria-label="암송 목록 보기">📋</button>
             </div>
 
             <div class="nav-right">
@@ -125,7 +126,29 @@
         </footer>
     </div>
 
-    <!-- Modals removed -->
+    <!-- 암송 목록 패널 -->
+    <div id="versePanelOverlay" class="verse-panel-overlay"></div>
+    <aside id="versePanel" class="verse-panel" aria-hidden="true" aria-label="암송 목록">
+        <div class="verse-panel-header">
+            <h2 id="versePanelTitle">암송 목록</h2>
+            <button id="btnCloseVersePanel" class="btn-icon" title="목록 닫기" aria-label="목록 닫기">✕</button>
+        </div>
+        <div class="verse-panel-sub">
+            <span id="versePanelCounts">전체 0 · 외움 0 · 출제 0</span>
+            <div class="verse-panel-sub-actions">
+                <button id="btnToggleVerseText" class="btn-text verse-panel-mini" title="본문을 한 줄 요약과 전체 보기로 전환합니다">본문
+                    펼치기</button>
+                <label class="verse-panel-switch" title="체크한 구절을 문제에서 제외합니다">
+                    <input type="checkbox" id="chkExcludeMastered" checked>
+                    외운 구절 제외
+                </label>
+            </div>
+        </div>
+        <div class="verse-panel-list" id="versePanelList"></div>
+        <div class="verse-panel-footer">
+            <button id="btnClearMastered" class="btn-text danger">이 일차 외움 표시 모두 해제</button>
+        </div>
+    </aside>
 
     <!-- Blank Settings Modal -->
     <div id="blankSettingsModal" class="modal">
@@ -291,15 +314,16 @@
 
     <script src="data.js?v=28"></script>
     <script src="audio.js?v=5"></script>
-    <script src="utils.js?v=1"></script>
+    <script src="utils.js?v=2"></script>
     <script src="ui.js?v=1"></script>
     <script src="theme.js?v=1"></script>
     <script src="fonts.js?v=3"></script>
     <script src="state.js?v=1"></script>
     <script src="dom.js?v=1"></script>
-    <script src="game.js?v=1"></script>
+    <script src="game.js?v=2"></script>
     <script src="hints.js?v=1"></script>
-    <script src="script.js?v=29"></script>
+    <script src="verselist.js?v=2"></script>
+    <script src="script.js?v=30"></script>
 </body>
 
 </html>

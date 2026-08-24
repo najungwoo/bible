@@ -58,6 +58,23 @@ function getRemainingUnderscoresMask(answer, hintLength) {
     return '_'.repeat(remaining);
 }
 
+// 데이터 한 줄을 장절/본문으로 분리 (예: "1\(요 5:39)^너희가..." -> {reference, verse})
+function parseVerseLine(line) {
+    let clean = line;
+    const levelMatch = line.match(/^(\d+)\\/);
+    if (levelMatch) {
+        clean = line.substring(levelMatch[0].length);
+    }
+
+    let [reference, verse] = clean.split('^');
+    if (!verse) {
+        verse = clean;
+        reference = '';
+    }
+
+    return { reference: reference.trim(), verse: verse.trim() };
+}
+
 // 성경 장절 파싱 (예: "(요 3:16)" -> ["요", "3", "16"])
 function parseRefParts(ref) {
     let s = ref.trim();

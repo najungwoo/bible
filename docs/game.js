@@ -55,6 +55,12 @@ function dayReset() {
                 return 1 <= maxLevel;
             });
         }
+
+        // 외움으로 표시한 구절은 출제에서 제외
+        if (typeof filterMasteredVerses === 'function') {
+            currentScripture = filterMasteredVerses(currentDayIndex, currentScripture);
+        }
+
         leftVerse = currentScripture.length;
     } else {
         currentScripture = [];
@@ -65,6 +71,8 @@ function dayReset() {
     score = 0;
     updateStatus();
     displayProblem();
+
+    if (typeof renderVersePanel === 'function') renderVersePanel();
 }
 
 // 상태 텍스트 업데이트 (남은 구절, 틀린 갯수, 점수)
@@ -82,8 +90,19 @@ function displayProblem() {
     if (typeof stopTTS === 'function') stopTTS();
     
     if (currentScripture.length === 0) {
-        problemArea.innerHTML = '<p class="placeholder">모든 구절을 완료했습니다!</p>';
+        let message = '모든 구절을 완료했습니다!';
+
+        // 모든 구절을 외움으로 표시해서 출제할 구절이 없는 경우 안내를 구분한다
+        if (typeof masteredCountForDay === 'function' && currentDayIndex !== -1) {
+            const counts = masteredCountForDay(currentDayIndex);
+            if (counts.total > 0 && counts.mastered === counts.total) {
+                message = '이 일차의 모든 구절을 외움으로 표시했습니다.<br>목록(📋)에서 체크를 해제하면 다시 출제됩니다.';
+            }
+        }
+
+        problemArea.innerHTML = `<p class="placeholder">${message}</p>`;
         answerInput.disabled = true;
+        if (typeof renderVersePanel === 'function') renderVersePanel();
         return;
     }
     answerInput.disabled = false;
@@ -113,6 +132,9 @@ function displayProblem() {
     answerInput.value = "";
     answerInput.focus();
 
+    // 목록이 열려 있으면 현재 구절 표시를 갱신
+    if (typeof isVersePanelOpen === 'function' && isVersePanelOpen()) renderVersePanel();
+
     if (wasSpeaking && typeof speakCurrentVerse === 'function') {
         // Automatically play the new verse if it was playing before
         setTimeout(() => {
@@ -124,7 +146,7 @@ function displayProblem() {
 // Keep focus on the input field when clicking anywhere else
 // (except when clicking buttons, selects, or modal overlays)
 document.addEventListener('click', (e) => {
-    const isInteractive = e.target.closest('button, select, .dropdown, .modal-content, input[type="range"], input[type="checkbox"]');
+    const isInteractive = e.target.closest('button, select, .dropdown, .modal-content, .verse-panel, input[type="range"], input[type="checkbox"]');
     if (!isInteractive && !problemCompleted && currentScripture.length > 0) {
         answerInput.focus();
     }
